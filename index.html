@@ -4,68 +4,35 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Sprint Capacity Dashboard</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"><\/script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#0f1117;--bg1:#161b27;--bg2:#1e2535;--bg3:#252d3d;
   --bdr:#2a3347;--bdr2:#3a4560;
   --t1:#e2e8f0;--t2:#8b97b0;--t3:#5a6580;
-  --green:#00d4aa;--g2:#00a87f;--gbg:rgba(0,212,170,.1);
-  --blue:#4da6ff;--bbg:rgba(77,166,255,.1);
-  --purple:#a78bfa;--pbg:rgba(167,139,250,.1);
-  --amber:#fbbf24;--abg:rgba(251,191,36,.1);
-  --red:#f87171;--rbg:rgba(248,113,113,.1);
+  --green:#00d4aa;--g2:#00a87f;--gbg:rgba(0,212,170,.12);
+  --blue:#4da6ff;--bbg:rgba(77,166,255,.12);
+  --purple:#a78bfa;--pbg:rgba(167,139,250,.12);
+  --amber:#fbbf24;--abg:rgba(251,191,36,.12);
+  --red:#f87171;--rbg:rgba(248,113,113,.12);
   --font:'DM Sans',system-ui,sans-serif;
-  --mono:'DM Mono','Fira Code',monospace;
+  --mono:'DM Mono',monospace;
 }
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono&display=swap');
-body{font-family:var(--font);background:var(--bg);color:var(--t1);min-height:100vh;font-size:14px;line-height:1.5}
-
-/* SCREENS */
-.screen{position:fixed;inset:0;background:var(--bg);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px}
-.screen.hide{display:none!important}
-.box{background:var(--bg1);border:1px solid var(--bdr2);border-radius:16px;padding:36px;width:520px;max-width:100%}
-.bh{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-.badge{background:var(--green);color:#000;font-size:11px;font-weight:700;padding:3px 9px;border-radius:4px;letter-spacing:.06em}
-.bt{font-size:20px;font-weight:500}
-.bs{font-size:13px;color:var(--t3);margin-bottom:22px;line-height:1.6}
-.sec-note{background:var(--gbg);border:1px solid rgba(0,212,170,.2);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--t2);margin-bottom:18px;line-height:1.6}
-.sec-note strong{color:var(--green);font-weight:500}
-.lbl{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
-.lbl a{color:var(--blue);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;text-decoration:none}
-.lbl a:hover{text-decoration:underline}
-.inp{width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--t1);font-family:var(--font);margin-bottom:14px}
-.inp:focus{outline:none;border-color:var(--green)}
-.inp::placeholder{color:var(--t3)}
-.inp.err{border-color:var(--red)}
-.emsg{font-size:12px;color:var(--red);margin:-8px 0 12px;display:none}
-.bigbtn{width:100%;background:var(--green);color:#000;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);transition:background .15s;display:flex;align-items:center;justify-content:center;gap:8px}
-.bigbtn:hover{background:var(--g2)}
-.bigbtn:disabled{opacity:.4;cursor:not-allowed}
-.foot-note{font-size:11px;color:var(--t3);margin-top:12px;text-align:center;line-height:1.6}
-.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.2);border-top-color:#000;border-radius:50%;animation:sp .7s linear infinite}
-.spin-w{display:inline-block;width:14px;height:14px;border:2px solid var(--bdr2);border-top-color:var(--green);border-radius:50%;animation:sp .7s linear infinite}
-@keyframes sp{to{transform:rotate(360deg)}}
-
-/* TOPBAR */
+body{font-family:var(--font);background:var(--bg);color:var(--t1);min-height:100vh;font-size:14px}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:var(--bg1);border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:100}
-.tl{display:flex;align-items:center;gap:10px}
+.tl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.badge{background:var(--green);color:#000;font-size:11px;font-weight:700;padding:3px 9px;border-radius:4px;letter-spacing:.06em}
 .pg-title{font-size:14px;font-weight:500;color:var(--t2)}
 .snd{color:var(--t1);font-weight:500}
-.team-tag{background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;font-size:11px;font-weight:500;padding:2px 10px;color:var(--t2)}
+.team-tag{background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;font-size:11px;padding:2px 10px;color:var(--t2)}
+.sync-ts{font-size:11px;color:var(--t3)}
 .tr{display:flex;align-items:center;gap:8px}
-.sts{font-size:12px;color:var(--t3)}
-.btn{background:var(--bg2);border:1px solid var(--bdr2);border-radius:6px;padding:5px 12px;font-size:12px;font-weight:500;color:var(--t1);cursor:pointer;font-family:var(--font);white-space:nowrap;transition:all .15s}
+.btn{background:var(--bg2);border:1px solid var(--bdr2);border-radius:6px;padding:5px 12px;font-size:12px;font-weight:500;color:var(--t1);cursor:pointer;font-family:var(--font);transition:all .15s}
 .btn:hover{background:var(--bg3)}
 .btn-g{background:var(--green);border-color:var(--green);color:#000;font-weight:600}
 .btn-g:hover{background:var(--g2)}
-.btn-r{border-color:var(--red);color:var(--red)}
-.btn-r:hover{background:var(--rbg)}
-.btn-blue{border-color:var(--blue);color:var(--blue)}
-.btn-blue:hover{background:var(--bbg)}
-
-/* MAIN */
 .main{padding:16px 20px;max-width:1440px;margin:0 auto}
 .sc{display:grid;grid-template-columns:2fr 1.1fr 1.1fr .9fr .9fr;gap:10px;background:var(--bg1);border:1px solid var(--bdr);border-radius:12px;padding:14px 18px;margin-bottom:16px}
 .field{display:flex;flex-direction:column;gap:4px}
@@ -76,10 +43,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);min-height:100
 .kpi{background:var(--bg1);border:1px solid var(--bdr);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden}
 .kbar{position:absolute;top:0;left:0;right:0;height:2px}
 .kl{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
-.kv{font-size:30px;font-weight:300;line-height:1;margin-bottom:3px}
+.kv{font-size:28px;font-weight:300;line-height:1;margin-bottom:3px}
 .ks{font-size:11px;color:var(--t3)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
 .card{background:var(--bg1);border:1px solid var(--bdr);border-radius:12px;padding:16px}
 .chd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:3px}
 .ctit{font-size:13px;font-weight:500}
@@ -92,673 +58,322 @@ td{padding:8px;border-bottom:1px solid var(--bdr);font-size:13px;vertical-align:
 tr:last-child td{border-bottom:none}
 tr.dr:hover td{background:var(--bg2)}
 .tr2 td{background:var(--bg2);font-weight:500;border-top:1px solid var(--bdr2)}
-.mc{display:flex;align-items:center;gap:7px}
-.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
-.ni{background:var(--bg2);border:1px solid var(--bdr);border-radius:4px;width:48px;padding:4px 6px;font-size:12px;color:var(--t1);font-family:var(--font);text-align:center}
+.ni{background:var(--bg2);border:1px solid var(--bdr);border-radius:4px;width:52px;padding:4px 6px;font-size:12px;color:var(--t1);font-family:var(--font);text-align:center}
 .ni:focus{outline:none;border-color:var(--green)}
-.netc{color:var(--green);font-weight:500}
-.overc{color:var(--red);font-weight:500}
-.rb{background:none;border:none;color:var(--t3);cursor:pointer;font-size:15px;padding:0;opacity:.5}
-.rb:hover{opacity:1;color:var(--red)}
-.pdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
-.pa{background:#22c55e}.pb2{background:#ef4444}.pw{background:#f59e0b}.po{background:#6b7280}.pu{background:#374151}
-.pbadge{font-size:10px;font-weight:500;padding:2px 6px;border-radius:20px;white-space:nowrap}
-.pb-av{background:var(--gbg);color:var(--green)}
-.pb-bz{background:var(--rbg);color:var(--red)}
-.pb-aw{background:var(--abg);color:var(--amber)}
-.pb-of{background:var(--bg3);color:var(--t3)}
-.addl{font-size:12px;color:var(--green);cursor:pointer;background:none;border:none;padding:0;font-family:var(--font);margin-top:8px;display:block;opacity:.8}
-.addl:hover{opacity:1}
-.sw{position:relative;margin-bottom:10px}
-.si{width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;font-size:13px;color:var(--t1);font-family:var(--font)}
-.si:focus{outline:none;border-color:var(--green)}
-.si::placeholder{color:var(--t3)}
-.sd{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--bg2);border:1px solid var(--bdr2);border-radius:8px;max-height:200px;overflow-y:auto;z-index:50;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
-.sdi{padding:9px 12px;cursor:pointer;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--bdr)}
-.sdi:last-child{border-bottom:none}
-.sdi:hover{background:var(--bg3)}
-.dor{display:grid;grid-template-columns:110px 110px 1fr 16px;gap:6px;align-items:center;margin-bottom:7px}
 .si2{background:var(--bg2);border:1px solid var(--bdr);border-radius:5px;padding:5px 7px;font-size:12px;color:var(--t1);font-family:var(--font);width:100%}
 .si2:focus{outline:none;border-color:var(--green)}
+.rb{background:none;border:none;color:var(--t3);cursor:pointer;font-size:15px;padding:0;opacity:.5}
+.rb:hover{opacity:1;color:var(--red)}
+.addl{font-size:12px;color:var(--green);cursor:pointer;background:none;border:none;padding:0;font-family:var(--font);margin-top:8px;display:block}
+.mc{display:flex;align-items:center;gap:7px}
+.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
+.netc{color:var(--green);font-weight:500}
+.overc{color:var(--red);font-weight:500}
+.dor{display:grid;grid-template-columns:110px 120px 1fr 16px;gap:6px;align-items:center;margin-bottom:7px}
 .clbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
-.cr{display:grid;grid-template-columns:1fr 54px 10px 54px 46px 16px;gap:5px;align-items:center;margin-bottom:9px}
-.cp{font-size:12px;font-weight:500;text-align:right;color:var(--blue)}
-.wbs-card{background:var(--bg1);border:1px solid var(--bdr);border-radius:12px;padding:16px;margin-bottom:12px}
-.wid{background:transparent;border:none;font-size:12px;color:var(--t3);font-family:var(--mono);width:80px;padding:0}
-.wid:focus{outline:none;border-bottom:1px solid var(--bdr2)}
-.wt{background:transparent;border:none;font-size:13px;color:var(--t1);font-family:var(--font);width:100%;padding:0}
-.wt:focus{outline:none;border-bottom:1px solid var(--bdr2)}
-.wt::placeholder{color:var(--t3)}
-.sel{background:var(--bg2);border:1px solid var(--bdr);border-radius:5px;padding:4px 6px;font-size:12px;color:var(--t1);font-family:var(--font);width:100%}
-.sel:focus{outline:none;border-color:var(--green)}
-.jira-link{font-size:11px;color:var(--blue);text-decoration:none;opacity:.7}
-.jira-link:hover{opacity:1}
-.hrs-pill{font-size:10px;background:var(--bg3);border-radius:20px;padding:1px 6px;color:var(--t3);margin-left:4px}
 .ar{margin-bottom:9px}
 .ar-hd{display:flex;justify-content:space-between;margin-bottom:3px;font-size:12px}
-.ar-bg{background:var(--bg3);border-radius:4px;height:5px;overflow:hidden}
+.ar-bg{background:var(--bg3);border-radius:4px;height:6px;overflow:hidden}
 .ar-fill{height:100%;border-radius:4px;transition:width .4s}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:8px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px}
 .cdl{font-size:10px;color:var(--t3);text-align:center;padding:2px 0;font-weight:600}
-.cd{font-size:10px;text-align:center;padding:4px 1px;border-radius:3px;color:var(--t3)}
+.cd{font-size:10px;text-align:center;padding:5px 2px;border-radius:4px}
 .cd.work{background:var(--bg3);color:var(--t2)}
 .cd.off{background:var(--rbg);color:var(--red)}
 .cd.today{background:var(--gbg);color:var(--green);font-weight:600}
-.sync-bar{background:var(--bbg);border:1px solid rgba(77,166,255,.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--t2)}
-.sync-bar strong{color:var(--blue);font-weight:500}
-::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:10px}
+.wbs-card{background:var(--bg1);border:1px solid var(--bdr);border-radius:12px;padding:16px;margin-bottom:12px}
+.jkey{font-family:var(--mono);font-size:12px;color:var(--t3)}
+.s-done{color:var(--green)}.s-prog{color:var(--blue)}.s-open{color:var(--t3)}.s-blok{color:var(--red)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:10px}
 </style>
 </head>
 <body>
-
-<!-- AUTH SCREEN -->
-<div class="screen" id="s-auth">
-  <div class="box">
-    <div class="bh"><span class="badge">WBS</span><span class="bt">Sprint Capacity Dashboard</span></div>
-    <p class="bs">Connect your Atlassian account. Your sprint data, team members, and issue hours load live from Jira.</p>
-    <div class="sec-note"><strong>&#128274; Secure.</strong> Your token stays in your browser only — never stored externally. This file contains zero names or org data.</div>
-    <div class="lbl">Atlassian email</div>
-    <input class="inp" id="a-email" type="email" placeholder="you@veradigm.com" autocomplete="email">
-    <div class="lbl">
-      API token
-      <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank">Get token &#8599;</a>
-    </div>
-    <input class="inp" id="a-token" type="password" placeholder="Paste your API token">
-    <div class="lbl">Jira project key</div>
-    <input class="inp" id="a-key" type="text" placeholder="e.g. WBS, MAV, AMGO" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
-    <div class="emsg" id="a-err">&#9888; Could not connect. Check your email, token, and project key.</div>
-    <button class="bigbtn" id="a-btn" onclick="doAuth()">Connect &amp; load sprint &#8594;</button>
-    <p class="foot-note">Token is used only to call <strong>veradigm.atlassian.net</strong> directly from your browser.<br>Each team member sets this up once — takes about 2 minutes.</p>
+<div class="topbar">
+  <div class="tl">
+    <span class="badge">WBS</span>
+    <span class="pg-title">Sprint Capacity &middot; <span class="snd" id="hdr-sprint"></span></span>
+    <span class="team-tag" id="hdr-team"></span>
+    <span class="sync-ts" id="sync-ts"></span>
+  </div>
+  <div class="tr">
+    <button class="btn btn-g" onclick="saveAll()">&#10003; Save changes</button>
   </div>
 </div>
-
-<!-- DASHBOARD -->
-<div id="dashboard" style="display:none">
-  <div class="topbar">
-    <div class="tl">
-      <span class="badge">WBS</span>
-      <span class="pg-title">Sprint Capacity &middot; <span class="snd" id="hdr-sprint">&mdash;</span></span>
-      <span class="team-tag" id="team-tag">—</span>
-    </div>
-    <div class="tr">
-      <span class="sts" id="saved-ts"></span>
-      <button class="btn btn-blue" id="sync-btn" onclick="syncFromJira()">&#8635; Sync Jira</button>
-      <button class="btn" onclick="resetSprint()">Reset sprint</button>
-      <button class="btn" id="pres-btn" onclick="refreshPresence()">&#9679; Presence</button>
-      <button class="btn btn-r" onclick="signOut()">Sign out</button>
-      <button class="btn btn-g" onclick="saveData()">Save</button>
-    </div>
+<div class="main">
+  <div class="sc">
+    <div class="field"><div class="fl">Sprint name</div><input class="fi" id="sprint-name" oninput="document.getElementById('hdr-sprint').textContent=this.value"></div>
+    <div class="field"><div class="fl">Start date</div><input class="fi" type="date" id="start-date" oninput="recalc()"></div>
+    <div class="field"><div class="fl">End date</div><input class="fi" type="date" id="end-date" oninput="recalc()"></div>
+    <div class="field"><div class="fl">Working days</div><input class="fi" type="number" id="work-days" min="1" max="30" oninput="recalc()"></div>
+    <div class="field"><div class="fl">Default hrs/day</div><input class="fi" type="number" id="hrs-day" min="1" max="12" oninput="recalc()"></div>
   </div>
-
-  <div class="main">
-    <div id="sync-notice" class="sync-bar" style="display:none">
-      <span><strong>Jira sync active</strong> &mdash; Sprint issues and subtask hours loaded from <span id="sync-project-label"></span>. Manual edits override Jira values.</span>
-      <button class="btn btn-blue" style="padding:3px 10px;font-size:11px" onclick="syncFromJira()">&#8635; Re-sync</button>
-    </div>
-
-    <div class="sc">
-      <div class="field"><div class="fl">Sprint name</div><input class="fi" id="sprint-name" oninput="document.getElementById('hdr-sprint').textContent=this.value"></div>
-      <div class="field"><div class="fl">Start date</div><input class="fi" type="date" id="start-date" oninput="recalc()"></div>
-      <div class="field"><div class="fl">End date</div><input class="fi" type="date" id="end-date" oninput="recalc()"></div>
-      <div class="field"><div class="fl">Working days</div><input class="fi" type="number" id="work-days" value="10" min="1" max="30" oninput="recalc()"></div>
-      <div class="field"><div class="fl">Default hrs/day</div><input class="fi" type="number" id="hrs-day" value="6" min="1" max="12" oninput="recalc()"></div>
-    </div>
-
-    <div class="kg">
-      <div class="kpi"><div class="kbar" style="background:var(--green)"></div><div class="kl">Net team hours</div><div class="kv" id="k-net">0</div><div class="ks">available this sprint</div></div>
-      <div class="kpi"><div class="kbar" style="background:var(--blue)"></div><div class="kl">Sprint completion</div><div class="kv" id="k-comp">0%</div><div class="ks" id="k-csub">0 done / 0 total</div></div>
-      <div class="kpi"><div class="kbar" style="background:var(--purple)"></div><div class="kl">Team size</div><div class="kv" id="k-size">0</div><div class="ks">active members</div></div>
-      <div class="kpi"><div class="kbar" style="background:var(--amber)"></div><div class="kl">Total PTO days</div><div class="kv" id="k-pto">0</div><div class="ks">personal + team days off</div></div>
-      <div class="kpi"><div class="kbar" style="background:var(--red)"></div><div class="kl">Capacity used</div><div class="kv" id="k-util">0%</div><div class="ks">assigned vs available</div></div>
-    </div>
-
-    <div class="two">
-      <div class="card">
-        <div class="chd"><div><div class="ctit">Team days off</div><div class="csub">Holidays &amp; recharge &mdash; deducted from everyone</div></div><span class="chip" id="tdo-chip">0 days off</span></div>
-        <div style="display:grid;grid-template-columns:110px 110px 1fr 16px;gap:6px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--bdr)">
-          <span class="clbl">Date</span><span class="clbl">Type</span><span class="clbl">Note</span><span></span>
-        </div>
-        <div id="tdo-list"></div>
-        <button class="addl" onclick="addTDO()">+ Add day off</button>
-      </div>
-      <div class="card">
-        <div class="chd"><div><div class="ctit">Sprint completion</div><div class="csub">Tickets done vs total per category</div></div><button class="btn" style="font-size:11px;padding:3px 9px" onclick="addCat()">+ Add</button></div>
-        <div id="comp-list"></div>
-      </div>
-    </div>
-
-    <div class="two">
-      <div class="card">
-        <div class="chd"><div><div class="ctit">Individual capacity</div><div class="csub">Net hrs = (working days &minus; days off &minus; PTO) &times; hrs/day</div></div><button class="btn btn-g" style="font-size:11px;padding:3px 9px" onclick="focusSearch()">+ Add member</button></div>
-        <div class="sw">
-          <input class="si" id="msearch" placeholder="Search Jira members..." oninput="searchMembers(this.value)" autocomplete="off">
-          <div class="sd" id="sdrop"></div>
-        </div>
-        <table>
-          <thead><tr><th>Member</th><th class="c">Hrs/day</th><th class="c">PTO</th><th class="c">Capacity</th><th class="c">Assigned</th><th class="c">Status</th><th></th></tr></thead>
-          <tbody id="mtbody"></tbody>
-          <tfoot><tr class="tr2"><td>Total</td><td></td><td class="c" id="t-pto">0</td><td class="c netc" id="t-cap">0</td><td class="c" id="t-asgn">0</td><td></td><td></td></tr></tfoot>
-        </table>
-        <button class="addl" onclick="focusSearch()">+ Add team member</button>
-      </div>
-      <div class="card">
-        <div class="chd" style="margin-bottom:10px">
-          <div class="ctit">Capacity by member</div>
-          <div style="display:flex;gap:10px;font-size:11px;color:var(--t3);align-items:center">
-            <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#374151;display:inline-block"></span>Gross</span>
-            <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:var(--green);display:inline-block"></span>Net</span>
-          </div>
-        </div>
-        <div id="chart-empty" style="text-align:center;padding:2rem 0;font-size:12px;color:var(--t3)">Add members to see chart</div>
-        <div id="chart-wrap" style="display:none;position:relative;width:100%"><canvas id="cap-chart" role="img" aria-label="Capacity by member"></canvas></div>
-      </div>
-    </div>
-
-    <div class="wbs-card">
-      <div class="chd" style="margin-bottom:12px">
-        <div>
-          <div class="ctit">WBS / Sprint issue tracker</div>
-          <div class="csub" style="margin-bottom:0">Auto-loaded from Jira active sprint with subtask hours rolled up. Edit freely — click Sync Jira to refresh.</div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-blue" style="font-size:11px;padding:3px 9px" onclick="syncFromJira()">&#8635; Sync Jira</button>
-          <button class="btn btn-g" style="font-size:11px;padding:3px 9px" onclick="addWBS()">+ Add item</button>
-        </div>
-      </div>
+  <div class="kg">
+    <div class="kpi"><div class="kbar" style="background:var(--green)"></div><div class="kl">Total capacity</div><div class="kv" id="k-cap">0</div><div class="ks">net team hours available</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--blue)"></div><div class="kl">Total assigned</div><div class="kv" id="k-asgn">0</div><div class="ks">hours from Jira issues</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--purple)"></div><div class="kl">Hours remaining</div><div class="kv" id="k-rem">0</div><div class="ks">estimated minus logged</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--amber)"></div><div class="kl">Capacity used</div><div class="kv" id="k-util">0%</div><div class="ks">assigned vs available</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--red)"></div><div class="kl">Days deducted</div><div class="kv" id="k-pto">0</div><div class="ks">PTO + team days off</div></div>
+  </div>
+  <div class="two">
+    <div class="card">
+      <div class="chd"><div><div class="ctit">Individual capacity</div><div class="csub">Net hrs = (working days &minus; team days off &minus; PTO) &times; hrs/day</div></div></div>
       <table>
         <thead><tr>
-          <th style="width:82px">Issue key</th>
-          <th>Summary</th>
-          <th style="width:155px">Assignee</th>
-          <th class="c" style="width:72px">Est. hrs</th>
-          <th class="c" style="width:72px">Logged</th>
-          <th style="width:120px">Status</th>
-          <th style="width:14px"></th>
+          <th>Member</th><th class="c">Hrs/day</th><th class="c">PTO days</th>
+          <th class="c">Net capacity</th><th class="c">Assigned</th><th class="c">Remaining</th>
         </tr></thead>
-        <tbody id="wbs-tbody"></tbody>
+        <tbody id="mtbody"></tbody>
         <tfoot><tr class="tr2">
-          <td colspan="3">Total</td>
-          <td class="c" id="wbs-est">0</td>
-          <td class="c" id="wbs-log">0</td>
-          <td colspan="2"></td>
+          <td>Total</td><td></td>
+          <td class="c" id="t-pto">0</td><td class="c netc" id="t-cap">0</td>
+          <td class="c" id="t-asgn">0</td><td class="c" id="t-rem">0</td>
         </tr></tfoot>
       </table>
     </div>
-
-    <div class="three">
-      <div class="card">
-        <div class="ctit" style="margin-bottom:3px">Sprint completion</div><div class="csub">Overall % done</div>
-        <div style="text-align:center;padding:16px 0"><div style="font-size:44px;font-weight:300" id="big-pct">0%</div><div style="font-size:12px;color:var(--t3)" id="big-sub">0 done / 0 total</div></div>
-        <div style="background:var(--bg3);border-radius:4px;height:5px;overflow:hidden"><div id="comp-bar" style="height:100%;background:var(--green);border-radius:4px;width:0%;transition:width .4s"></div></div>
+    <div class="card">
+      <div class="chd">
+        <div><div class="ctit">Team days off</div><div class="csub">Holidays, recharge &amp; company days &mdash; deducted from all members</div></div>
+        <span class="chip" id="tdo-chip">0 days</span>
       </div>
-      <div class="card">
-        <div class="ctit" style="margin-bottom:3px">Availability</div><div class="csub">Capacity used vs available per person</div>
-        <div id="avail-list" style="margin-top:8px"></div>
+      <div style="display:grid;grid-template-columns:110px 120px 1fr 16px;gap:6px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--bdr)">
+        <span class="clbl">Date</span><span class="clbl">Type</span><span class="clbl">Note</span><span></span>
       </div>
-      <div class="card">
-        <div class="ctit" style="margin-bottom:3px">Sprint calendar</div><div class="csub">Working days &amp; days off</div>
-        <div style="display:flex;gap:10px;margin-top:6px;font-size:10px;color:var(--t3)">
-          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:var(--bg3);display:inline-block"></span>Work</span>
-          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:var(--rbg);display:inline-block"></span>Off</span>
-          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:var(--gbg);display:inline-block"></span>Today</span>
-        </div>
-        <div class="cal-grid" id="cal-grid"></div>
-      </div>
+      <div id="tdo-list"></div>
+      <button class="addl" onclick="addTDO()">+ Add holiday / recharge / company day</button>
     </div>
   </div>
+  <div class="two">
+    <div class="card">
+      <div class="chd" style="margin-bottom:12px">
+        <div class="ctit">Burndown chart</div>
+        <div style="font-size:11px;color:var(--t3)"><span style="color:rgba(77,166,255,.7)">&#9472;&#9472;</span> Ideal &nbsp; <span style="color:#00d4aa">&#9472;&#9472;</span> Actual</div>
+      </div>
+      <div style="position:relative;width:100%;height:220px"><canvas id="burndown-chart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ctit" style="margin-bottom:3px">Assigned vs available</div>
+      <div class="csub">Per team member</div>
+      <div id="avail-list" style="margin-top:6px;margin-bottom:12px"></div>
+      <div style="position:relative;width:100%;height:160px"><canvas id="cap-chart"></canvas></div>
+    </div>
+  </div>
+  <div class="wbs-card">
+    <div class="chd" style="margin-bottom:12px">
+      <div><div class="ctit">Sprint issues &mdash; synced from Jira</div><div class="csub" style="margin-bottom:0">Est. hrs = subtask rollup via aggregatetimeoriginalestimate &middot; To refresh: ask Claude to sync Jira to Confluence</div></div>
+    </div>
+    <table>
+      <thead><tr>
+        <th style="width:78px">Issue</th><th style="width:58px">Type</th>
+        <th>Summary</th><th style="width:130px">Assignee</th>
+        <th class="c" style="width:68px">Est hrs</th>
+        <th class="c" style="width:68px">Logged</th>
+        <th class="c" style="width:68px">Remaining</th>
+        <th style="width:108px">Status</th>
+      </tr></thead>
+      <tbody id="issues-tbody"></tbody>
+      <tfoot><tr class="tr2">
+        <td colspan="4">Total</td>
+        <td class="c" id="i-est">0</td><td class="c" id="i-log">0</td>
+        <td class="c" id="i-rem">0</td><td></td>
+      </tr></tfoot>
+    </table>
+  </div>
+  <div class="card">
+    <div class="chd" style="margin-bottom:3px">
+      <div class="ctit">Sprint calendar</div>
+      <div style="display:flex;gap:12px;font-size:11px;color:var(--t3);align-items:center">
+        <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--bg3);margin-right:3px"></span>Work</span>
+        <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--rbg);margin-right:3px"></span>Day off</span>
+        <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--gbg);margin-right:3px"></span>Today</span>
+      </div>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
 </div>
-
 <script>
-const CLOUD = 'veradigm.atlassian.net';
-const AVC = ['#00d4aa','#4da6ff','#a78bfa','#f472b6','#fbbf24','#f87171','#34d399','#60a5fa','#fb923c','#e879f9'];
-const AVB = AVC.map(c => c + '22');
-
-let auth = null; // { email, token, key, header }
-let currentUser = null;
-let projectInfo = null;
-let members = [];
-let teamDays = [];
-let categories = [{label:'Features',done:0,total:0},{label:'Bug Fixes',done:0,total:0},{label:'Tech Debt',done:0,total:0}];
-let wbsItems = [];
-let presenceData = {};
-let chart = null;
-let searchTimer = null;
-let searchCache = {};
-let jiraRoster = []; // members pulled from Jira
-
-// ── API helpers ──────────────────────────────────────────────────
-async function jget(path) {
-  const r = await fetch(`https://${CLOUD}/rest/api/3${path}`, {
-    headers: { 'Authorization': auth.header, 'Accept': 'application/json' }
-  });
-  if (!r.ok) throw new Error(r.status);
-  return r.json();
-}
-async function aget(path) {
-  const r = await fetch(`https://${CLOUD}/rest/agile/1.0${path}`, {
-    headers: { 'Authorization': auth.header, 'Accept': 'application/json' }
-  });
-  if (!r.ok) throw new Error(r.status);
-  return r.json();
-}
-function secs2hrs(s) { return s ? Math.round(s / 3600 * 10) / 10 : 0; }
-
-// ── AUTH ─────────────────────────────────────────────────────────
-async function doAuth() {
-  const email = document.getElementById('a-email').value.trim();
-  const token = document.getElementById('a-token').value.trim();
-  const key   = document.getElementById('a-key').value.trim().toUpperCase();
-  if (!email || !token || !key) return;
-
-  const btn = document.getElementById('a-btn');
-  const err = document.getElementById('a-err');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spin"></span> Connecting...';
-  err.style.display = 'none';
-
-  auth = { email, token, key, header: 'Basic ' + btoa(email + ':' + token) };
-
-  try {
-    const [me, proj] = await Promise.all([
-      jget('/myself'),
-      jget(`/project/${key}`)
-    ]);
-    currentUser = { name: me.displayName, email: me.emailAddress, accountId: me.accountId };
-    projectInfo = { key: proj.key, name: proj.name, id: proj.id };
-
-    localStorage.setItem('wbs-auth', btoa(JSON.stringify({ email, token, key })));
-    showDashboard();
-  } catch(e) {
-    err.style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = 'Connect & load sprint →';
-    auth = null;
-  }
-}
-
-function signOut() {
-  if (!confirm('Sign out? Sprint data will be saved.')) return;
-  saveData();
-  localStorage.removeItem('wbs-auth');
-  auth = null; currentUser = null; projectInfo = null;
-  members = []; teamDays = []; wbsItems = []; presenceData = {}; jiraRoster = [];
-  document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('s-auth').classList.remove('hide');
-  document.getElementById('a-token').value = '';
-}
-
-// ── DASHBOARD INIT ────────────────────────────────────────────────
-async function showDashboard() {
-  document.getElementById('s-auth').classList.add('hide');
-  document.getElementById('dashboard').style.display = 'block';
-
-  document.getElementById('team-tag').textContent = projectInfo.name + ' (' + projectInfo.key + ')';
-  document.getElementById('sync-project-label').textContent = projectInfo.key;
-
-  loadSavedData();
-
-  // Load Jira roster and sprint in parallel
-  loadJiraRoster();
-  await syncFromJira(true); // silent first sync
-}
-
-// ── JIRA ROSTER ───────────────────────────────────────────────────
-async function loadJiraRoster() {
-  try {
-    // Get project members via role endpoint
-    const roles = await jget(`/project/${projectInfo.key}/role`);
-    const roleUrls = Object.values(roles);
-    const seen = new Set();
-    const people = [];
-
-    await Promise.all(roleUrls.map(async url => {
-      try {
-        const r = await fetch(url, { headers: { 'Authorization': auth.header, 'Accept': 'application/json' } });
-        if (!r.ok) return;
-        const data = await r.json();
-        (data.actors || []).forEach(a => {
-          if (a.type === 'atlassian-user-role-actor' && a.actorUser && !seen.has(a.actorUser.accountId)) {
-            seen.add(a.actorUser.accountId);
-            people.push({ name: a.displayName, email: '', accountId: a.actorUser.accountId });
-          }
-        });
-      } catch(e) {}
-    }));
-
-    jiraRoster = people;
-
-    // If no members yet, auto-populate from roster
-    if (members.length === 0 && people.length > 0) {
-      members = people.map(m => ({ ...m, hrs: parseInt(document.getElementById('hrs-day').value) || 6, pto: 0 }));
-      recalc();
-    }
-  } catch(e) {
-    console.warn('Could not load project roster:', e);
-  }
-}
-
-// ── JIRA SPRINT SYNC ──────────────────────────────────────────────
-async function syncFromJira(silent = false) {
-  const btn = document.getElementById('sync-btn');
-  if (!silent) { btn.innerHTML = '<span class="spin-w"></span> Syncing...'; btn.disabled = true; }
-
-  try {
-    // 1. Find board for project
-    const boards = await aget(`/board?projectKeyOrId=${projectInfo.key}&type=scrum`);
-    const board = (boards.values || [])[0];
-    if (!board) throw new Error('No scrum board found');
-
-    // 2. Get active sprint
-    const sprints = await aget(`/board/${board.id}/sprint?state=active`);
-    const sprint = (sprints.values || [])[0];
-    if (!sprint) { if (!silent) showSaved('No active sprint found'); return; }
-
-    // Update sprint config
-    document.getElementById('sprint-name').value = sprint.name;
-    document.getElementById('hdr-sprint').textContent = sprint.name;
-    if (sprint.startDate) document.getElementById('start-date').value = sprint.startDate.slice(0,10);
-    if (sprint.endDate) document.getElementById('end-date').value = sprint.endDate.slice(0,10);
-
-    // 3. Get all issues in sprint (non-subtasks)
-    const issues = await aget(`/board/${board.id}/sprint/${sprint.id}/issue?maxResults=100&fields=summary,assignee,subtasks,timetracking,aggregatetimeoriginalestimate,aggregatetimespent,status,issuetype`);
-
-    const parentIssues = (issues.issues || []).filter(i => !i.fields.issuetype?.subtask);
-
-    // Build WBS items — roll up subtask estimates
-    const newItems = parentIssues.map(issue => {
-      const f = issue.fields;
-      const estSecs = f.aggregatetimeoriginalestimate || 0;
-      const logSecs = f.aggregatetimespent || 0;
-      const estHrs = secs2hrs(estSecs);
-      const logHrs = secs2hrs(logSecs);
-      const assignee = f.assignee ? f.assignee.displayName : '';
-      const status = mapStatus(f.status?.statusCategory?.key);
-
-      // Add assignee to members if not already there
-      if (f.assignee && !members.find(m => m.accountId === f.assignee.accountId)) {
-        members.push({
-          name: f.assignee.displayName,
-          email: f.assignee.emailAddress || '',
-          accountId: f.assignee.accountId,
-          hrs: parseInt(document.getElementById('hrs-day').value) || 6,
-          pto: 0
-        });
-      }
-
-      return {
-        id: issue.key,
-        title: f.summary,
-        assignee,
-        hrs: estHrs,
-        logged: logHrs,
-        status,
-        subtaskCount: (f.subtasks || []).length,
-        jiraKey: issue.key
-      };
-    });
-
-    wbsItems = newItems;
-    document.getElementById('sync-notice').style.display = 'flex';
-
-    recalc();
-    renderAll();
-    if (!silent) showSaved('Synced from Jira ✓');
-  } catch(e) {
-    if (!silent) showSaved('Sync failed — ' + e.message);
-    console.error(e);
-  } finally {
-    if (!silent) { btn.innerHTML = '&#8635; Sync Jira'; btn.disabled = false; }
-  }
-}
-
-function mapStatus(categoryKey) {
-  if (categoryKey === 'done') return 'Done';
-  if (categoryKey === 'indeterminate') return 'In Progress';
-  if (categoryKey === 'new') return 'Planned';
-  return 'Planned';
-}
-
-// ── SAVE / LOAD ───────────────────────────────────────────────────
-function loadSavedData() {
-  const key = 'wbs-data-' + (projectInfo?.key || 'default');
-  const saved = JSON.parse(localStorage.getItem(key) || 'null');
-  if (saved) {
-    members = saved.members || [];
-    teamDays = saved.teamDays || [];
-    categories = saved.categories || defCats();
-    wbsItems = saved.wbsItems || [];
-    if (saved.sprintName) document.getElementById('sprint-name').value = saved.sprintName;
-    if (saved.startDate) document.getElementById('start-date').value = saved.startDate;
-    if (saved.endDate) document.getElementById('end-date').value = saved.endDate;
-    if (saved.workDays) document.getElementById('work-days').value = saved.workDays;
-    if (saved.hrsDay) document.getElementById('hrs-day').value = saved.hrsDay;
-  } else {
-    members = []; teamDays = []; categories = defCats(); wbsItems = [];
-    document.getElementById('sprint-name').value = '';
-    document.getElementById('start-date').value = '2026-04-15';
-    document.getElementById('end-date').value = '2026-04-29';
-    document.getElementById('work-days').value = 10;
-    document.getElementById('hrs-day').value = 6;
-  }
-  document.getElementById('hdr-sprint').textContent = document.getElementById('sprint-name').value || '—';
-  presenceData = {};
-  renderAll();
-}
-
-function saveData() {
-  if (!projectInfo) return;
-  localStorage.setItem('wbs-data-' + projectInfo.key, JSON.stringify({
-    members, teamDays, categories, wbsItems,
-    sprintName: document.getElementById('sprint-name').value,
-    startDate: document.getElementById('start-date').value,
-    endDate: document.getElementById('end-date').value,
-    workDays: document.getElementById('work-days').value,
-    hrsDay: document.getElementById('hrs-day').value,
-  }));
-  showSaved('Saved ✓');
-}
-
-function showSaved(msg) {
-  document.getElementById('saved-ts').textContent = msg + ' ' + new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-}
-
-function resetSprint() {
-  if (!confirm('Reset sprint data? Members kept.')) return;
-  teamDays = []; wbsItems = [];
-  categories = defCats();
-  members.forEach(m => m.pto = 0);
-  renderAll();
-}
-
-function defCats() { return [{label:'Features',done:0,total:0},{label:'Bug Fixes',done:0,total:0},{label:'Tech Debt',done:0,total:0}]; }
-
-// ── HELPERS ───────────────────────────────────────────────────────
+const SD={"team": "Webslingers", "projectKey": "WBS", "sprintName": "WBS 2026 Q2S2", "startDate": "2026-04-15", "endDate": "2026-04-29", "workDays": 10, "hrsPerDay": 6, "syncedAt": "2026-04-16T15:30:00Z", "members": [{"name": "Julia Lukas", "hrs": 6, "pto": 0}, {"name": "David Swiezy", "hrs": 6, "pto": 0}, {"name": "Jeremy Goodman", "hrs": 6, "pto": 0}, {"name": "Joi Hepler", "hrs": 6, "pto": 0}, {"name": "Matt Glick", "hrs": 6, "pto": 0}, {"name": "Suvarna Damarla", "hrs": 6, "pto": 0}, {"name": "Yudong He", "hrs": 6, "pto": 0}], "teamDays": [{"date": "2026-04-24", "type": "Recharge", "note": ""}], "issues": [{"key": "WBS-66", "type": "Task", "summary": "Migrate Daily Scrum Report Claude Skill from Azure DevOps to Jira", "assignee": "Yudong He", "est": 0, "logged": 2, "status": "Done", "subtasks": ""}, {"key": "WBS-63", "type": "Bug", "summary": "Bug 8867850: Practice Performance - Filter Search - Case Sensitive", "assignee": "Unassigned", "est": 1, "logged": 0, "status": "Open", "subtasks": "WBS-64 ✅ WBS-65 🔄"}, {"key": "WBS-52", "type": "Story", "summary": "Meta Tasks", "assignee": "Unassigned", "est": 32, "logged": 8, "status": "Open", "subtasks": "WBS-53 🔄"}, {"key": "WBS-50", "type": "Bug", "summary": "Bug 8867869: Practice Performance - AR Measures - 500 Internal Server Error", "assignee": "Yudong He", "est": 8, "logged": 2, "status": "Open", "subtasks": "WBS-54 ✅ WBS-55 📋"}, {"key": "WBS-45", "type": "Story", "summary": "Pract Perf: AR measures lookback - pass lookback parameter from UI", "assignee": "Unassigned", "est": 3, "logged": 0, "status": "Open", "subtasks": "WBS-56 ✅ WBS-57 ✅ WBS-58 ✅ WBS-59 📋"}, {"key": "WBS-39", "type": "Story", "summary": "PractPerf Single EOB - Spike - Research to gain understanding of requirements", "assignee": "Unassigned", "est": 20, "logged": 0, "status": "Open", "subtasks": "WBS-60 📋 WBS-61 🔄"}, {"key": "WBS-24", "type": "Story", "summary": "AR Measures Performance Tuning", "assignee": "Yudong He", "est": 20, "logged": 0, "status": "Open", "subtasks": "WBS-25 🔄 WBS-26 📋 WBS-27 📋"}, {"key": "WBS-14", "type": "Story", "summary": "26.1.1 Pract Perf Testing / Deployment DEV02", "assignee": "Unassigned", "est": 38, "logged": 0, "status": "Open", "subtasks": "8 subtasks (mixed)"}]};
+const AVC=['#00d4aa','#4da6ff','#a78bfa','#f472b6','#fbbf24','#f87171','#34d399','#60a5fa'];
+const AVB=AVC.map(c=>c+'22');
 function ini(n){return(n||'').trim().split(/\s+/).map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?'}
+let members,teamDays,issues,charts={};
+
+function load(){
+  const saved=JSON.parse(localStorage.getItem('wbs-'+SD.projectKey+'-'+SD.sprintName)||'null');
+  members=saved?saved.members:SD.members.map(m=>({...m}));
+  teamDays=saved?saved.teamDays:SD.teamDays.map(d=>({...d}));
+  issues=SD.issues.map(i=>({...i}));
+  document.getElementById('sprint-name').value=SD.sprintName;
+  document.getElementById('hdr-sprint').textContent=SD.sprintName;
+  document.getElementById('hdr-team').textContent=SD.team+' ('+SD.projectKey+')';
+  document.getElementById('start-date').value=SD.startDate;
+  document.getElementById('end-date').value=SD.endDate;
+  document.getElementById('work-days').value=SD.workDays;
+  document.getElementById('hrs-day').value=SD.hrsPerDay;
+  const ts=new Date(SD.syncedAt);
+  document.getElementById('sync-ts').textContent='Jira sync: '+ts.toLocaleDateString()+' '+ts.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  renderAll();
+}
+
+function saveAll(){
+  localStorage.setItem('wbs-'+SD.projectKey+'-'+SD.sprintName,JSON.stringify({members,teamDays}));
+  document.getElementById('sync-ts').textContent+=' · Saved ✓';
+}
+
 function wd(){return Math.max(1,parseInt(document.getElementById('work-days').value)||10)}
 function hd(){return Math.max(1,parseInt(document.getElementById('hrs-day').value)||6)}
 function tdo(){return teamDays.length}
 function cap(m){return Math.max(0,wd()-tdo()-m.pto)*m.hrs}
-function asgnFor(name){return wbsItems.filter(w=>w.assignee===name).reduce((a,w)=>a+(+w.hrs||0),0)}
-function focusSearch(){document.getElementById('msearch').focus()}
-function pdot(n){const p=presenceData[n];const mp={Available:'pa',Busy:'pb2',Away:'pw',DoNotDisturb:'pb2',Offline:'po'};return`<span class="pdot ${p?mp[p]||'pu':'pu'}" title="${p||'Unknown'}"></span>`}
-function pbadge(n){const p=presenceData[n];if(!p)return'<span style="font-size:11px;color:var(--t3)">-</span>';const mp={Available:['pb-av','Available'],Busy:['pb-bz','Busy'],Away:['pb-aw','Away'],DoNotDisturb:['pb-bz','DND'],Offline:['pb-of','Offline']};const[c,l]=mp[p]||['pb-of','?'];return`<span class="pbadge ${c}">${l}</span>`}
-function mopts(sel=''){return'<option value="">— Unassigned —</option>'+members.map(m=>`<option value="${m.name}"${m.name===sel?' selected':''}>${m.name}</option>`).join('')}
+function asgnFor(n){return issues.filter(i=>i.assignee===n).reduce((a,i)=>a+(+i.est||0),0)}
+function logFor(n){return issues.filter(i=>i.assignee===n).reduce((a,i)=>a+(+i.logged||0),0)}
 
-// ── MEMBERS ───────────────────────────────────────────────────────
-function renderMembers() {
-  const tb = document.getElementById('mtbody');
-  if (!members.length) {
-    tb.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--t3);font-style:italic;padding:16px 0">Members auto-load from Jira on sync, or search to add manually</td></tr>`;
-    document.getElementById('t-pto').textContent = 0;
-    document.getElementById('t-cap').textContent = 0;
-    document.getElementById('t-asgn').textContent = 0;
-    return;
-  }
-  tb.innerHTML = members.map((m,i) => {
-    const c=cap(m), a=asgnFor(m.name), over=a>c&&c>0;
-    return `<tr class="dr"><td><div class="mc">${pdot(m.name)}<div class="av" style="background:${AVB[i%AVB.length]};color:${AVC[i%AVC.length]}">${ini(m.name)}</div><span>${m.name}</span></div></td><td class="c"><input class="ni" type="number" min="1" max="12" value="${m.hrs}" oninput="members[${i}].hrs=Math.max(1,+this.value||6);recalc()"></td><td class="c"><input class="ni" type="number" min="0" value="${m.pto}" oninput="members[${i}].pto=Math.max(0,+this.value||0);recalc()"></td><td class="c ${over?'overc':'netc'}">${c}</td><td class="c ${over?'overc':''}">${a}${over?' ⚠':''}</td><td class="c">${pbadge(m.name)}</td><td><button class="rb" onclick="removeMember(${i})">×</button></td></tr>`;
+function renderMembers(){
+  document.getElementById('mtbody').innerHTML=members.map((m,i)=>{
+    const c=cap(m),a=asgnFor(m.name),l=logFor(m.name),rem=Math.max(0,a-l),over=a>c&&c>0;
+    return'<tr class="dr"><td><div class="mc"><div class="av" style="background:'+AVB[i%AVB.length]+';color:'+AVC[i%AVC.length]+'">'+ini(m.name)+'</div><span>'+m.name+'</span></div></td>'+
+    '<td class="c"><input class="ni" type="number" min="1" max="12" value="'+m.hrs+'" oninput="members['+i+'].hrs=Math.max(1,+this.value||6);recalc()"></td>'+
+    '<td class="c"><input class="ni" type="number" min="0" value="'+m.pto+'" oninput="members['+i+'].pto=Math.max(0,+this.value||0);recalc()"></td>'+
+    '<td class="c '+( over?'overc':'netc')+'">'+c+'</td>'+
+    '<td class="c">'+a+'</td>'+
+    '<td class="c" style="color:'+( rem>0?'var(--amber)':'var(--green)')+'">'+rem+'</td></tr>';
   }).join('');
-  document.getElementById('t-pto').textContent = members.reduce((a,m)=>a+m.pto,0);
-  document.getElementById('t-cap').textContent = members.reduce((a,m)=>a+cap(m),0);
-  document.getElementById('t-asgn').textContent = members.reduce((a,m)=>a+asgnFor(m.name),0);
+  const tp=members.reduce((a,m)=>a+m.pto,0);
+  const tc=members.reduce((a,m)=>a+cap(m),0);
+  const ta=members.reduce((a,m)=>a+asgnFor(m.name),0);
+  const tl=members.reduce((a,m)=>a+logFor(m.name),0);
+  document.getElementById('t-pto').textContent=tp;
+  document.getElementById('t-cap').textContent=tc;
+  document.getElementById('t-asgn').textContent=ta;
+  document.getElementById('t-rem').textContent=Math.max(0,ta-tl);
 }
 
-function addMember(u){if(members.find(m=>m.accountId===u.accountId))return;members.push({...u,hrs:hd(),pto:0});document.getElementById('msearch').value='';document.getElementById('sdrop').style.display='none';renderAll();}
-function removeMember(i){const n=members[i].name;members.splice(i,1);wbsItems.forEach(w=>{if(w.assignee===n)w.assignee='';});renderAll();}
-
-function searchMembers(q) {
-  clearTimeout(searchTimer);
-  const dd = document.getElementById('sdrop');
-  if (!q.trim()) { dd.style.display='none'; return; }
-  const lq = q.toLowerCase();
-  // Search local roster first
-  const local = jiraRoster.filter(u => u.name.toLowerCase().includes(lq) && !members.find(m=>m.accountId===u.accountId));
-  if (local.length) { showSearchDrop(local); return; }
-  // Then Jira API
-  dd.innerHTML = '<div style="padding:9px 12px;font-size:12px;color:var(--t3)"><span class="spin-w"></span> Searching...</div>';
-  dd.style.display = 'block';
-  searchTimer = setTimeout(async () => {
-    if (searchCache[q]) { showSearchDrop(searchCache[q]); return; }
-    try {
-      const data = await jget(`/user/search?query=${encodeURIComponent(q)}&maxResults=8`);
-      const res = (Array.isArray(data)?data:[]).filter(u=>u.accountType==='atlassian'&&!members.find(m=>m.accountId===u.accountId)).map(u=>({name:u.displayName,email:u.emailAddress||'',accountId:u.accountId}));
-      searchCache[q] = res;
-      showSearchDrop(res);
-    } catch(e) { dd.innerHTML = '<div style="padding:9px 12px;font-size:12px;color:var(--t3)">Search failed</div>'; }
-  }, 350);
-}
-
-function showSearchDrop(results) {
-  const dd = document.getElementById('sdrop');
-  if (!results.length) { dd.innerHTML = '<div style="padding:9px 12px;font-size:12px;color:var(--t3)">No members found</div>'; dd.style.display='block'; return; }
-  dd.innerHTML = results.map((u,i) => `<div class="sdi" onclick='addMember(${JSON.stringify(u).replace(/'/g,"&#39;")})'><div class="av" style="background:${AVB[i%AVB.length]};color:${AVC[i%AVC.length]};width:24px;height:24px;font-size:10px">${ini(u.name)}</div><div><div style="font-size:13px">${u.name}</div><div style="font-size:11px;color:var(--t3)">${u.email}</div></div></div>`).join('');
-  dd.style.display = 'block';
-}
-document.addEventListener('click', e => { if (!e.target.closest('.sw')) document.getElementById('sdrop').style.display='none'; });
-
-// ── DAYS OFF ──────────────────────────────────────────────────────
-function renderTDO() {
-  document.getElementById('tdo-list').innerHTML = teamDays.map((d,i) => `<div class="dor"><input type="date" class="si2" value="${d.date}" oninput="teamDays[${i}].date=this.value;recalc()"><select class="si2" oninput="teamDays[${i}].type=this.value"><option ${d.type==='Holiday'?'selected':''}>Holiday</option><option ${d.type==='Recharge'?'selected':''}>Recharge</option><option ${d.type==='Company'?'selected':''}>Company</option></select><input type="text" class="si2" value="${d.note}" placeholder="Note..." oninput="teamDays[${i}].note=this.value"><button class="rb" onclick="teamDays.splice(${i},1);renderTDO();recalc()">×</button></div>`).join('');
-  document.getElementById('tdo-chip').textContent = `${teamDays.length} day${teamDays.length!==1?'s':''} off`;
+function renderTDO(){
+  document.getElementById('tdo-list').innerHTML=teamDays.map((d,i)=>
+    '<div class="dor"><input type="date" class="si2" value="'+d.date+'" oninput="teamDays['+i+'].date=this.value;recalc()">'+
+    '<select class="si2" oninput="teamDays['+i+'].type=this.value"><option '+( d.type==='Holiday'?'selected':'')+'>Holiday</option><option '+( d.type==='Recharge'?'selected':'')+'>Recharge</option><option '+( d.type==='Company'?'selected':'')+'>Company</option></select>'+
+    '<input type="text" class="si2" value="'+( d.note||'')+'" placeholder="Note..." oninput="teamDays['+i+'].note=this.value">'+
+    '<button class="rb" onclick="teamDays.splice('+i+',1);renderTDO();recalc()">&#215;</button></div>'
+  ).join('');
+  document.getElementById('tdo-chip').textContent=teamDays.length+' day'+(teamDays.length!==1?'s':'');
 }
 function addTDO(){teamDays.push({date:'',type:'Holiday',note:''});renderTDO();recalc();}
 
-// ── COMPLETION ────────────────────────────────────────────────────
-function renderCats() {
-  document.getElementById('comp-list').innerHTML = categories.map((c,i) => `<div class="cr"><span style="font-size:13px">${c.label}</span><input class="ni" type="number" min="0" value="${c.done}" oninput="categories[${i}].done=Math.max(0,+this.value||0);recalc()"><span style="text-align:center;color:var(--t3)">/</span><input class="ni" type="number" min="0" value="${c.total}" oninput="categories[${i}].total=Math.max(0,+this.value||0);recalc()"><span class="cp" id="cp-${i}">0%</span><button class="rb" onclick="categories.splice(${i},1);renderCats();recalc()">×</button></div>`).join('');
-  recalcComp();
-}
-function addCat(){const l=prompt('Category name:');if(l){categories.push({label:l,done:0,total:0});renderCats();recalc();}}
-function recalcComp() {
-  let td=0,tt=0;
-  categories.forEach((c,i)=>{td+=c.done;tt+=c.total;const p=c.total>0?Math.round(c.done/c.total*100):0;const el=document.getElementById('cp-'+i);if(el)el.textContent=p+'%';});
-  const p=tt>0?Math.round(td/tt*100):0;
-  ['k-comp','big-pct'].forEach(id=>document.getElementById(id).textContent=p+'%');
-  ['k-csub','big-sub'].forEach(id=>document.getElementById(id).textContent=td+' done / '+tt+' total');
-  document.getElementById('comp-bar').style.width=p+'%';
-}
-
-// ── WBS TABLE ─────────────────────────────────────────────────────
-function renderWBS() {
-  const tb = document.getElementById('wbs-tbody');
-  tb.innerHTML = wbsItems.map((w,i) => {
-    const statCol = {Done:'color:var(--green)',InProgress:'color:var(--blue)','In Progress':'color:var(--blue)',Blocked:'color:var(--red)',Planned:'color:var(--t3)'}[w.status]||'color:var(--t3)';
-    const jiraUrl = w.jiraKey ? `<a class="jira-link" href="https://${CLOUD}/browse/${w.jiraKey}" target="_blank">&#8599;</a>` : '';
-    const subtaskNote = w.subtaskCount ? `<span class="hrs-pill">${w.subtaskCount} subtask${w.subtaskCount>1?'s':''}</span>` : '';
-    return `<tr class="dr">
-      <td><div style="display:flex;align-items:center;gap:4px"><input class="wid" value="${w.id}" oninput="wbsItems[${i}].id=this.value">${jiraUrl}</div></td>
-      <td><input class="wt" value="${w.title}" placeholder="Summary..." oninput="wbsItems[${i}].title=this.value">${subtaskNote}</td>
-      <td><select class="sel" onchange="wbsItems[${i}].assignee=this.value;recalc()">${mopts(w.assignee)}</select></td>
-      <td class="c"><input class="ni" type="number" min="0" step="0.5" value="${w.hrs}" oninput="wbsItems[${i}].hrs=Math.max(0,+this.value||0);recalc()"></td>
-      <td class="c" style="color:var(--t2)">${w.logged||0}</td>
-      <td><select class="sel" onchange="wbsItems[${i}].status=this.value" style="${statCol}">
-        <option ${w.status==='Planned'?'selected':''}>Planned</option>
-        <option ${w.status==='In Progress'?'selected':''}>In Progress</option>
-        <option ${w.status==='Done'?'selected':''}>Done</option>
-        <option ${w.status==='Blocked'?'selected':''}>Blocked</option>
-      </select></td>
-      <td><button class="rb" onclick="wbsItems.splice(${i},1);recalc()">×</button></td>
-    </tr>`;
+function renderIssues(){
+  const si={Done:'&#10003;','In Progress':'&#8635;',Open:'&#9492;',Blocked:'&#9888;'};
+  const sc={Done:'s-done','In Progress':'s-prog',Open:'s-open',Blocked:'s-blok'};
+  document.getElementById('issues-tbody').innerHTML=issues.map(iss=>{
+    const rem=Math.max(0,(iss.est||0)-(iss.logged||0));
+    return'<tr class="dr"><td><span class="jkey">'+iss.key+'</span></td>'+
+    '<td style="font-size:11px;color:var(--t3)">'+iss.type+'</td>'+
+    '<td style="font-size:12px">'+iss.summary+(iss.subtasks?'<div style="font-size:10px;color:var(--t3);margin-top:2px">'+iss.subtasks+'</div>':'')+'</td>'+
+    '<td style="font-size:12px">'+( iss.assignee||'Unassigned')+'</td>'+
+    '<td class="c">'+( iss.est||'&mdash;')+'</td>'+
+    '<td class="c" style="color:var(--t2)">'+( iss.logged||'&mdash;')+'</td>'+
+    '<td class="c" style="color:'+( rem>0?'var(--amber)':'var(--green)')+'">'+( rem||'&mdash;')+'</td>'+
+    '<td class="'+( sc[iss.status]||'s-open')+'">'+( si[iss.status]||'&#9492;')+' '+iss.status+'</td></tr>';
   }).join('');
-  document.getElementById('wbs-est').textContent = Math.round(wbsItems.reduce((a,w)=>a+(+w.hrs||0),0)*10)/10;
-  document.getElementById('wbs-log').textContent = Math.round(wbsItems.reduce((a,w)=>a+(+w.logged||0),0)*10)/10;
+  const te=issues.reduce((a,i)=>a+(+i.est||0),0);
+  const tl=issues.reduce((a,i)=>a+(+i.logged||0),0);
+  document.getElementById('i-est').textContent=te||'&mdash;';
+  document.getElementById('i-log').textContent=tl||'&mdash;';
+  document.getElementById('i-rem').textContent=Math.max(0,te-tl)||'&mdash;';
 }
 
-function addWBS(){
-  const last=wbsItems[wbsItems.length-1];
-  let nid=(projectInfo?projectInfo.key:'WBS')+'-?';
-  wbsItems.push({id:nid,title:'',assignee:'',hrs:0,logged:0,status:'Planned',subtaskCount:0});
-  recalc();
-}
-
-// ── AVAILABILITY ──────────────────────────────────────────────────
-function renderAvail() {
-  const el = document.getElementById('avail-list');
-  if (!members.length) { el.innerHTML='<div style="font-size:12px;color:var(--t3);text-align:center;padding:1rem 0">No members added</div>'; return; }
-  el.innerHTML = members.map(m => {
+function renderAvail(){
+  document.getElementById('avail-list').innerHTML=members.map(m=>{
     const c=cap(m),a=asgnFor(m.name),p=c>0?Math.min(100,Math.round(a/c*100)):0;
-    const col=p>90?'var(--red)':p>70?'var(--amber)':'var(--green)';
-    return `<div class="ar"><div class="ar-hd"><span style="color:var(--t2);font-size:12px">${m.name}</span><span style="color:var(--t3);font-size:11px">${a} / ${c} hrs (${p}%)</span></div><div class="ar-bg"><div class="ar-fill" style="width:${p}%;background:${col}"></div></div></div>`;
+    const col=p>100?'var(--red)':p>80?'var(--amber)':'var(--green)';
+    return'<div class="ar"><div class="ar-hd"><span style="color:var(--t2);font-size:12px">'+m.name+'</span><span style="color:var(--t3);font-size:11px">'+a+' / '+c+' hrs ('+p+'%)</span></div><div class="ar-bg"><div class="ar-fill" style="width:'+p+'%;background:'+col+'"></div></div></div>';
   }).join('');
 }
 
-// ── CALENDAR ──────────────────────────────────────────────────────
-function renderCal() {
-  const el=document.getElementById('cal-grid');
-  const s=new Date(document.getElementById('start-date').value),e=new Date(document.getElementById('end-date').value);
-  if(isNaN(s)||isNaN(e)){el.innerHTML='';return;}
+function renderCal(){
+  const s=new Date(document.getElementById('start-date').value);
+  const e=new Date(document.getElementById('end-date').value);
+  if(isNaN(s)||isNaN(e)){document.getElementById('cal-grid').innerHTML='';return;}
   const today=new Date();today.setHours(0,0,0,0);
   const off=new Set(teamDays.map(d=>d.date));
-  let h=['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>`<div class="cdl">${d}</div>`).join('');
-  const cur=new Date(s);for(let i=0;i<cur.getDay();i++)h+=`<div class="cd"></div>`;
-  while(cur<=e){const dow=cur.getDay(),iso=cur.toISOString().slice(0,10),isT=cur.getTime()===today.getTime(),isO=off.has(iso),isW=dow===0||dow===6;let c='cd';if(isT)c+=' today';else if(isO)c+=' off';else if(!isW)c+=' work';h+=`<div class="${c}">${cur.getDate()}</div>`;cur.setDate(cur.getDate()+1);}
-  el.innerHTML=h;
-}
-
-// ── CHART ─────────────────────────────────────────────────────────
-function updateChart() {
-  const wrap=document.getElementById('chart-wrap'),empty=document.getElementById('chart-empty');
-  if(!members.length){wrap.style.display='none';empty.style.display='block';if(chart){chart.destroy();chart=null;}return;}
-  empty.style.display='none';wrap.style.display='block';
-  wrap.style.height=Math.max(160,members.length*44+50)+'px';
-  if(chart)chart.destroy();
-  chart=new Chart(document.getElementById('cap-chart'),{type:'bar',data:{labels:members.map(m=>m.name),datasets:[{label:'Gross hrs',data:members.map(m=>wd()*m.hrs),backgroundColor:'#374151',borderRadius:3,borderSkipped:false},{label:'Net hrs',data:members.map(m=>cap(m)),backgroundColor:'#00d4aa',borderRadius:3,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.raw} hrs`}}},scales:{x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#5a6580',font:{size:11}}},y:{grid:{display:false},ticks:{color:'#8b97b0',font:{size:11}}}}}});
-}
-
-// ── PRESENCE ──────────────────────────────────────────────────────
-const PP=['Available','Away','Busy','Available','Available','Away','Busy','Available'];
-function refreshPresence(){
-  const btn=document.getElementById('pres-btn');btn.textContent='Loading...';btn.disabled=true;
-  setTimeout(()=>{members.forEach((m,i)=>{presenceData[m.name]=PP[i%PP.length];});btn.textContent='&#9679; Presence';btn.disabled=false;showSaved('Presence refreshed');renderMembers();},800);
-}
-
-// ── RECALC ────────────────────────────────────────────────────────
-function recalc() {
-  const tc=members.reduce((a,m)=>a+cap(m),0),ta=wbsItems.reduce((a,w)=>a+(+w.hrs||0),0),tp=members.reduce((a,m)=>a+m.pto,0)+tdo()*members.length,u=tc>0?Math.round(ta/tc*100):0;
-  document.getElementById('k-net').textContent=tc;document.getElementById('k-size').textContent=members.length;document.getElementById('k-pto').textContent=tp;document.getElementById('k-util').textContent=u+'%';
-  recalcComp();renderMembers();renderWBS();renderAvail();renderCal();updateChart();
-}
-function renderAll(){recalc();renderTDO();renderCats();}
-
-// ── AUTO LOGIN ────────────────────────────────────────────────────
-(async function init(){
-  const saved = localStorage.getItem('wbs-auth');
-  if (!saved) return;
-  try {
-    const {email,token,key} = JSON.parse(atob(saved));
-    auth = {email,token,key,header:'Basic '+btoa(email+':'+token)};
-    document.getElementById('a-email').value=email;
-    document.getElementById('a-token').value=token;
-    document.getElementById('a-key').value=key;
-    const [me,proj] = await Promise.all([jget('/myself'),jget(`/project/${key}`)]);
-    currentUser={name:me.displayName,email:me.emailAddress,accountId:me.accountId};
-    projectInfo={key:proj.key,name:proj.name,id:proj.id};
-    showDashboard();
-  } catch(e) {
-    localStorage.removeItem('wbs-auth');
-    auth=null;
+  let h=['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>'<div class="cdl">'+d+'</div>').join('');
+  const cur=new Date(s);
+  for(let i=0;i<cur.getDay();i++)h+='<div class="cd"></div>';
+  while(cur<=e){
+    const dow=cur.getDay(),iso=cur.toISOString().slice(0,10);
+    const isT=cur.getTime()===today.getTime(),isO=off.has(iso),isW=dow===0||dow===6;
+    let c='cd';
+    if(isT)c+=' today';else if(isO)c+=' off';else if(!isW)c+=' work';
+    h+='<div class="'+c+'" title="'+iso+'">'+cur.getDate()+'</div>';
+    cur.setDate(cur.getDate()+1);
   }
-})();
-</script>
+  document.getElementById('cal-grid').innerHTML=h;
+}
+
+function renderBurndown(){
+  const totalEst=issues.reduce((a,i)=>a+(+i.est||0),0);
+  const totalLog=issues.reduce((a,i)=>a+(+i.logged||0),0);
+  const s=new Date(SD.startDate),e=new Date(SD.endDate),today=new Date();
+  today.setHours(0,0,0,0);
+  const off=new Set(teamDays.map(d=>d.date));
+  const labels=[],workIdx=[];
+  const cur=new Date(s);let wi=0;
+  while(cur<=e){
+    const dow=cur.getDay(),iso=cur.toISOString().slice(0,10);
+    if(dow!==0&&dow!==6&&!off.has(iso)){
+      labels.push(cur.toLocaleDateString('en-US',{month:'numeric',day:'numeric'}));
+      if(cur<=today)workIdx.push(wi);
+      wi++;
+    }
+    cur.setDate(cur.getDate()+1);
+  }
+  const wdays=labels.length||1;
+  const ideal=labels.map((_,i)=>Math.round(totalEst*(1-(i/(wdays-1||1)))*10)/10);
+  const elap=workIdx.length;
+  const actual=labels.map((_,i)=>{
+    if(i>=elap)return null;
+    const burned=elap>1?(totalLog/elap)*i:0;
+    return Math.max(0,Math.round((totalEst-burned)*10)/10);
+  });
+  if(charts.bd)charts.bd.destroy();
+  charts.bd=new Chart(document.getElementById('burndown-chart'),{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'Ideal',data:ideal,borderColor:'rgba(77,166,255,.45)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:false,tension:0},
+      {label:'Actual',data:actual,borderColor:'#00d4aa',backgroundColor:'rgba(0,212,170,.08)',borderWidth:2,pointRadius:3,pointBackgroundColor:'#00d4aa',fill:true,tension:0,spanGaps:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.raw} hrs`}}},
+    scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5a6580',font:{size:10},maxTicksLimit:8}},
+    y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5a6580',font:{size:10}},min:0,title:{display:true,text:'Hrs remaining',color:'#5a6580',font:{size:10}}}}}
+  });
+}
+
+function renderCapChart(){
+  if(charts.cap)charts.cap.destroy();
+  charts.cap=new Chart(document.getElementById('cap-chart'),{
+    type:'bar',
+    data:{labels:members.map(m=>m.name),datasets:[
+      {label:'Capacity',data:members.map(m=>cap(m)),backgroundColor:'rgba(255,255,255,.08)',borderRadius:3,borderSkipped:false},
+      {label:'Assigned',data:members.map(m=>asgnFor(m.name)),backgroundColor:'#00d4aa',borderRadius:3,borderSkipped:false}
+    ]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.raw} hrs`}}},
+    scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5a6580',font:{size:10}}},
+    y:{grid:{display:false},ticks:{color:'#8b97b0',font:{size:10}}}}}
+  });
+}
+
+function recalc(){
+  const tc=members.reduce((a,m)=>a+cap(m),0);
+  const ta=issues.reduce((a,i)=>a+(+i.est||0),0);
+  const tl=issues.reduce((a,i)=>a+(+i.logged||0),0);
+  const tp=members.reduce((a,m)=>a+m.pto,0)+tdo()*members.length;
+  const u=tc>0?Math.round(ta/tc*100):0;
+  document.getElementById('k-cap').textContent=tc;
+  document.getElementById('k-asgn').textContent=ta;
+  document.getElementById('k-rem').textContent=Math.max(0,ta-tl);
+  document.getElementById('k-util').textContent=u+'%';
+  document.getElementById('k-pto').textContent=tp;
+  renderMembers();renderAvail();renderCal();renderBurndown();renderCapChart();
+}
+
+function renderAll(){renderTDO();renderIssues();recalc();}
+load();
+<\/script>
 </body>
 </html>
