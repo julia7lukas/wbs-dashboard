@@ -59,18 +59,21 @@ tr:last-child td{border-bottom:none}tr.dr:hover td{background:var(--bg2)}
 </head>
 <body>
 <div class="topbar">
-  <div class="tl">
-    <span class="badge">WBS</span>
-    <span class="pg-title">Sprint Capacity &middot; <span class="snd" id="hdr-sprint"></span></span>
-    <span class="team-tag" id="hdr-team"></span>
-    <span class="sync-ts" id="sync-ts"></span>
+  <div style="display:flex;flex-direction:column;gap:6px;flex:1">
+    <div class="tl">
+      <span class="badge" id="team-badge">WBS</span>
+      <span class="pg-title">Sprint Capacity &middot; <span class="snd" id="hdr-sprint"></span></span>
+      <span class="team-tag" id="hdr-team"></span>
+      <span class="sync-ts" id="sync-ts"></span>
+    </div>
+    <div id="team-selector" style="display:flex;gap:6px;flex-wrap:wrap"></div>
   </div>
   <div class="tr">
     <button id="refresh-btn" class="btn" onclick="refreshFromJira()">&#8635; Jira</button>
     <button class="btn btn-g" onclick="saveAll()">&#10003; Save changes</button>
   </div>
 </div>
- 
+
 <div class="main">
   <div class="sc">
     <div class="field"><div class="fl">Sprint name</div><input class="fi" id="sprint-name" oninput="document.getElementById('hdr-sprint').textContent=this.value"></div>
@@ -79,7 +82,7 @@ tr:last-child td{border-bottom:none}tr.dr:hover td{background:var(--bg2)}
     <div class="field"><div class="fl">Working days</div><input class="fi" type="number" id="work-days" min="1" max="30" oninput="recalc()"></div>
     <div class="field"><div class="fl">Default hrs/day</div><input class="fi" type="number" id="hrs-day" min="1" max="12" oninput="recalc()"></div>
   </div>
- 
+
   <div class="kg">
     <div class="kpi"><div class="kbar" style="background:var(--green)"></div><div class="kl">Total capacity</div><div class="kv" id="k-cap">0</div><div class="ks">net team hours available</div></div>
     <div class="kpi"><div class="kbar" style="background:var(--blue)"></div><div class="kl">Total assigned</div><div class="kv" id="k-asgn">0</div><div class="ks">hours from Jira issues</div></div>
@@ -87,7 +90,7 @@ tr:last-child td{border-bottom:none}tr.dr:hover td{background:var(--bg2)}
     <div class="kpi"><div class="kbar" style="background:var(--amber)"></div><div class="kl">Capacity used</div><div class="kv" id="k-util">0%</div><div class="ks">assigned vs available</div></div>
     <div class="kpi"><div class="kbar" style="background:var(--red)"></div><div class="kl">Days deducted</div><div class="kv" id="k-pto">0</div><div class="ks">PTO + team days off</div></div>
   </div>
- 
+
   <div class="two">
     <div class="card">
       <div class="chd"><div>
@@ -100,18 +103,19 @@ tr:last-child td{border-bottom:none}tr.dr:hover td{background:var(--bg2)}
           <th class="c">Hrs/day</th>
           <th class="c">PTO days</th>
           <th class="c">Net capacity</th>
-          <th></th>
+          <th class="c">Assigned</th>
+        
         </tr></thead>
         <tbody id="mtbody"></tbody>
         <tfoot><tr class="tr2">
           <td>Total</td><td></td>
-          <td class="c" id="t-pto">0</td>
-          <td class="c netc" id="t-cap">0</td>
-          <td></td>
+          <td class="c" id="t-pto" title="Total PTO days across all members">0</td>
+          <td class="c netc" id="t-cap" title="Total net capacity hours">0</td>
+          <td class="c" id="t-asgn" title="Total hours assigned from Jira subtasks" style="color:var(--blue)">0</td>
         </tr></tfoot>
       </table>
     </div>
- 
+
     <div class="card">
       <div class="chd">
         <div><div class="ctit">Team days off</div><div class="csub">Holidays, recharge &amp; company days &mdash; deducted from all members</div></div>
@@ -124,7 +128,7 @@ tr:last-child td{border-bottom:none}tr.dr:hover td{background:var(--bg2)}
       <button class="addl" onclick="addTDO()">+ Add holiday / recharge / company day</button>
     </div>
   </div>
- 
+
   <div class="two">
     <div class="card">
       <div class="chd" style="margin-bottom:12px">
@@ -140,7 +144,7 @@ tr:last-child td{border-bottom:none}tr.dr:hover td{background:var(--bg2)}
       <div style="position:relative;width:100%;height:160px"><canvas id="cap-chart"></canvas></div>
     </div>
   </div>
- 
+
   <div class="wbs-card">
     <div class="chd" style="margin-bottom:12px">
       <div>
@@ -160,7 +164,7 @@ tr:last-child td{border-bottom:none}tr.dr:hover td{background:var(--bg2)}
       </tr></tfoot>
     </table>
   </div>
- 
+
   <div class="card">
     <div class="chd" style="margin-bottom:3px">
       <div class="ctit">Sprint calendar</div>
@@ -173,7 +177,7 @@ tr:last-child td{border-bottom:none}tr.dr:hover td{background:var(--bg2)}
     <div class="cal-grid" id="cal-grid"></div>
   </div>
 </div>
- 
+
 <script src="dashboard.js"></script>
 </body>
 </html>
