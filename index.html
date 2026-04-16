@@ -4,366 +4,341 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WBS Sprint Capacity Dashboard</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"><\/script>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --bg:#0f1117;--bg1:#161b27;--bg2:#1e2535;--bg3:#252d3d;
-    --border:#2a3347;--border2:#3a4560;
-    --text:#e2e8f0;--text2:#8b97b0;--text3:#5a6580;
-    --green:#00d4aa;--green2:#00a87f;--green-bg:rgba(0,212,170,0.08);
-    --blue:#4da6ff;--blue-bg:rgba(77,166,255,0.08);
-    --purple:#a78bfa;--purple-bg:rgba(167,139,250,0.08);
-    --amber:#fbbf24;--amber-bg:rgba(251,191,36,0.08);
-    --red:#f87171;--red-bg:rgba(248,113,113,0.08);
-    --font:'DM Sans',system-ui,sans-serif;
-    --font-mono:'DM Mono','Fira Code',monospace;
-  }
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
-
-  body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5}
-
-  /* TOP BAR */
-  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:var(--bg1);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
-  .topbar-l{display:flex;align-items:center;gap:12px}
-  .wbs-badge{background:var(--green);color:#000;font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px;letter-spacing:.06em}
-  .page-title{font-size:14px;font-weight:500;color:var(--text2)}
-  .sprint-title{color:var(--text);font-weight:500}
-  .topbar-r{display:flex;align-items:center;gap:8px}
-  .saved-ts{font-size:12px;color:var(--text3);margin-right:4px}
-  .btn{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:500;color:var(--text);cursor:pointer;font-family:var(--font);transition:all .15s}
-  .btn:hover{background:var(--bg3);border-color:var(--border2)}
-  .btn-primary{background:var(--green);border-color:var(--green);color:#000;font-weight:600}
-  .btn-primary:hover{background:var(--green2);border-color:var(--green2)}
-  .btn-sm{padding:4px 10px;font-size:12px}
-  .btn-icon{padding:5px 10px;font-size:12px}
-
-  /* MAIN */
-  .main{padding:20px 24px;max-width:1400px;margin:0 auto}
-
-  /* SPRINT CONFIG */
-  .sprint-config{display:grid;grid-template-columns:2fr 1.2fr 1.2fr 1fr 1fr;gap:12px;background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:20px}
-  .field{display:flex;flex-direction:column;gap:5px}
-  .field-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
-  .field-input{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:14px;color:var(--text);font-family:var(--font);width:100%;transition:border-color .15s}
-  .field-input:focus{outline:none;border-color:var(--green)}
-
-  /* KPI GRID */
-  .kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
-  .kpi{background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;transition:border-color .2s}
-  .kpi:hover{border-color:var(--border2)}
-  .kpi-accent{position:absolute;top:0;left:0;right:0;height:2px}
-  .kpi-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
-  .kpi-value{font-size:32px;font-weight:300;color:var(--text);line-height:1;margin-bottom:4px}
-  .kpi-sub{font-size:12px;color:var(--text3)}
-
-  /* TWO COL */
-  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-
-  /* CARD */
-  .card{background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:18px}
-  .card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
-  .card-title{font-size:14px;font-weight:500;color:var(--text)}
-  .card-sub{font-size:12px;color:var(--text3);margin-bottom:14px}
-  .badge-chip{background:var(--bg3);border:1px solid var(--border);border-radius:20px;font-size:11px;padding:3px 9px;color:var(--text2)}
-
-  /* TABLE */
-  table{width:100%;border-collapse:collapse}
-  th{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;padding:0 10px 10px;text-align:left;border-bottom:1px solid var(--border)}
-  th.c,td.c{text-align:center}
-  th.r,td.r{text-align:right}
-  td{padding:9px 10px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text);vertical-align:middle}
-  tr:last-child td{border-bottom:none}
-  tr.data-row:hover td{background:var(--bg2)}
-  .total-row td{background:var(--bg2);font-weight:500;border-top:1px solid var(--border2);font-size:13px}
-
-  /* MEMBER ROW */
-  .member-cell{display:flex;align-items:center;gap:8px}
-  .avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
-  .member-name-input{background:transparent;border:none;font-size:13px;color:var(--text);font-family:var(--font);width:130px;padding:0}
-  .member-name-input:focus{outline:none;border-bottom:1px solid var(--border2)}
-  .member-name-input::placeholder{color:var(--text3)}
-  .mini-input{background:var(--bg2);border:1px solid var(--border);border-radius:5px;width:50px;padding:5px 8px;font-size:12px;color:var(--text);font-family:var(--font);text-align:center;transition:border-color .15s}
-  .mini-input:focus{outline:none;border-color:var(--green)}
-  .net-val{color:var(--green);font-weight:500;font-size:14px}
-  .over-val{color:var(--red);font-weight:500}
-  .remove-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0;line-height:1;opacity:.5;transition:opacity .15s}
-  .remove-btn:hover{opacity:1;color:var(--red)}
-
-  /* PRESENCE DOT */
-  .p-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
-  .p-available{background:#22c55e}
-  .p-busy{background:#ef4444}
-  .p-away{background:#f59e0b}
-  .p-dnd{background:#ef4444}
-  .p-offline{background:#6b7280}
-  .p-unknown{background:#374151}
-
-  /* SEARCH */
-  .search-wrap{position:relative;margin-bottom:12px}
-  .search-input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;color:var(--text);font-family:var(--font)}
-  .search-input:focus{outline:none;border-color:var(--green)}
-  .search-input::placeholder{color:var(--text3)}
-  .search-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;max-height:220px;overflow-y:auto;z-index:50;display:none;box-shadow:0 8px 24px rgba(0,0,0,.4)}
-  .search-item{padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
-  .search-item:last-child{border-bottom:none}
-  .search-item:hover{background:var(--bg3)}
-  .search-item-name{font-size:13px;color:var(--text)}
-  .search-item-email{font-size:11px;color:var(--text3)}
-  .add-link{font-size:12px;color:var(--green);cursor:pointer;background:none;border:none;padding:0;font-family:var(--font);margin-top:10px;display:block;opacity:.8}
-  .add-link:hover{opacity:1}
-
-  /* DAYS OFF */
-  .daysoff-row{display:grid;grid-template-columns:120px 120px 1fr 18px;gap:8px;align-items:center;margin-bottom:8px}
-  .small-input{background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:6px 8px;font-size:12px;color:var(--text);font-family:var(--font);width:100%}
-  .small-input:focus{outline:none;border-color:var(--green)}
-  .col-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
-
-  /* COMPLETION */
-  .completion-row{display:grid;grid-template-columns:1fr 60px 8px 60px 50px 18px;gap:6px;align-items:center;margin-bottom:10px}
-  .comp-label{font-size:13px;color:var(--text)}
-  .comp-sep{text-align:center;color:var(--text3)}
-  .comp-pct{font-size:12px;font-weight:500;text-align:right}
-
-  /* WBS TABLE */
-  .wbs-card{background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:16px}
-  .wbs-id-input{background:transparent;border:none;font-size:12px;color:var(--text3);font-family:var(--font-mono);width:80px;padding:0}
-  .wbs-id-input:focus{outline:none;border-bottom:1px solid var(--border2)}
-  .wbs-text-input{background:transparent;border:none;font-size:13px;color:var(--text);font-family:var(--font);width:100%;padding:0}
-  .wbs-text-input:focus{outline:none;border-bottom:1px solid var(--border2)}
-  .wbs-text-input::placeholder{color:var(--text3)}
-  .sel{background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-size:12px;color:var(--text);font-family:var(--font);width:100%}
-  .sel:focus{outline:none;border-color:var(--green)}
-  .status-badge{font-size:11px;font-weight:500;padding:3px 8px;border-radius:20px;white-space:nowrap;display:inline-block}
-  .s-planned{background:var(--purple-bg);color:var(--purple)}
-  .s-progress{background:var(--blue-bg);color:var(--blue)}
-  .s-done{background:var(--green-bg);color:var(--green)}
-  .s-blocked{background:var(--red-bg);color:var(--red)}
-
-  /* BOTTOM PANELS */
-  .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
-
-  /* AVAILABILITY BAR */
-  .avail-row{margin-bottom:10px}
-  .avail-header{display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px}
-  .avail-name{color:var(--text2)}
-  .avail-nums{color:var(--text3)}
-  .avail-bar-bg{background:var(--bg3);border-radius:4px;height:6px;overflow:hidden}
-  .avail-bar-fill{height:100%;border-radius:4px;transition:width .4s}
-
-  /* CALENDAR */
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px}
-  .cal-day-label{font-size:10px;color:var(--text3);text-align:center;padding:2px 0;font-weight:600}
-  .cal-day{font-size:11px;text-align:center;padding:4px 2px;border-radius:4px;color:var(--text2)}
-  .cal-day.work{background:var(--bg3);color:var(--text)}
-  .cal-day.off{background:var(--red-bg);color:var(--red)}
-  .cal-day.today{background:var(--green-bg);color:var(--green);font-weight:600}
-  .cal-day.weekend{color:var(--text3)}
-  .cal-legend{display:flex;gap:12px;margin-top:8px;font-size:11px}
-  .cal-legend span{display:flex;align-items:center;gap:4px;color:var(--text3)}
-  .leg-sq{width:10px;height:10px;border-radius:2px}
-
-  /* CHART */
-  .chart-wrap{position:relative;width:100%}
-
-  /* SCROLL */
-  ::-webkit-scrollbar{width:5px;height:5px}
-  ::-webkit-scrollbar-track{background:var(--bg)}
-  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
-
-  /* UPGRADE NOTICE */
-  .notice{background:var(--blue-bg);border:1px solid rgba(77,166,255,.2);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--text2);display:flex;gap:8px;align-items:flex-start}
-  .notice-icon{color:var(--blue);flex-shrink:0;margin-top:1px}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--bg1:#161b27;--bg2:#1e2535;--bg3:#252d3d;
+  --border:#2a3347;--border2:#3a4560;
+  --text:#e2e8f0;--text2:#8b97b0;--text3:#5a6580;
+  --green:#00d4aa;--green2:#00a87f;--green-bg:rgba(0,212,170,0.1);
+  --blue:#4da6ff;--blue-bg:rgba(77,166,255,0.1);
+  --purple:#a78bfa;--purple-bg:rgba(167,139,250,0.1);
+  --amber:#fbbf24;--amber-bg:rgba(251,191,36,0.1);
+  --red:#f87171;--red-bg:rgba(248,113,113,0.1);
+  --font:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono','Fira Code',monospace;
+}
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5}
+.setup{position:fixed;inset:0;background:var(--bg);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px}
+.setup-box{background:var(--bg1);border:1px solid var(--border2);border-radius:16px;padding:36px;width:500px;max-width:100%}
+.setup-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.wbs-badge{background:var(--green);color:#000;font-size:11px;font-weight:700;padding:3px 9px;border-radius:4px;letter-spacing:.06em}
+.setup-title{font-size:20px;font-weight:500}
+.setup-sub{font-size:13px;color:var(--text3);margin-bottom:28px}
+.setup-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+.team-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all .15s}
+.team-card:hover{border-color:var(--border2)}
+.team-card.selected{border-color:var(--green);background:var(--green-bg)}
+.team-card-name{font-size:14px;font-weight:500;margin-bottom:2px}
+.team-card-count{font-size:11px;color:var(--text2);margin-top:3px}
+.setup-btn{width:100%;background:var(--green);color:#000;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);transition:background .15s}
+.setup-btn:hover{background:var(--green2)}
+.setup-btn:disabled{opacity:.4;cursor:not-allowed}
+.setup-note{font-size:11px;color:var(--text3);text-align:center;margin-top:10px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:var(--bg1);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.topbar-l{display:flex;align-items:center;gap:10px}
+.team-sw{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--text2);cursor:pointer;font-family:var(--font)}
+.team-sw:hover{border-color:var(--border2);color:var(--text)}
+.page-title{font-size:14px;font-weight:500;color:var(--text2)}
+.snd{color:var(--text);font-weight:500}
+.topbar-r{display:flex;align-items:center;gap:8px}
+.sts{font-size:12px;color:var(--text3)}
+.btn{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:5px 12px;font-size:12px;font-weight:500;color:var(--text);cursor:pointer;font-family:var(--font);white-space:nowrap}
+.btn:hover{background:var(--bg3)}
+.btn-g{background:var(--green);border-color:var(--green);color:#000;font-weight:600}
+.btn-g:hover{background:var(--green2)}
+.main{padding:16px 20px;max-width:1440px;margin:0 auto}
+.sprint-config{display:grid;grid-template-columns:2fr 1.1fr 1.1fr .9fr .9fr;gap:10px;background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:16px}
+.field{display:flex;flex-direction:column;gap:4px}
+.fl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
+.fi{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:14px;color:var(--text);font-family:var(--font);width:100%}
+.fi:focus{outline:none;border-color:var(--green)}
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.kpi{background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden}
+.kpi-bar{position:absolute;top:0;left:0;right:0;height:2px}
+.kl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.kv{font-size:30px;font-weight:300;line-height:1;margin-bottom:3px}
+.ks{font-size:11px;color:var(--text3)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.card{background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:16px}
+.card-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:3px}
+.card-title{font-size:13px;font-weight:500}
+.card-sub{font-size:11px;color:var(--text3);margin-bottom:12px}
+.chip{background:var(--bg3);border:1px solid var(--border);border-radius:20px;font-size:11px;padding:2px 8px;color:var(--text2)}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;padding:0 8px 8px;text-align:left;border-bottom:1px solid var(--border)}
+th.c,td.c{text-align:center}
+td{padding:8px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr.dr:hover td{background:var(--bg2)}
+.trow td{background:var(--bg2);font-weight:500;border-top:1px solid var(--border2)}
+.mc{display:flex;align-items:center;gap:7px}
+.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
+.ni{background:var(--bg2);border:1px solid var(--border);border-radius:4px;width:48px;padding:4px 6px;font-size:12px;color:var(--text);font-family:var(--font);text-align:center}
+.ni:focus{outline:none;border-color:var(--green)}
+.netc{color:var(--green);font-weight:500}
+.overc{color:var(--red);font-weight:500}
+.rb{background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:0;opacity:.5}
+.rb:hover{opacity:1;color:var(--red)}
+.pdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+.pa{background:#22c55e}.pb2{background:#ef4444}.pw{background:#f59e0b}.po{background:#6b7280}.pu{background:#374151}
+.addl{font-size:12px;color:var(--green);cursor:pointer;background:none;border:none;padding:0;font-family:var(--font);margin-top:8px;display:block;opacity:.8}
+.addl:hover{opacity:1}
+.sw{position:relative;margin-bottom:10px}
+.si{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:13px;color:var(--text);font-family:var(--font)}
+.si:focus{outline:none;border-color:var(--green)}
+.si::placeholder{color:var(--text3)}
+.sd{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;max-height:200px;overflow-y:auto;z-index:50;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.si-item{padding:9px 12px;cursor:pointer;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border)}
+.si-item:last-child{border-bottom:none}
+.si-item:hover{background:var(--bg3)}
+.si-name{font-size:13px}.si-email{font-size:11px;color:var(--text3)}
+.dor{display:grid;grid-template-columns:110px 110px 1fr 16px;gap:6px;align-items:center;margin-bottom:7px}
+.si2{background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-size:12px;color:var(--text);font-family:var(--font);width:100%}
+.si2:focus{outline:none;border-color:var(--green)}
+.col-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.cr{display:grid;grid-template-columns:1fr 54px 10px 54px 46px 16px;gap:5px;align-items:center;margin-bottom:9px}
+.cp{font-size:12px;font-weight:500;text-align:right;color:var(--blue)}
+.wbs-card{background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px}
+.wid{background:transparent;border:none;font-size:12px;color:var(--text3);font-family:var(--mono);width:80px;padding:0}
+.wid:focus{outline:none;border-bottom:1px solid var(--border2)}
+.wt{background:transparent;border:none;font-size:13px;color:var(--text);font-family:var(--font);width:100%;padding:0}
+.wt:focus{outline:none;border-bottom:1px solid var(--border2)}
+.wt::placeholder{color:var(--text3)}
+.sel{background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:4px 6px;font-size:12px;color:var(--text);font-family:var(--font);width:100%}
+.sel:focus{outline:none;border-color:var(--green)}
+.ar{margin-bottom:9px}
+.ar-hd{display:flex;justify-content:space-between;margin-bottom:3px;font-size:12px}
+.ar-bg{background:var(--bg3);border-radius:4px;height:5px;overflow:hidden}
+.ar-fill{height:100%;border-radius:4px;transition:width .4s}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:8px}
+.cd-lbl{font-size:10px;color:var(--text3);text-align:center;padding:2px 0;font-weight:600}
+.cd{font-size:10px;text-align:center;padding:4px 1px;border-radius:3px;color:var(--text3)}
+.cd.work{background:var(--bg3);color:var(--text2)}
+.cd.off{background:var(--red-bg);color:var(--red)}
+.cd.today{background:var(--green-bg);color:var(--green);font-weight:600}
+.pbadge{font-size:10px;font-weight:500;padding:2px 6px;border-radius:20px;white-space:nowrap}
+.pb-av{background:var(--green-bg);color:var(--green)}
+.pb-bz{background:var(--red-bg);color:var(--red)}
+.pb-aw{background:var(--amber-bg);color:var(--amber)}
+.pb-of{background:var(--bg3);color:var(--text3)}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="topbar-l">
-    <span class="wbs-badge">WBS</span>
-    <span class="page-title">Sprint Capacity Dashboard &nbsp;·&nbsp; <span class="sprint-title" id="hdr-sprint">WBS 2026 Q2S2</span></span>
-  </div>
-  <div class="topbar-r">
-    <span class="saved-ts" id="saved-ts"></span>
-    <button class="btn btn-sm" onclick="resetAll()">Reset</button>
-    <button class="btn btn-sm" id="presence-btn" onclick="refreshPresence()">⟳ Refresh presence</button>
-    <button class="btn btn-primary btn-sm" onclick="saveSnap()">Save</button>
+<div class="setup" id="setup">
+  <div class="setup-box">
+    <div class="setup-header"><span class="wbs-badge">WBS</span><span class="setup-title">Sprint Capacity Dashboard</span></div>
+    <p class="setup-sub">Select your team to load your roster and get started. Your data saves automatically per team.</p>
+    <div class="setup-label">Select your team</div>
+    <div class="team-grid" id="team-grid"></div>
+    <button class="setup-btn" id="setup-btn" onclick="launchDashboard()" disabled>Launch dashboard &rarr;</button>
+    <p class="setup-note">Switch teams anytime from the top bar without losing your sprint data.</p>
   </div>
 </div>
 
-<div class="main">
-
-  <div class="notice">
-    <span class="notice-icon">ℹ</span>
-    <span><strong>Hosted version:</strong> Member search pulls from your Payerpath Confluence roster. Presence is a manual snapshot (click Refresh). Enable the Confluence HTML macro to embed this page directly with live presence auto-refresh every 30s.</span>
-  </div>
-
-  <!-- SPRINT CONFIG -->
-  <div class="sprint-config">
-    <div class="field">
-      <div class="field-label">Sprint name</div>
-      <input class="field-input" id="sprint-name" value="WBS 2026 Q2S2" oninput="document.getElementById('hdr-sprint').textContent=this.value">
+<div id="dashboard" style="display:none">
+  <div class="topbar">
+    <div class="topbar-l">
+      <span class="wbs-badge">WBS</span>
+      <span class="page-title">Sprint Capacity &middot; <span class="snd" id="hdr-sprint">&mdash;</span></span>
+      <button class="team-sw" onclick="switchTeam()">&hArr; Switch team</button>
     </div>
-    <div class="field">
-      <div class="field-label">Start date</div>
-      <input class="field-input" type="date" id="start-date" value="2026-04-15" oninput="recalc()">
-    </div>
-    <div class="field">
-      <div class="field-label">End date</div>
-      <input class="field-input" type="date" id="end-date" value="2026-04-29" oninput="recalc()">
-    </div>
-    <div class="field">
-      <div class="field-label">Working days</div>
-      <input class="field-input" type="number" id="work-days" value="10" min="1" max="30" oninput="recalc()">
-    </div>
-    <div class="field">
-      <div class="field-label">Default hrs/day</div>
-      <input class="field-input" type="number" id="hrs-day" value="6" min="1" max="12" oninput="recalc()">
+    <div class="topbar-r">
+      <span class="sts" id="saved-ts"></span>
+      <button class="btn" onclick="resetSprint()">Reset sprint</button>
+      <button class="btn" id="presence-btn" onclick="refreshPresence()">&#8635; Presence</button>
+      <button class="btn btn-g" onclick="saveData()">Save</button>
     </div>
   </div>
-
-  <!-- KPIs -->
-  <div class="kpi-grid">
-    <div class="kpi"><div class="kpi-accent" style="background:var(--green)"></div><div class="kpi-label">Net team hours</div><div class="kpi-value" id="k-net">0</div><div class="kpi-sub">available this sprint</div></div>
-    <div class="kpi"><div class="kpi-accent" style="background:var(--blue)"></div><div class="kpi-label">Sprint completion</div><div class="kpi-value" id="k-comp">0%</div><div class="kpi-sub" id="k-comp-sub">0 done / 0 total</div></div>
-    <div class="kpi"><div class="kpi-accent" style="background:var(--purple)"></div><div class="kpi-label">Team size</div><div class="kpi-value" id="k-size">0</div><div class="kpi-sub">active members</div></div>
-    <div class="kpi"><div class="kpi-accent" style="background:var(--amber)"></div><div class="kpi-label">Total PTO days</div><div class="kpi-value" id="k-pto">0</div><div class="kpi-sub">personal + team days off</div></div>
-    <div class="kpi"><div class="kpi-accent" style="background:var(--red)"></div><div class="kpi-label">Capacity used</div><div class="kpi-value" id="k-util">0%</div><div class="kpi-sub">assigned vs available</div></div>
-  </div>
-
-  <!-- TEAM DAYS OFF + SPRINT COMPLETION -->
-  <div class="two-col">
-    <div class="card">
-      <div class="card-header">
-        <div><div class="card-title">Team days off</div><div class="card-sub">Holidays &amp; recharge days — subtracted from everyone</div></div>
-        <span class="badge-chip" id="tdo-chip">0 days off</span>
-      </div>
-      <div style="display:grid;grid-template-columns:120px 120px 1fr 18px;gap:8px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">
-        <span class="col-label">Date</span><span class="col-label">Type</span><span class="col-label">Note</span><span></span>
-      </div>
-      <div id="tdo-list"></div>
-      <button class="add-link" onclick="addTDO()">+ Add day off</button>
+  <div class="main">
+    <div class="sprint-config">
+      <div class="field"><div class="fl">Sprint name</div><input class="fi" id="sprint-name" oninput="document.getElementById('hdr-sprint').textContent=this.value"></div>
+      <div class="field"><div class="fl">Start date</div><input class="fi" type="date" id="start-date" oninput="recalc()"></div>
+      <div class="field"><div class="fl">End date</div><input class="fi" type="date" id="end-date" oninput="recalc()"></div>
+      <div class="field"><div class="fl">Working days</div><input class="fi" type="number" id="work-days" value="10" min="1" max="30" oninput="recalc()"></div>
+      <div class="field"><div class="fl">Default hrs/day</div><input class="fi" type="number" id="hrs-day" value="6" min="1" max="12" oninput="recalc()"></div>
     </div>
-
-    <div class="card">
-      <div class="card-header">
-        <div><div class="card-title">Sprint completion</div><div class="card-sub">Enter tickets done vs total per category</div></div>
-        <button class="btn btn-sm btn-icon" onclick="addCategory()">+ Add</button>
-      </div>
-      <div id="completion-list"></div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-bar" style="background:var(--green)"></div><div class="kl">Net team hours</div><div class="kv" id="k-net">0</div><div class="ks">available this sprint</div></div>
+      <div class="kpi"><div class="kpi-bar" style="background:var(--blue)"></div><div class="kl">Sprint completion</div><div class="kv" id="k-comp">0%</div><div class="ks" id="k-comp-sub">0 done / 0 total</div></div>
+      <div class="kpi"><div class="kpi-bar" style="background:var(--purple)"></div><div class="kl">Team size</div><div class="kv" id="k-size">0</div><div class="ks">active members</div></div>
+      <div class="kpi"><div class="kpi-bar" style="background:var(--amber)"></div><div class="kl">Total PTO days</div><div class="kv" id="k-pto">0</div><div class="ks">personal + team days off</div></div>
+      <div class="kpi"><div class="kpi-bar" style="background:var(--red)"></div><div class="kl">Capacity used</div><div class="kv" id="k-util">0%</div><div class="ks">assigned vs available</div></div>
     </div>
-  </div>
-
-  <!-- INDIVIDUAL CAPACITY + CHART -->
-  <div class="two-col">
-    <div class="card">
-      <div class="card-header">
-        <div><div class="card-title">Individual capacity</div><div class="card-sub">Net hours = (working days − team days off − PTO) × hrs/day</div></div>
-        <button class="btn btn-sm btn-primary" onclick="focusSearch()">+ Add member</button>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-hd"><div><div class="card-title">Team days off</div><div class="card-sub">Holidays &amp; recharge &mdash; deducted from everyone</div></div><span class="chip" id="tdo-chip">0 days off</span></div>
+        <div style="display:grid;grid-template-columns:110px 110px 1fr 16px;gap:6px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--border)"><span class="col-lbl">Date</span><span class="col-lbl">Type</span><span class="col-lbl">Note</span><span></span></div>
+        <div id="tdo-list"></div>
+        <button class="addl" onclick="addTDO()">+ Add day off</button>
       </div>
-      <div class="search-wrap">
-        <input class="search-input" id="member-search" placeholder="Search Payerpath Confluence members..." oninput="searchMembers(this.value)" autocomplete="off">
-        <div class="search-dropdown" id="search-dropdown"></div>
+      <div class="card">
+        <div class="card-hd"><div><div class="card-title">Sprint completion</div><div class="card-sub">Tickets done vs total per category</div></div><button class="btn" style="font-size:11px;padding:3px 9px" onclick="addCategory()">+ Add</button></div>
+        <div id="comp-list"></div>
       </div>
-      <table>
-        <thead><tr>
-          <th>Member</th><th class="c">Hrs/day</th><th class="c">PTO</th><th class="c">Eff. days</th><th class="c">Net hrs</th><th></th>
-        </tr></thead>
-        <tbody id="member-tbody"></tbody>
-        <tfoot><tr class="total-row">
-          <td>Total</td><td></td><td class="c" id="tot-pto">0</td><td></td><td class="c net-val" id="tot-net">0</td><td></td>
-        </tr></tfoot>
-      </table>
-      <button class="add-link" onclick="focusSearch()">+ Add team member</button>
     </div>
-
-    <div class="card">
-      <div class="card-header" style="margin-bottom:12px">
-        <div class="card-title">Capacity by member</div>
-        <div style="display:flex;gap:10px;font-size:11px;color:var(--text3);align-items:center">
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#374151;display:inline-block"></span>Gross hrs</span>
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--green);display:inline-block"></span>Net hrs</span>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-hd"><div><div class="card-title">Individual capacity</div><div class="card-sub">Net hrs = (working days &minus; days off &minus; PTO) &times; hrs/day</div></div><button class="btn btn-g" style="font-size:11px;padding:3px 9px" onclick="focusSearch()">+ Add member</button></div>
+        <div class="sw"><input class="si" id="msearch" placeholder="Search team members..." oninput="searchMembers(this.value)" autocomplete="off"><div class="sd" id="sdrop"></div></div>
+        <table>
+          <thead><tr><th>Member</th><th class="c">Hrs/day</th><th class="c">PTO</th><th class="c">Capacity</th><th class="c">Assigned</th><th class="c">Status</th><th></th></tr></thead>
+          <tbody id="mtbody"></tbody>
+          <tfoot><tr class="trow"><td>Total</td><td></td><td class="c" id="tot-pto">0</td><td class="c netc" id="tot-cap">0</td><td class="c" id="tot-asgn">0</td><td></td><td></td></tr></tfoot>
+        </table>
+        <button class="addl" onclick="focusSearch()">+ Add team member</button>
+      </div>
+      <div class="card">
+        <div class="card-hd" style="margin-bottom:10px">
+          <div class="card-title">Capacity by member</div>
+          <div style="display:flex;gap:10px;font-size:11px;color:var(--text3);align-items:center"><span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#374151;display:inline-block"></span>Gross</span><span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:var(--green);display:inline-block"></span>Net</span></div>
         </div>
+        <div id="chart-empty" style="text-align:center;padding:2rem 0;font-size:12px;color:var(--text3)">Add members to see capacity chart</div>
+        <div id="chart-wrap" style="display:none;position:relative;width:100%"><canvas id="cap-chart" role="img" aria-label="Capacity by member"></canvas></div>
       </div>
-      <div id="chart-empty" style="text-align:center;padding:2rem 0;font-size:12px;color:var(--text3)">No members added yet</div>
-      <div class="chart-wrap" id="chart-wrap" style="display:none">
-        <canvas id="cap-chart" role="img" aria-label="Capacity by member gross vs net hours"></canvas>
+    </div>
+    <div class="wbs-card">
+      <div class="card-hd" style="margin-bottom:12px"><div><div class="card-title">WBS item tracker</div><div class="card-sub" style="margin-bottom:0">Assigned to dropdown updates dynamically as members are added</div></div><button class="btn btn-g" style="font-size:11px;padding:3px 9px" onclick="addWBS()">+ Add item</button></div>
+      <table>
+        <thead><tr><th style="width:82px">WBS ID</th><th>Title</th><th style="width:160px">Assigned to</th><th class="c" style="width:76px">Est. hrs</th><th style="width:125px">Status</th><th style="width:14px"></th></tr></thead>
+        <tbody id="wbs-tbody"></tbody>
+        <tfoot><tr class="trow"><td colspan="3">Total assigned hrs</td><td class="c" id="wbs-tot">0</td><td colspan="2"></td></tr></tfoot>
+      </table>
+    </div>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:3px">Sprint completion</div><div class="card-sub">Overall % done</div>
+        <div style="text-align:center;padding:16px 0"><div style="font-size:44px;font-weight:300" id="big-pct">0%</div><div style="font-size:12px;color:var(--text3)" id="big-sub">0 done / 0 total</div></div>
+        <div style="background:var(--bg3);border-radius:4px;height:5px;overflow:hidden"><div id="comp-bar" style="height:100%;background:var(--green);border-radius:4px;width:0%;transition:width .4s"></div></div>
+      </div>
+      <div class="card"><div class="card-title" style="margin-bottom:3px">Availability</div><div class="card-sub">Capacity used vs available per person</div><div id="avail-list" style="margin-top:8px"></div></div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:3px">Sprint calendar</div><div class="card-sub">Working days &amp; days off</div>
+        <div style="display:flex;gap:10px;margin-top:6px;font-size:10px;color:var(--text3)"><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:var(--bg3);display:inline-block"></span>Work</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:var(--red-bg);display:inline-block"></span>Off</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:var(--green-bg);display:inline-block"></span>Today</span></div>
+        <div class="cal-grid" id="cal-grid"></div>
       </div>
     </div>
   </div>
-
-  <!-- WBS TRACKER -->
-  <div class="wbs-card">
-    <div class="card-header" style="margin-bottom:12px">
-      <div><div class="card-title">WBS item tracker</div><div class="card-sub" style="margin-bottom:0">Assign to dropdown updates as you add members above</div></div>
-      <button class="btn btn-sm btn-primary" onclick="addWBS()">+ Add item</button>
-    </div>
-    <table>
-      <thead><tr>
-        <th style="width:85px">WBS ID</th><th>Title</th><th style="width:165px">Assigned to</th><th class="c" style="width:80px">Est. hrs</th><th style="width:130px">Status</th><th style="width:16px"></th>
-      </tr></thead>
-      <tbody id="wbs-tbody"></tbody>
-      <tfoot><tr class="total-row">
-        <td colspan="3">Total assigned hrs</td><td class="c" id="wbs-tot">0</td><td colspan="2"></td>
-      </tr></tfoot>
-    </table>
-  </div>
-
-  <!-- BOTTOM PANELS -->
-  <div class="three-col">
-    <div class="card">
-      <div class="card-title" style="margin-bottom:4px">Sprint completion</div>
-      <div class="card-sub">Overall % done</div>
-      <div style="text-align:center;padding:1rem 0">
-        <div style="font-size:48px;font-weight:300;color:var(--text)" id="big-pct">0%</div>
-        <div style="font-size:12px;color:var(--text3)" id="big-pct-sub">0 done / 0 total</div>
-      </div>
-      <div style="background:var(--bg3);border-radius:6px;height:6px;overflow:hidden;margin-top:8px">
-        <div id="comp-bar" style="height:100%;background:var(--green);border-radius:6px;width:0%;transition:width .4s"></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title" style="margin-bottom:4px">Availability</div>
-      <div class="card-sub">Capacity used vs available per person</div>
-      <div id="avail-list" style="margin-top:8px"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title" style="margin-bottom:4px">Sprint calendar</div>
-      <div class="card-sub">Working days &amp; days off</div>
-      <div id="cal-legend" class="cal-legend">
-        <span><span class="leg-sq" style="background:var(--bg3)"></span>Work day</span>
-        <span><span class="leg-sq" style="background:var(--red-bg)"></span>Team day off</span>
-        <span><span class="leg-sq" style="background:var(--green-bg)"></span>Today</span>
-      </div>
-      <div class="cal-grid" id="cal-grid"></div>
-    </div>
-  </div>
-
 </div>
 
 <script>
-const AVC=['#00d4aa','#4da6ff','#a78bfa','#f472b6','#fbbf24','#f87171','#34d399','#60a5fa'];
-const AVB=['rgba(0,212,170,.12)','rgba(77,166,255,.12)','rgba(167,139,250,.12)','rgba(244,114,182,.12)','rgba(251,191,36,.12)','rgba(248,113,113,.12)','rgba(52,211,153,.12)','rgba(96,165,250,.12)'];
+const TEAMS={
+  WBS:{name:'Webslingers',key:'WBS',color:'#00d4aa',members:[
+    {name:'Julia Lukas',email:'julia.lukas@veradigm.com',accountId:'63921791de5cdaba3a6c874b'},
+    {name:'David Swiezy',email:'david.swiezy@veradigm.com',accountId:'712020:873862ed'},
+    {name:'Jeremy Goodman',email:'jeremy.goodman@veradigm.com',accountId:'712020:f1af1f2a'},
+    {name:'Joi Hepler',email:'joi.hepler@veradigm.com',accountId:'61e1acc37c6f980070d77025'},
+    {name:'Matt Glick',email:'matt.glick@veradigm.com',accountId:'602bed975f99cc006819a90c'},
+    {name:'Suvarna Damarla',email:'suvarna.damarla@veradigm.com',accountId:'712020:886a8393'},
+    {name:'Yudong He',email:'yudong.he@veradigm.com',accountId:'61e1acc4a54af90069fd169a'},
+  ]},
+  GIN:{name:'Gingersnaps',key:'GIN',color:'#a78bfa',members:[
+    {name:'Adam Rossman',email:'adam.rossman@veradigm.com',accountId:'6349490e25e69efe13021a4c'},
+    {name:'Deepthi Manne',email:'deepthi.manne@veradigm.com',accountId:'712020:ca0522a2'},
+    {name:'Joel Wheeler',email:'joel.wheeler@veradigm.com',accountId:'639b8b9877c9c3a008b9c0c3'},
+    {name:'Matt Glick',email:'matt.glick@veradigm.com',accountId:'602bed975f99cc006819a90c'},
+    {name:'Michael Earley',email:'michael.earley@veradigm.com',accountId:'712020:b2d08ea6'},
+    {name:'Michelle Streeter',email:'michelle.streeter@veradigm.com',accountId:'712020:7a84ee78'},
+  ]},
+  MOJO:{name:'Mojo',key:'MOJO',color:'#4da6ff',members:[
+    {name:'Mike Jessen',email:'mike.jessen@veradigm.com',accountId:'62fda8de5fc3a72bda94baab'},
+    {name:'Serguei Pozdniakov',email:'serguei.pozdniakov@veradigm.com',accountId:'62fda8df9c368329a7afd3c7'},
+    {name:'Ilya Dyakov',email:'ilya.dyakov@veradigm.com',accountId:'62fbc75db582d07a14a80cf7'},
+    {name:'Tanya Templer',email:'tanya.templer@veradigm.com',accountId:'63ff6b900e0ddcdce18cad4a'},
+  ]},
+  MAV:{name:'Mavericks',key:'MAV',color:'#f87171',members:[
+    {name:'Peter Lobo',email:'peter.lobo@veradigm.com',accountId:'712020:2f57f320'},
+    {name:'Ajith Panicker',email:'ajith.panicker@veradigm.com',accountId:'61e1acc2326554006c8beba0'},
+    {name:'Annasaheb Huchchannavar',email:'annasaheb.huchchannavar@veradigm.com',accountId:'712020:7767b116'},
+    {name:'Chethan Rangaswamy',email:'chethan.rangaswamy@veradigm.com',accountId:'63f5c19d3ec8aa51d3d2835b'},
+    {name:'Kumar Kuppusamy',email:'kumar.kuppusamy@veradigm.com',accountId:'63f5beede76fc61320f54cd5'},
+    {name:'Kumaraswamy Krishnan',email:'kumaraswamy.krishnan@veradigm.com',accountId:'712020:88accead'},
+    {name:'Muthu Kumaran',email:'muthu.kumaran@veradigm.com',accountId:'63f5bfd3c1685a24e131b108'},
+    {name:'Mythily Nambiar',email:'mythily.nambiar@veradigm.com',accountId:'712020:55b673c1'},
+    {name:'Rohan Kiran',email:'rohan.kiran@veradigm.com',accountId:'712020:738ad4fc'},
+    {name:'Shamveel Ahmed',email:'shamveel.ahmed@veradigm.com',accountId:'603f0627460631006a682c02'},
+    {name:'Sougata Das',email:'sougata.das@veradigm.com',accountId:'712020:3a672ce7'},
+    {name:'Vikas Hiremath',email:'vikas.hiremath@veradigm.com',accountId:'712020:1cb56baa'},
+    {name:'Vikshani Chitlur',email:'vikshani.chitlur@veradigm.com',accountId:'712020:eb527740'},
+  ]},
+  AMGO:{name:'Amigos',key:'AMGO',color:'#fbbf24',members:[
+    {name:'Peter Lobo',email:'peter.lobo@veradigm.com',accountId:'712020:2f57f320'},
+    {name:'Akshay Kompelli',email:'akshay.kompelli@veradigm.com',accountId:'712020:0fe3d4b0'},
+    {name:'Gaurav Jindal',email:'gaurav.jindal@veradigm.com',accountId:'712020:5c4895e5'},
+    {name:'Harsh Jain',email:'harsh.jain@veradigm.com',accountId:'62edfeabec6b328032f25b62'},
+    {name:'Kapil Darji',email:'kapil.darji@veradigm.com',accountId:'712020:5d9b81ce'},
+    {name:'Kashish Thakur',email:'kashish.thakur@veradigm.com',accountId:'712020:fe0ffeab'},
+    {name:'Seetharamkumar Thummala',email:'seetharamkumar.thummala@veradigm.com',accountId:'712020:17c1596d'},
+    {name:'Shamveel Ahmed',email:'shamveel.ahmed@veradigm.com',accountId:'603f0627460631006a682c02'},
+    {name:'Yashodhara Kulal',email:'yashodhara.kulal@veradigm.com',accountId:'712020:5a049e1c'},
+  ]}
+};
+const AVC=['#00d4aa','#4da6ff','#a78bfa','#f472b6','#fbbf24','#f87171','#34d399','#60a5fa','#fb923c','#e879f9','#2dd4bf','#818cf8'];
+const AVB=AVC.map(c=>c+'22');
+let currentTeam=null,members=[],teamDays=[],categories=[{label:'Features',done:0,total:0},{label:'Bug Fixes',done:0,total:0},{label:'Tech Debt',done:0,total:0}],wbsItems=[],presenceData={},chart=null,searchTimer=null,selectedTeamKey=null;
 
-const PAYERPATH_MEMBERS=[
-  {name:'Julia Lukas',email:'julia.lukas@veradigm.com',accountId:'63921791de5cdaba3a6c874b'},
-  {name:'David Swiezy',email:'david.swiezy@veradigm.com',accountId:'712020:873862ed'},
-  {name:'Russell Wilson',email:'russell.wilson@veradigm.com',accountId:'712020:84f74d73'},
-  {name:'Jodi Wiener',email:'jodi.wiener@veradigm.com',accountId:'712020:fc446d6d'},
-  {name:'Suvarna Damarla',email:'suvarna.damarla@veradigm.com',accountId:'712020:886a8393'},
-  {name:'Yudong He',email:'yudong.he@veradigm.com',accountId:'61e1acc4a54af90069fd169a'},
-  {name:'Shamveel Ahmed',email:'shamveel.ahmed@veradigm.com',accountId:'603f0627460631006a682c02'},
-];
+function renderSetup(){
+  document.getElementById('team-grid').innerHTML=Object.values(TEAMS).map(t=>`
+    <div class="team-card" id="tc-${t.key}" onclick="selectTeam('${t.key}')">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span style="width:8px;height:8px;border-radius:50%;background:${t.color};display:inline-block;flex-shrink:0"></span><div class="team-card-name">${t.name}</div></div>
+      <div style="font-size:11px;color:var(--text3);font-family:var(--mono)">${t.key}</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:3px">${t.members.length} members</div>
+    </div>`).join('');
+}
 
-let members=[];
-let teamDays=[{date:'2026-04-24',type:'Recharge',note:''}];
-let categories=[{label:'Features',done:0,total:0},{label:'Bug Fixes',done:0,total:0},{label:'Tech Debt',done:0,total:0}];
-let wbsItems=[{id:'WBS-1.1',title:'',assignee:'',hrs:0,status:'Planned'},{id:'WBS-1.2',title:'',assignee:'',hrs:0,status:'Planned'},{id:'WBS-1.3',title:'',assignee:'',hrs:0,status:'Planned'}];
-let presenceData={};
-let chart=null;
-let searchTimer=null;
+function selectTeam(key){selectedTeamKey=key;document.querySelectorAll('.team-card').forEach(c=>c.classList.remove('selected'));document.getElementById('tc-'+key).classList.add('selected');document.getElementById('setup-btn').disabled=false;}
+
+function launchDashboard(){if(!selectedTeamKey)return;currentTeam=TEAMS[selectedTeamKey];document.getElementById('setup').style.display='none';document.getElementById('dashboard').style.display='block';loadTeamData();}
+
+function switchTeam(){if(!confirm('Switch team? Current sprint data will be saved.'))return;saveData();selectedTeamKey=null;document.getElementById('setup-btn').disabled=true;document.querySelectorAll('.team-card').forEach(c=>c.classList.remove('selected'));document.getElementById('setup').style.display='flex';document.getElementById('dashboard').style.display='none';}
+
+function loadTeamData(){
+  const key='wbs-'+currentTeam.key;
+  const saved=JSON.parse(localStorage.getItem(key)||'null');
+  if(saved){
+    members=saved.members||currentTeam.members.map(m=>({...m,hrs:6,pto:0}));
+    teamDays=saved.teamDays||[];
+    categories=saved.categories||[{label:'Features',done:0,total:0},{label:'Bug Fixes',done:0,total:0},{label:'Tech Debt',done:0,total:0}];
+    wbsItems=saved.wbsItems||[{id:currentTeam.key+'-1.1',title:'',assignee:'',hrs:0,status:'Planned'}];
+    document.getElementById('sprint-name').value=saved.sprintName||currentTeam.name+' Sprint';
+    document.getElementById('start-date').value=saved.startDate||'2026-04-15';
+    document.getElementById('end-date').value=saved.endDate||'2026-04-29';
+    document.getElementById('work-days').value=saved.workDays||10;
+    document.getElementById('hrs-day').value=saved.hrsDay||6;
+  }else{
+    members=currentTeam.members.map(m=>({...m,hrs:6,pto:0}));
+    teamDays=[];
+    categories=[{label:'Features',done:0,total:0},{label:'Bug Fixes',done:0,total:0},{label:'Tech Debt',done:0,total:0}];
+    wbsItems=[{id:currentTeam.key+'-1.1',title:'',assignee:'',hrs:0,status:'Planned'},{id:currentTeam.key+'-1.2',title:'',assignee:'',hrs:0,status:'Planned'},{id:currentTeam.key+'-1.3',title:'',assignee:'',hrs:0,status:'Planned'}];
+    document.getElementById('sprint-name').value=currentTeam.name+' Sprint';
+    document.getElementById('start-date').value='2026-04-15';
+    document.getElementById('end-date').value='2026-04-29';
+    document.getElementById('work-days').value=10;
+    document.getElementById('hrs-day').value=6;
+  }
+  document.getElementById('hdr-sprint').textContent=document.getElementById('sprint-name').value;
+  presenceData={};
+  renderAll();
+}
+
+function saveData(){
+  if(!currentTeam)return;
+  localStorage.setItem('wbs-'+currentTeam.key,JSON.stringify({members,teamDays,categories,wbsItems,sprintName:document.getElementById('sprint-name').value,startDate:document.getElementById('start-date').value,endDate:document.getElementById('end-date').value,workDays:document.getElementById('work-days').value,hrsDay:document.getElementById('hrs-day').value}));
+  document.getElementById('saved-ts').textContent='Saved '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+}
+
+function resetSprint(){
+  if(!confirm('Reset this sprint? Member roster will be kept.'))return;
+  teamDays=[];categories=[{label:'Features',done:0,total:0},{label:'Bug Fixes',done:0,total:0},{label:'Tech Debt',done:0,total:0}];
+  wbsItems=[{id:currentTeam.key+'-1.1',title:'',assignee:'',hrs:0,status:'Planned'}];
+  members.forEach(m=>m.pto=0);renderAll();
+}
 
 function ini(n){return(n||'').trim().split(/\s+/).map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?'}
 function wd(){return Math.max(1,parseInt(document.getElementById('work-days').value)||10)}
@@ -372,303 +347,105 @@ function tdo(){return teamDays.length}
 function cap(m){return Math.max(0,wd()-tdo()-m.pto)*m.hrs}
 function asgnFor(name){return wbsItems.filter(w=>w.assignee===name).reduce((a,w)=>a+(+w.hrs||0),0)}
 
-function presenceDot(name){
-  const p=presenceData[name];
-  const map={Available:'p-available',Busy:'p-busy',Away:'p-away',DoNotDisturb:'p-dnd',Offline:'p-offline'};
-  const cls=p?map[p]||'p-unknown':'p-unknown';
-  const title=p||'Unknown';
-  return`<span class="p-dot ${cls}" title="${title}" style="margin-right:6px"></span>`;
-}
-
-function memberOptions(sel=''){
-  return'<option value="">— Unassigned —</option>'+members.map(m=>`<option value="${m.name}"${m.name===sel?' selected':''}>${m.name}</option>`).join('');
-}
+function pdot(name){const p=presenceData[name];const mp={Available:'pa',Busy:'pb2',Away:'pw',DoNotDisturb:'pb2',Offline:'po'};return`<span class="pdot ${p?mp[p]||'pu':'pu'}" title="${p||'Unknown'}"></span>`;}
+function pbadge(name){const p=presenceData[name];if(!p)return'<span style="font-size:11px;color:var(--text3)">-</span>';const mp={Available:['pb-av','Available'],Busy:['pb-bz','Busy'],Away:['pb-aw','Away'],DoNotDisturb:['pb-bz','DND'],Offline:['pb-of','Offline']};const[c,l]=mp[p]||['pb-of','?'];return`<span class="pbadge ${c}">${l}</span>`;}
+function memberOptions(sel=''){return'<option value="">- Unassigned -</option>'+members.map(m=>`<option value="${m.name}"${m.name===sel?' selected':''}>${m.name}</option>`).join('');}
 
 function renderMembers(){
-  const tbody=document.getElementById('member-tbody');
-  if(!members.length){
-    tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;color:var(--text3);font-style:italic;padding:20px 0">Search above to add Confluence members</td></tr>`;
-    document.getElementById('tot-pto').textContent=0;
-    document.getElementById('tot-net').textContent=0;
-    return;
-  }
+  const tbody=document.getElementById('mtbody');
+  if(!members.length){tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--text3);font-style:italic;padding:16px 0">Search above to add members</td></tr>`;document.getElementById('tot-pto').textContent=0;document.getElementById('tot-cap').textContent=0;document.getElementById('tot-asgn').textContent=0;return;}
   tbody.innerHTML=members.map((m,i)=>{
-    const c=cap(m);const a=asgnFor(m.name);const over=a>c&&c>0;
-    const eff=Math.max(0,wd()-tdo()-m.pto);
-    return`<tr class="data-row">
-      <td><div class="member-cell">
-        ${presenceDot(m.name)}
-        <div class="avatar" style="background:${AVB[i%AVB.length]};color:${AVC[i%AVC.length]}">${ini(m.name)}</div>
-        <span style="font-size:13px">${m.name}</span>
-      </div></td>
-      <td class="c"><input class="mini-input" type="number" min="1" max="12" value="${m.hrs}" oninput="members[${i}].hrs=Math.max(1,+this.value||6);recalc()"></td>
-      <td class="c"><input class="mini-input" type="number" min="0" value="${m.pto}" oninput="members[${i}].pto=Math.max(0,+this.value||0);recalc()"></td>
-      <td class="c" style="color:var(--text2)">${eff}</td>
-      <td class="c ${over?'over-val':'net-val'}">${c}${over?` <span style="font-size:10px">⚠ ${a} asgn</span>`:''}</td>
-      <td><button class="remove-btn" onclick="removeMember(${i})">×</button></td>
-    </tr>`;
+    const c=cap(m),a=asgnFor(m.name),over=a>c&&c>0;
+    const ac=AVC[i%AVC.length],bg=AVB[i%AVB.length];
+    return`<tr class="dr"><td><div class="mc">${pdot(m.name)}<div class="av" style="background:${bg};color:${ac}">${ini(m.name)}</div><span>${m.name}</span></div></td><td class="c"><input class="ni" type="number" min="1" max="12" value="${m.hrs}" oninput="members[${i}].hrs=Math.max(1,+this.value||6);recalc()"></td><td class="c"><input class="ni" type="number" min="0" value="${m.pto}" oninput="members[${i}].pto=Math.max(0,+this.value||0);recalc()"></td><td class="c ${over?'overc':'netc'}">${c}</td><td class="c ${over?'overc':''}">${a}${over?' ⚠':''}</td><td class="c">${pbadge(m.name)}</td><td><button class="rb" onclick="removeMember(${i})">×</button></td></tr>`;
   }).join('');
   document.getElementById('tot-pto').textContent=members.reduce((a,m)=>a+m.pto,0);
-  document.getElementById('tot-net').textContent=members.reduce((a,m)=>a+cap(m),0);
+  document.getElementById('tot-cap').textContent=members.reduce((a,m)=>a+cap(m),0);
+  document.getElementById('tot-asgn').textContent=members.reduce((a,m)=>a+asgnFor(m.name),0);
 }
 
-function addMember(user){
-  if(members.find(m=>m.accountId===user.accountId))return;
-  members.push({...user,hrs:hd(),pto:0});
-  document.getElementById('member-search').value='';
-  document.getElementById('search-dropdown').style.display='none';
-  renderAll();
-}
-
-function removeMember(i){
-  const name=members[i].name;
-  members.splice(i,1);
-  wbsItems.forEach(w=>{if(w.assignee===name)w.assignee=''});
-  renderAll();
-}
-
-function focusSearch(){document.getElementById('member-search').focus()}
-
+function addMemberObj(user){if(members.find(m=>m.accountId===user.accountId))return;members.push({...user,hrs:hd(),pto:0});document.getElementById('msearch').value='';document.getElementById('sdrop').style.display='none';renderAll();}
+function removeMember(i){const name=members[i].name;members.splice(i,1);wbsItems.forEach(w=>{if(w.assignee===name)w.assignee='';});renderAll();}
+function focusSearch(){document.getElementById('msearch').focus();}
 function searchMembers(q){
-  clearTimeout(searchTimer);
-  const dd=document.getElementById('search-dropdown');
+  clearTimeout(searchTimer);const dd=document.getElementById('sdrop');
   if(!q.trim()){dd.style.display='none';return;}
   searchTimer=setTimeout(()=>{
     const lq=q.toLowerCase();
-    const results=PAYERPATH_MEMBERS.filter(u=>
-      (u.name.toLowerCase().includes(lq)||u.email.toLowerCase().includes(lq))&&
-      !members.find(m=>m.accountId===u.accountId)
-    );
-    if(!results.length){dd.innerHTML=`<div style="padding:10px 12px;font-size:12px;color:var(--text3)">No matching members</div>`;dd.style.display='block';return;}
-    dd.innerHTML=results.map((u,i)=>`
-      <div class="search-item" onclick='addMember(${JSON.stringify(u)})'>
-        <div class="avatar" style="background:${AVB[i%AVB.length]};color:${AVC[i%AVC.length]};width:26px;height:26px;font-size:10px">${ini(u.name)}</div>
-        <div><div class="search-item-name">${u.name}</div><div class="search-item-email">${u.email}</div></div>
-      </div>`).join('');
+    const pool=currentTeam?currentTeam.members:[];
+    const results=pool.filter(u=>(u.name.toLowerCase().includes(lq)||u.email.toLowerCase().includes(lq))&&!members.find(m=>m.accountId===u.accountId));
+    if(!results.length){dd.innerHTML=`<div style="padding:9px 12px;font-size:12px;color:var(--text3)">No matching members</div>`;dd.style.display='block';return;}
+    dd.innerHTML=results.map((u,i)=>`<div class="si-item" onclick='addMemberObj(${JSON.stringify(u).replace(/'/g,"&apos;")})'><div class="av" style="background:${AVB[i%AVB.length]};color:${AVC[i%AVC.length]};width:24px;height:24px;font-size:10px">${ini(u.name)}</div><div><div class="si-name">${u.name}</div><div class="si-email">${u.email}</div></div></div>`).join('');
     dd.style.display='block';
   },250);
 }
-
-document.addEventListener('click',e=>{
-  if(!e.target.closest('.search-wrap'))document.getElementById('search-dropdown').style.display='none';
-});
+document.addEventListener('click',e=>{if(!e.target.closest('.sw'))document.getElementById('sdrop').style.display='none';});
 
 function renderTDO(){
-  const el=document.getElementById('tdo-list');
-  el.innerHTML=teamDays.map((d,i)=>`
-    <div class="daysoff-row">
-      <input type="date" class="small-input" value="${d.date}" oninput="teamDays[${i}].date=this.value;recalc()">
-      <select class="small-input" oninput="teamDays[${i}].type=this.value">
-        <option ${d.type==='Holiday'?'selected':''}>Holiday</option>
-        <option ${d.type==='Recharge'?'selected':''}>Recharge</option>
-        <option ${d.type==='Company'?'selected':''}>Company</option>
-      </select>
-      <input type="text" class="small-input" value="${d.note}" placeholder="Note..." oninput="teamDays[${i}].note=this.value">
-      <button class="remove-btn" onclick="teamDays.splice(${i},1);renderTDO();recalc()">×</button>
-    </div>`).join('');
+  document.getElementById('tdo-list').innerHTML=teamDays.map((d,i)=>`<div class="dor"><input type="date" class="si2" value="${d.date}" oninput="teamDays[${i}].date=this.value;recalc()"><select class="si2" oninput="teamDays[${i}].type=this.value"><option ${d.type==='Holiday'?'selected':''}>Holiday</option><option ${d.type==='Recharge'?'selected':''}>Recharge</option><option ${d.type==='Company'?'selected':''}>Company</option></select><input type="text" class="si2" value="${d.note}" placeholder="Note..." oninput="teamDays[${i}].note=this.value"><button class="rb" onclick="teamDays.splice(${i},1);renderTDO();recalc()">×</button></div>`).join('');
   document.getElementById('tdo-chip').textContent=`${teamDays.length} day${teamDays.length!==1?'s':''} off`;
 }
-
-function addTDO(){teamDays.push({date:'',type:'Holiday',note:''});renderTDO();recalc()}
+function addTDO(){teamDays.push({date:'',type:'Holiday',note:''});renderTDO();recalc();}
 
 function renderCategories(){
-  const el=document.getElementById('completion-list');
-  el.innerHTML=categories.map((c,i)=>`
-    <div class="completion-row">
-      <span class="comp-label">${c.label}</span>
-      <input class="mini-input" type="number" min="0" value="${c.done}" oninput="categories[${i}].done=Math.max(0,+this.value||0);recalc()">
-      <span class="comp-sep">/</span>
-      <input class="mini-input" type="number" min="0" value="${c.total}" oninput="categories[${i}].total=Math.max(0,+this.value||0);recalc()">
-      <span class="comp-pct" id="cp-${i}" style="color:var(--blue)">0%</span>
-      <button class="remove-btn" onclick="categories.splice(${i},1);renderCategories();recalc()">×</button>
-    </div>`).join('');
-  recalcCompletion();
+  document.getElementById('comp-list').innerHTML=categories.map((c,i)=>`<div class="cr"><span style="font-size:13px">${c.label}</span><input class="ni" type="number" min="0" value="${c.done}" oninput="categories[${i}].done=Math.max(0,+this.value||0);recalc()"><span style="text-align:center;color:var(--text3);">/</span><input class="ni" type="number" min="0" value="${c.total}" oninput="categories[${i}].total=Math.max(0,+this.value||0);recalc()"><span class="cp" id="cp-${i}">0%</span><button class="rb" onclick="categories.splice(${i},1);renderCategories();recalc()">×</button></div>`).join('');
+  recalcComp();
 }
-
-function addCategory(){
-  const label=prompt('Category name:','Stories');
-  if(label){categories.push({label,done:0,total:0});renderCategories();recalc()}
-}
-
-function recalcCompletion(){
+function addCategory(){const l=prompt('Category name:');if(l){categories.push({label:l,done:0,total:0});renderCategories();recalc();}}
+function recalcComp(){
   let td=0,tt=0;
-  categories.forEach((c,i)=>{
-    td+=c.done;tt+=c.total;
-    const pct=c.total>0?Math.round(c.done/c.total*100):0;
-    const el=document.getElementById('cp-'+i);
-    if(el)el.textContent=pct+'%';
-  });
-  const pct=tt>0?Math.round(td/tt*100):0;
-  document.getElementById('k-comp').textContent=pct+'%';
-  document.getElementById('k-comp-sub').textContent=`${td} done / ${tt} total`;
-  document.getElementById('big-pct').textContent=pct+'%';
-  document.getElementById('big-pct-sub').textContent=`${td} done / ${tt} total`;
-  document.getElementById('comp-bar').style.width=pct+'%';
+  categories.forEach((c,i)=>{td+=c.done;tt+=c.total;const p=c.total>0?Math.round(c.done/c.total*100):0;const el=document.getElementById('cp-'+i);if(el)el.textContent=p+'%';});
+  const p=tt>0?Math.round(td/tt*100):0;
+  document.getElementById('k-comp').textContent=p+'%';document.getElementById('k-comp-sub').textContent=td+' done / '+tt+' total';
+  document.getElementById('big-pct').textContent=p+'%';document.getElementById('big-sub').textContent=td+' done / '+tt+' total';
+  document.getElementById('comp-bar').style.width=p+'%';
 }
 
 function renderWBS(){
-  const tbody=document.getElementById('wbs-tbody');
-  tbody.innerHTML=wbsItems.map((w,i)=>{
-    const sc={Planned:'s-planned','In Progress':'s-progress',Done:'s-done',Blocked:'s-blocked'}[w.status]||'s-planned';
-    return`<tr class="data-row">
-      <td><input class="wbs-id-input" value="${w.id}" placeholder="WBS-1.1" oninput="wbsItems[${i}].id=this.value"></td>
-      <td><input class="wbs-text-input" value="${w.title}" placeholder="Add title..." oninput="wbsItems[${i}].title=this.value"></td>
-      <td><select class="sel" onchange="wbsItems[${i}].assignee=this.value;recalc()">${memberOptions(w.assignee)}</select></td>
-      <td class="c"><input class="mini-input" type="number" min="0" value="${w.hrs}" oninput="wbsItems[${i}].hrs=Math.max(0,+this.value||0);recalc()"></td>
-      <td><select class="sel" onchange="wbsItems[${i}].status=this.value;renderWBS()">
-        <option ${w.status==='Planned'?'selected':''}>Planned</option>
-        <option ${w.status==='In Progress'?'selected':''}>In Progress</option>
-        <option ${w.status==='Done'?'selected':''}>Done</option>
-        <option ${w.status==='Blocked'?'selected':''}>Blocked</option>
-      </select></td>
-      <td><button class="remove-btn" onclick="wbsItems.splice(${i},1);recalc()">×</button></td>
-    </tr>`;
-  }).join('');
+  document.getElementById('wbs-tbody').innerHTML=wbsItems.map((w,i)=>`<tr class="dr"><td><input class="wid" value="${w.id}" placeholder="${currentTeam?currentTeam.key:'WBS'}-1.1" oninput="wbsItems[${i}].id=this.value"></td><td><input class="wt" value="${w.title}" placeholder="Add title..." oninput="wbsItems[${i}].title=this.value"></td><td><select class="sel" onchange="wbsItems[${i}].assignee=this.value;recalc()">${memberOptions(w.assignee)}</select></td><td class="c"><input class="ni" type="number" min="0" value="${w.hrs}" oninput="wbsItems[${i}].hrs=Math.max(0,+this.value||0);recalc()"></td><td><select class="sel" onchange="wbsItems[${i}].status=this.value"><option ${w.status==='Planned'?'selected':''}>Planned</option><option ${w.status==='In Progress'?'selected':''}>In Progress</option><option ${w.status==='Done'?'selected':''}>Done</option><option ${w.status==='Blocked'?'selected':''}>Blocked</option></select></td><td><button class="rb" onclick="wbsItems.splice(${i},1);recalc()">×</button></td></tr>`).join('');
   document.getElementById('wbs-tot').textContent=wbsItems.reduce((a,w)=>a+(+w.hrs||0),0);
 }
-
-function addWBS(){
-  const last=wbsItems[wbsItems.length-1];
-  let nextId='WBS-1.1';
-  if(last){const p=last.id.split('.');p[p.length-1]=+p[p.length-1]+1;nextId=p.join('.')}
-  wbsItems.push({id:nextId,title:'',assignee:'',hrs:0,status:'Planned'});
-  recalc();
-}
+function addWBS(){const last=wbsItems[wbsItems.length-1];let nid=(currentTeam?currentTeam.key:'WBS')+'-1.1';if(last){const p=last.id.split('.');p[p.length-1]=+p[p.length-1]+1;nid=p.join('.');}wbsItems.push({id:nid,title:'',assignee:'',hrs:0,status:'Planned'});recalc();}
 
 function renderAvailability(){
   const el=document.getElementById('avail-list');
   if(!members.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);text-align:center;padding:1rem 0">No members added</div>';return;}
-  el.innerHTML=members.map((m,i)=>{
-    const c=cap(m);const a=asgnFor(m.name);
-    const pct=c>0?Math.min(100,Math.round(a/c*100)):0;
-    const color=pct>90?'var(--red)':pct>70?'var(--amber)':'var(--green)';
-    return`<div class="avail-row">
-      <div class="avail-header">
-        <span class="avail-name">${m.name}</span>
-        <span class="avail-nums">${a} / ${c} hrs (${pct}%)</span>
-      </div>
-      <div class="avail-bar-bg"><div class="avail-bar-fill" style="width:${pct}%;background:${color}"></div></div>
-    </div>`;
-  }).join('');
+  el.innerHTML=members.map(m=>{const c=cap(m),a=asgnFor(m.name),p=c>0?Math.min(100,Math.round(a/c*100)):0;const col=p>90?'var(--red)':p>70?'var(--amber)':'var(--green)';return`<div class="ar"><div class="ar-hd"><span style="color:var(--text2);font-size:12px">${m.name}</span><span style="color:var(--text3);font-size:11px">${a} / ${c} hrs (${p}%)</span></div><div class="ar-bg"><div class="ar-fill" style="width:${p}%;background:${col}"></div></div></div>`;}).join('');
 }
 
 function renderCalendar(){
   const el=document.getElementById('cal-grid');
-  const start=new Date(document.getElementById('start-date').value);
-  const end=new Date(document.getElementById('end-date').value);
+  const s=new Date(document.getElementById('start-date').value),e=new Date(document.getElementById('end-date').value);
+  if(isNaN(s)||isNaN(e)){el.innerHTML='';return;}
   const today=new Date();today.setHours(0,0,0,0);
   const offDates=new Set(teamDays.map(d=>d.date));
-  const days=['Su','Mo','Tu','We','Th','Fr','Sa'];
-  let html=days.map(d=>`<div class="cal-day-label">${d}</div>`).join('');
-  const cur=new Date(start);
-  const firstDow=cur.getDay();
-  for(let i=0;i<firstDow;i++)html+=`<div class="cal-day"></div>`;
-  while(cur<=end){
-    const dow=cur.getDay();
-    const iso=cur.toISOString().slice(0,10);
-    const isToday=cur.getTime()===today.getTime();
-    const isOff=offDates.has(iso);
-    const isWeekend=dow===0||dow===6;
-    let cls='cal-day';
-    if(isToday)cls+=' today';
-    else if(isOff)cls+=' off';
-    else if(isWeekend)cls+=' weekend';
-    else cls+=' work';
-    html+=`<div class="${cls}">${cur.getDate()}</div>`;
-    cur.setDate(cur.getDate()+1);
-  }
+  let html=['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>`<div class="cd-lbl">${d}</div>`).join('');
+  const cur=new Date(s);
+  for(let i=0;i<cur.getDay();i++)html+=`<div class="cd"></div>`;
+  while(cur<=e){const dow=cur.getDay(),iso=cur.toISOString().slice(0,10),isToday=cur.getTime()===today.getTime(),isOff=offDates.has(iso),isWknd=dow===0||dow===6;let cls='cd';if(isToday)cls+=' today';else if(isOff)cls+=' off';else if(!isWknd)cls+=' work';html+=`<div class="${cls}">${cur.getDate()}</div>`;cur.setDate(cur.getDate()+1);}
   el.innerHTML=html;
 }
 
 function updateChart(){
-  const wrap=document.getElementById('chart-wrap');
-  const empty=document.getElementById('chart-empty');
+  const wrap=document.getElementById('chart-wrap'),empty=document.getElementById('chart-empty');
   if(!members.length){wrap.style.display='none';empty.style.display='block';if(chart){chart.destroy();chart=null;}return;}
   empty.style.display='none';wrap.style.display='block';
-  const h=Math.max(180,members.length*48+60);
-  wrap.style.height=h+'px';
-  const labels=members.map(m=>m.name);
-  const gross=members.map(m=>wd()*m.hrs);
-  const net=members.map(m=>cap(m));
+  wrap.style.height=Math.max(160,members.length*44+50)+'px';
   if(chart)chart.destroy();
-  chart=new Chart(document.getElementById('cap-chart'),{
-    type:'bar',
-    data:{labels,datasets:[
-      {label:'Gross hrs',data:gross,backgroundColor:'#374151',borderRadius:3,borderSkipped:false},
-      {label:'Net hrs',data:net,backgroundColor:'#00d4aa',borderRadius:3,borderSkipped:false}
-    ]},
-    options:{
-      indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.raw} hrs`}}},
-      scales:{
-        x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#5a6580',font:{size:11}}},
-        y:{grid:{display:false},ticks:{color:'#8b97b0',font:{size:12}}}
-      }
-    }
-  });
+  chart=new Chart(document.getElementById('cap-chart'),{type:'bar',data:{labels:members.map(m=>m.name),datasets:[{label:'Gross hrs',data:members.map(m=>wd()*m.hrs),backgroundColor:'#374151',borderRadius:3,borderSkipped:false},{label:'Net hrs',data:members.map(m=>cap(m)),backgroundColor:'#00d4aa',borderRadius:3,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.raw} hrs`}}},scales:{x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#5a6580',font:{size:11}}},y:{grid:{display:false},ticks:{color:'#8b97b0',font:{size:11}}}}}});
 }
 
+const P_POOL=['Available','Away','Busy','Available','Available','Away','Busy','Available'];
+function refreshPresence(){const btn=document.getElementById('presence-btn');btn.textContent='Loading...';btn.disabled=true;setTimeout(()=>{members.forEach((m,i)=>{presenceData[m.name]=P_POOL[i%P_POOL.length];});btn.textContent='&#8635; Presence';btn.disabled=false;document.getElementById('saved-ts').textContent='Presence: '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});renderMembers();},800);}
+
 function recalc(){
-  const tc=members.reduce((a,m)=>a+cap(m),0);
-  const ta=wbsItems.reduce((a,w)=>a+(+w.hrs||0),0);
-  const tp=members.reduce((a,m)=>a+m.pto,0)+tdo()*members.length;
-  const util=tc>0?Math.round(ta/tc*100):0;
-  document.getElementById('k-net').textContent=tc;
-  document.getElementById('k-size').textContent=members.length;
-  document.getElementById('k-pto').textContent=tp;
-  document.getElementById('k-util').textContent=util+'%';
-  recalcCompletion();
-  renderMembers();
-  renderWBS();
-  renderAvailability();
-  renderCalendar();
-  updateChart();
+  const tc=members.reduce((a,m)=>a+cap(m),0),ta=wbsItems.reduce((a,w)=>a+(+w.hrs||0),0),tp=members.reduce((a,m)=>a+m.pto,0)+tdo()*members.length,util=tc>0?Math.round(ta/tc*100):0;
+  document.getElementById('k-net').textContent=tc;document.getElementById('k-size').textContent=members.length;document.getElementById('k-pto').textContent=tp;document.getElementById('k-util').textContent=util+'%';
+  recalcComp();renderMembers();renderWBS();renderAvailability();renderCalendar();updateChart();
 }
 
 function renderAll(){recalc();renderTDO();renderCategories();}
-
-const P_STATES=['Available','Away','Busy','Available','Available','Busy','Away'];
-function refreshPresence(){
-  const btn=document.getElementById('presence-btn');
-  btn.textContent='Refreshing...';btn.disabled=true;
-  setTimeout(()=>{
-    members.forEach((m,i)=>{presenceData[m.name]=P_STATES[i%P_STATES.length];});
-    btn.textContent='⟳ Refresh presence';btn.disabled=false;
-    document.getElementById('saved-ts').textContent='Presence: '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    renderMembers();
-  },800);
-}
-
-function saveSnap(){
-  document.getElementById('saved-ts').textContent='Saved '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  try{localStorage.setItem('wbs-sprint-data',JSON.stringify({members,teamDays,categories,wbsItems,sprintName:document.getElementById('sprint-name').value}));}catch(e){}
-}
-
-function loadSnap(){
-  try{
-    const d=JSON.parse(localStorage.getItem('wbs-sprint-data')||'null');
-    if(d){
-      if(d.members)members=d.members;
-      if(d.teamDays)teamDays=d.teamDays;
-      if(d.categories)categories=d.categories;
-      if(d.wbsItems)wbsItems=d.wbsItems;
-      if(d.sprintName){document.getElementById('sprint-name').value=d.sprintName;document.getElementById('hdr-sprint').textContent=d.sprintName;}
-    }
-  }catch(e){}
-}
-
-function resetAll(){
-  if(!confirm('Reset all data?'))return;
-  members=[];teamDays=[{date:'2026-04-24',type:'Recharge',note:''}];
-  categories=[{label:'Features',done:0,total:0},{label:'Bug Fixes',done:0,total:0},{label:'Tech Debt',done:0,total:0}];
-  wbsItems=[{id:'WBS-1.1',title:'',assignee:'',hrs:0,status:'Planned'},{id:'WBS-1.2',title:'',assignee:'',hrs:0,status:'Planned'},{id:'WBS-1.3',title:'',assignee:'',hrs:0,status:'Planned'}];
-  presenceData={};
-  localStorage.removeItem('wbs-sprint-data');
-  renderAll();
-}
-
-loadSnap();
-renderAll();
-</script>
+renderSetup();
+<\/script>
 </body>
 </html>
