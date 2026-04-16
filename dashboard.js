@@ -1,21 +1,69 @@
-// ── LIVE DATA — injected by Claude via __injectTeamData() ──────────
-// TEAMS is populated externally. On first load, localStorage cache is restored.
-let TEAMS = {};
+// ── SHARED DATA CONFIG ───────────────────────────────────────────────
+// Data is stored in data.json in this repo and fetched on load.
+// Claude writes to it via __publishData() after each Jira refresh.
+const REPO = 'julia7lukas/wbs-dashboard';
+const DATA_URL = 'https://raw.githubusercontent.com/' + REPO + '/main/data.json?cb=' + Date.now();
+const API_URL = 'https://api.github.com/repos/' + REPO + '/contents/data.json';
 
-// ── PUBLIC INJECT API (called by Claude via javascript_tool) ────────
+let TEAMS = {};
+let GH_TOKEN = localStorage.getItem('wbs-gh-token') || '';
+
+// ── PUBLIC INJECT API (called by Claude via javascript_tool) ─────────
 window.__injectTeamData = function(jsonStr) {
   try {
     const incoming = typeof jsonStr === 'string' ? JSON.parse(jsonStr) : jsonStr;
     Object.assign(TEAMS, incoming);
-    localStorage.setItem('wbs-teams-cache', JSON.stringify(TEAMS));
     buildTeamSelector();
     switchTeam(currentTeam || Object.keys(TEAMS)[0]);
     const el = document.getElementById('sync-ts');
     if (el) el.textContent = 'Jira sync: ' + new Date().toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) + ' · Live ✓';
+    // Auto-publish if token is set
+    if (GH_TOKEN) window.__publishData();
   } catch (e) {
     console.error('__injectTeamData failed:', e);
     alert('Inject failed: ' + e.message);
   }
+};
+
+// ── PUBLISH TO GITHUB (makes data available to all users) ────────────
+window.__publishData = async function() {
+  if (!GH_TOKEN) {
+    alert('No GitHub token set. Call window.__setToken("your_token") first.');
+    return;
+  }
+  try {
+    // Get current file SHA (needed for update)
+    const meta = await fetch(API_URL, {
+      headers: { 'Authorization': 'token ' + GH_TOKEN, 'Accept': 'application/vnd.github.v3+json' }
+    }).then(r => r.json());
+
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(TEAMS, null, 2))));
+    const res = await fetch(API_URL, {
+      method: 'PUT',
+      headers: { 'Authorization': 'token ' + GH_TOKEN, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: 'Sprint data refresh ' + new Date().toISOString(),
+        content,
+        sha: meta.sha
+      })
+    });
+    if (res.ok) {
+      const el = document.getElementById('sync-ts');
+      if (el) el.textContent += ' · Published ✓';
+      console.log('Data published to GitHub');
+    } else {
+      console.error('Publish failed:', await res.text());
+    }
+  } catch(e) {
+    console.error('__publishData failed:', e);
+  }
+};
+
+// ── SET TOKEN (call once, saves to localStorage) ─────────────────────
+window.__setToken = function(token) {
+  GH_TOKEN = token;
+  localStorage.setItem('wbs-gh-token', token);
+  console.log('GitHub token saved. Data will auto-publish on next refresh.');
 };
 
 // ── TEAM SELECTOR ────────────────────────────────────────────────────
@@ -30,7 +78,6 @@ function switchTeam(key) {
   members = saved ? saved.members : SD.members.map(m => ({ ...m }));
   teamDays = saved ? saved.teamDays : SD.teamDays.map(d => ({ ...d }));
   issues = SD.issues.map(i => ({ ...i }));
-
   document.getElementById('sprint-name').value = SD.sprintName;
   document.getElementById('hdr-sprint').textContent = SD.sprintName;
   document.getElementById('hdr-team').textContent = SD.team + ' (' + SD.projectKey + ')';
@@ -38,11 +85,9 @@ function switchTeam(key) {
   document.getElementById('end-date').value = SD.endDate;
   document.getElementById('work-days').value = SD.workDays;
   document.getElementById('hrs-day').value = SD.hrsPerDay;
-
   const ts = new Date(SD.syncedAt);
   document.getElementById('sync-ts').textContent = 'Jira sync: ' + ts.toLocaleDateString() + ' ' + ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   document.getElementById('team-badge').textContent = key;
-
   document.querySelectorAll('.team-btn').forEach(b => {
     b.style.background = b.dataset.key === key ? 'var(--green)' : 'var(--bg3)';
     b.style.color = b.dataset.key === key ? '#000' : 'var(--t2)';
@@ -58,31 +103,39 @@ function ini(n) { return (n||'').trim().split(/\s+/).map(w=>w[0]||'').join('').t
 let members, teamDays, issues, charts = {}, sortKey = 'key', sortDir = 1;
 function getSD() { return TEAMS[currentTeam]; }
 
-// ── TIMEZONE-SAFE DATE HELPERS ───────────────────────────────────────
 function parseDate(str) { if (!str) return null; const [y,m,d]=str.split('-').map(Number); return new Date(y,m-1,d); }
 function isoDate(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 
-// ── LOAD — restore from cache or show prompt ─────────────────────────
-function load() {
-  const savedTeams = localStorage.getItem('wbs-teams-cache');
-  if (savedTeams) {
-    try {
-      TEAMS = JSON.parse(savedTeams);
-      buildTeamSelector();
-      switchTeam(Object.keys(TEAMS)[0]);
-      return;
-    } catch(e) { /* fall through */ }
+// ── LOAD — fetch shared data.json, fall back to localStorage ─────────
+async function load() {
+  const el = document.getElementById('sync-ts');
+  if (el) el.textContent = 'Loading shared data...';
+  try {
+    const res = await fetch(DATA_URL);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Object.keys(data).length > 0) {
+        TEAMS = data;
+        buildTeamSelector();
+        switchTeam(Object.keys(TEAMS)[0]);
+        if (el) el.textContent = 'Jira sync: ' + new Date(Object.values(TEAMS)[0].syncedAt).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
+        return;
+      }
+    }
+  } catch(e) {
+    console.log('Could not fetch data.json, trying localStorage:', e);
+  }
+  // Fall back to localStorage
+  const saved = localStorage.getItem('wbs-teams-cache');
+  if (saved) {
+    try { TEAMS = JSON.parse(saved); buildTeamSelector(); switchTeam(Object.keys(TEAMS)[0]); return; }
+    catch(e) {}
   }
   showLoadPrompt();
 }
 
 function showLoadPrompt() {
-  document.querySelector('.main').innerHTML = `
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:20px;text-align:center;padding:40px">
-      <div style="font-size:48px">🔄</div>
-      <div style="font-size:18px;font-weight:500;color:var(--t1)">No sprint data loaded yet</div>
-      <div style="font-size:13px;color:var(--t2);max-width:420px">Ask Claude: <em>"refresh the WBS sprint dashboard"</em><br>Claude will pull live data from Jira and inject it here.</div>
-    </div>`;
+  document.querySelector('.main').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:20px;text-align:center;padding:40px"><div style="font-size:48px">🔄</div><div style="font-size:18px;font-weight:500;color:var(--t1)">No sprint data loaded yet</div><div style="font-size:13px;color:var(--t2);max-width:420px">Ask Claude: <em>"refresh the WBS sprint dashboard"</em><br>Claude will pull live data from Jira and inject it here.</div></div>';
 }
 
 function buildTeamSelector() {
@@ -91,12 +144,8 @@ function buildTeamSelector() {
   tl.innerHTML = '';
   Object.keys(TEAMS).forEach(k => {
     const b = document.createElement('button');
-    b.className = 'btn team-btn';
-    b.dataset.key = k;
-    b.textContent = k;
-    b.style.padding = '4px 10px';
-    b.style.fontSize = '11px';
-    b.style.fontWeight = '600';
+    b.className = 'btn team-btn'; b.dataset.key = k; b.textContent = k;
+    b.style.padding = '4px 10px'; b.style.fontSize = '11px'; b.style.fontWeight = '600';
     b.onclick = () => switchTeam(k);
     tl.appendChild(b);
   });
@@ -138,11 +187,8 @@ function renderMembers() {
       +'<td class="c netc">'+c+'h</td>'
       +'<td class="c" style="color:var(--blue)">'+asgnFor(m.name)+'h</td>'
       +'<td><button class="rb" onclick="removeMember('+i+')">×</button></td></tr>';
-  }).join('')
-    +'<tr><td colspan="5" style="padding:6px 0"><button class="addl" onclick="addMemberPrompt()">+ Add team member</button></td></tr>';
-
-  const tp=members.reduce((a,m)=>a+m.pto,0);
-  const tc=members.reduce((a,m)=>a+cap(m),0);
+  }).join('')+'<tr><td colspan="5" style="padding:6px 0"><button class="addl" onclick="addMemberPrompt()">+ Add team member</button></td></tr>';
+  const tp=members.reduce((a,m)=>a+m.pto,0), tc=members.reduce((a,m)=>a+cap(m),0);
   document.getElementById('t-pto').textContent=tp;
   document.getElementById('t-cap').textContent=tc+'h';
   const ta=members.reduce((s,m)=>s+asgnFor(m.name),0);
@@ -157,12 +203,8 @@ function sprintDateAttrs() {
 function renderTDO() {
   const a=sprintDateAttrs();
   document.getElementById('tdo-list').innerHTML=teamDays.map((d,i)=>
-    '<div class="dor">'
-    +'<input type="date" class="si2" value="'+d.date+'" '+a+' oninput="teamDays['+i+'].date=this.value;renderTDO();recalc()">'
-    +'<select class="si2" oninput="teamDays['+i+'].type=this.value">'
-    +'<option '+(d.type==='Holiday'?'selected':'')+'>Holiday</option>'
-    +'<option '+(d.type==='Recharge'?'selected':'')+'>Recharge</option>'
-    +'<option '+(d.type==='Company'?'selected':'')+'>Company</option></select>'
+    '<div class="dor"><input type="date" class="si2" value="'+d.date+'" '+a+' oninput="teamDays['+i+'].date=this.value;renderTDO();recalc()">'
+    +'<select class="si2" oninput="teamDays['+i+'].type=this.value"><option '+(d.type==='Holiday'?'selected':'')+'>Holiday</option><option '+(d.type==='Recharge'?'selected':'')+'>Recharge</option><option '+(d.type==='Company'?'selected':'')+'>Company</option></select>'
     +'<input type="text" class="si2" value="'+(d.note||'')+'" placeholder="Note..." oninput="teamDays['+i+'].note=this.value">'
     +'<button class="rb" onclick="teamDays.splice('+i+',1);renderTDO();recalc()">×</button></div>'
   ).join('');
@@ -175,8 +217,7 @@ function addTDO() {
   const ex=new Set(teamDays.map(d=>d.date));
   let cur=parseDate(s); const end=parseDate(e); let sg='';
   while(cur<=end){const iso=isoDate(cur);if(cur.getDay()!==0&&cur.getDay()!==6&&!ex.has(iso)){sg=iso;break;}cur.setDate(cur.getDate()+1);}
-  teamDays.push({date:sg,type:'Holiday',note:''});
-  renderTDO(); recalc();
+  teamDays.push({date:sg,type:'Holiday',note:''}); renderTDO(); recalc();
 }
 
 function setSort(k) { if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;}renderIssues(); }
@@ -202,17 +243,11 @@ function renderIssues() {
     +'<th class="c" style="width:58px">Logged</th>'
     +'<th class="c" style="width:80px">Remaining</th>'
     +'<th style="width:108px;cursor:pointer" onclick="setSort(\'status\')">Status'+ar('status')+'</th>';
-
   const si={Done:'✅','In Progress':'🔄',Open:'📋',Blocked:'🚫'};
   const sc={Done:'s-done','In Progress':'s-prog',Open:'s-open',Blocked:'s-blok'};
-
   document.getElementById('issues-tbody').innerHTML=sortedIssues().map(iss=>{
-    const i=issues.indexOf(iss);
-    const rem=Math.max(0,(iss.est||0)-(iss.logged||0));
-    const pct=iss.est>0?Math.round((iss.logged||0)/iss.est*100):0;
-    return '<tr class="dr">'
-      +'<td><span class="jkey">'+iss.key+'</span></td>'
-      +'<td style="font-size:11px;color:var(--t3)">'+iss.type+'</td>'
+    const i=issues.indexOf(iss), rem=Math.max(0,(iss.est||0)-(iss.logged||0)), pct=iss.est>0?Math.round((iss.logged||0)/iss.est*100):0;
+    return '<tr class="dr"><td><span class="jkey">'+iss.key+'</span></td><td style="font-size:11px;color:var(--t3)">'+iss.type+'</td>'
       +'<td style="font-size:12px">'+iss.summary+(iss.subtasks?'<div style="font-size:10px;color:var(--t3);margin-top:2px">'+iss.subtasks+'</div>':'')+'</td>'
       +'<td><select class="si2" style="width:120px" onchange="issues['+i+'].assignee=this.value;recalc()">'+memberOpts(iss.assignee)+'</select></td>'
       +'<td class="c"><input class="ni" type="number" min="0" step="0.5" value="'+(iss.est||0)+'" oninput="issues['+i+'].est=+this.value;recalc()"></td>'
@@ -227,9 +262,7 @@ function renderIssues() {
       +'<option '+(iss.status==='Blocked'?'selected':'')+'>Blocked</option>'
       +'</select></td></tr>';
   }).join('');
-
-  const te=issues.reduce((a,i)=>a+(+i.est||0),0);
-  const tl=issues.reduce((a,i)=>a+(+i.logged||0),0);
+  const te=issues.reduce((a,i)=>a+(+i.est||0),0), tl=issues.reduce((a,i)=>a+(+i.logged||0),0);
   const totalCount=issues.length, doneCount=issues.filter(i=>i.status==='Done').length;
   const pc=totalCount>0?Math.round(doneCount/totalCount*100):0;
   document.getElementById('i-est').textContent=Math.round(te*10)/10||0;
@@ -241,8 +274,7 @@ function renderAvail() {
   document.getElementById('avail-list').innerHTML=members.map(m=>{
     const c=cap(m),a=asgnFor(m.name),p=c>0?Math.min(100,Math.round(a/c*100)):0;
     const col=p>100?'var(--red)':p>80?'var(--amber)':'var(--green)';
-    return '<div class="ar">'
-      +'<div class="ar-hd"><span style="color:var(--t2);font-size:12px">'+m.name+'</span>'
+    return '<div class="ar"><div class="ar-hd"><span style="color:var(--t2);font-size:12px">'+m.name+'</span>'
       +'<span style="color:var(--t3);font-size:11px">'+a+' / '+c+' hrs ('+p+'%)</span></div>'
       +'<div class="ar-bg"><div class="ar-fill" style="width:'+p+'%;background:'+col+'"></div></div></div>';
   }).join('');
@@ -250,68 +282,48 @@ function renderAvail() {
   const cc=document.getElementById('cap-chart'); if(cc) cc.style.display='none';
 }
 
-// ── CALENDAR ─────────────────────────────────────────────────────────
 function renderCal() {
   const el=document.getElementById('cal-grid');
-  const startStr=document.getElementById('start-date').value;
-  const endStr=document.getElementById('end-date').value;
+  const startStr=document.getElementById('start-date').value, endStr=document.getElementById('end-date').value;
   if(!startStr||!endStr){el.innerHTML='';return;}
   const s=parseDate(startStr),e=parseDate(endStr);
   if(!s||!e||isNaN(s)||isNaN(e)){el.innerHTML='';return;}
-  const todayIso=isoDate(new Date());
-  const offDates=new Set(teamDays.map(d=>d.date));
+  const _n1=new Date(); const todayIso=_n1.getFullYear()+'-'+String(_n1.getMonth()+1).padStart(2,'0')+'-'+String(_n1.getDate()).padStart(2,'0'), offDates=new Set(teamDays.map(d=>d.date));
   let h=['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>'<div class="cdl">'+d+'</div>').join('');
   for(let i=0;i<s.getDay();i++) h+='<div class="cd"></div>';
   let wc=0; const cur=new Date(s);
   while(cur<=e){
     const dow=cur.getDay(), iso=isoDate(cur);
-    const isToday=iso===todayIso, isOff=offDates.has(iso), isWeekend=dow===0||dow===6;
-    const isPast=iso<todayIso&&!isToday;
+    const isToday=iso===todayIso, isOff=offDates.has(iso), isWeekend=dow===0||dow===6, isPast=iso<todayIso&&!isToday;
     const ti=teamDays.find(d=>d.date===iso);
-    const ttl=ti?ti.type+(ti.note?' — '+ti.note:''):iso;
     if(!isWeekend&&!isOff) wc++;
     let cls='cd',ex='';
     if(isToday) cls+=' today';
     else if(isOff) cls+=' off';
-    else if(isWeekend){/* blank */}
+    else if(isWeekend){}
     else if(isPast){cls+=' work';ex=' style="opacity:.38"';}
     else cls+=' work';
-    h+='<div class="'+cls+'"'+ex+' title="'+ttl+'">'+cur.getDate()+'</div>';
+    h+='<div class="'+cls+'"'+ex+' title="'+iso+'">'+cur.getDate()+'</div>';
     cur.setDate(cur.getDate()+1);
   }
   el.innerHTML=h;
   const w=document.getElementById('work-days'); if(w&&wc>0) w.value=wc;
 }
 
-// ── BURNDOWN ──────────────────────────────────────────────────────────
 function renderBurndown() {
   const sd=getSD();
   const startStr=document.getElementById('start-date').value||(sd&&sd.startDate)||'';
   const endStr=document.getElementById('end-date').value||(sd&&sd.endDate)||'';
   const s=parseDate(startStr), e=parseDate(endStr);
   if(!s||!e) return;
-  const todayIso=isoDate(new Date());
-  const off=new Set(teamDays.map(d=>d.date));
+  const _n2=new Date(); const todayIso=_n2.getFullYear()+'-'+String(_n2.getMonth()+1).padStart(2,'0')+'-'+String(_n2.getDate()).padStart(2,'0'), off=new Set(teamDays.map(d=>d.date));
   const workDays=[]; const cur=new Date(s);
-  while(cur<=e){
-    const dow=cur.getDay(), iso=isoDate(cur);
-    if(dow!==0&&dow!==6&&!off.has(iso)) workDays.push(iso);
-    cur.setDate(cur.getDate()+1);
-  }
+  while(cur<=e){ const dow=cur.getDay(), iso=isoDate(cur); if(dow!==0&&dow!==6&&!off.has(iso)) workDays.push(iso); cur.setDate(cur.getDate()+1); }
   if(!workDays.length) return;
-  const totalIssues=issues.length;
-  const doneCount=issues.filter(i=>i.status==='Done').length;
-  const openCount=totalIssues-doneCount;
-  const n=workDays.length;
+  const totalIssues=issues.length, doneCount=issues.filter(i=>i.status==='Done').length, openCount=totalIssues-doneCount, n=workDays.length;
   const ideal=workDays.map((_,i)=>Math.round(totalIssues*(1-i/Math.max(n-1,1))*10)/10);
-  const pivotIdx=workDays.findIndex(d=>d>=todayIso);
-  const pivot=pivotIdx===-1?n-1:pivotIdx;
-  const actual=workDays.map((day,i)=>{
-    if(i>pivot) return null;
-    if(i===pivot) return openCount;
-    if(pivot===0) return totalIssues;
-    return Math.round((totalIssues-(totalIssues-openCount)*(i/pivot))*10)/10;
-  });
+  const pivotIdx=workDays.findIndex(d=>d>=todayIso), pivot=pivotIdx===-1?n-1:pivotIdx;
+  const actual=workDays.map((day,i)=>{ if(i>pivot) return null; if(i===pivot) return openCount; if(pivot===0) return totalIssues; return Math.round((totalIssues-(totalIssues-openCount)*(i/pivot))*10)/10; });
   const labels=workDays.map(d=>{const[,m,day]=d.split('-');return parseInt(m)+'/'+parseInt(day);});
   if(charts.bd) charts.bd.destroy();
   charts.bd=new Chart(document.getElementById('burndown-chart'),{
@@ -320,25 +332,19 @@ function renderBurndown() {
       {label:'Ideal',data:ideal,borderColor:'rgba(77,166,255,.45)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:false,tension:0},
       {label:'Actual',data:actual,borderColor:'#00d4aa',backgroundColor:'rgba(0,212,170,.08)',borderWidth:2,pointRadius:3,pointBackgroundColor:'#00d4aa',fill:true,tension:0,spanGaps:false}
     ]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
+    options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.raw+' issues remaining'}}},
       scales:{
         x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5a6580',font:{size:10},maxTicksLimit:8}},
-        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5a6580',font:{size:10},stepSize:1,precision:0},min:0,max:Math.max(5,totalIssues),
-          title:{display:true,text:'Issues remaining',color:'#5a6580',font:{size:10}}}
+        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5a6580',font:{size:10},stepSize:1,precision:0},min:0,max:Math.max(5,totalIssues),title:{display:true,text:'Issues remaining',color:'#5a6580',font:{size:10}}}
       }
     }
   });
 }
 
-// ── RECALC ────────────────────────────────────────────────────────────
 function recalc() {
-  const tc=members.reduce((a,m)=>a+cap(m),0);
-  const ta=members.reduce((a,m)=>a+asgnFor(m.name),0);
-  const tp=members.reduce((a,m)=>a+m.pto,0)+tdo();
-  const util=tc>0?Math.round(ta/tc*100):0;
-  const totalCount=issues.length, doneCount=issues.filter(i=>i.status==='Done').length;
+  const tc=members.reduce((a,m)=>a+cap(m),0), ta=members.reduce((a,m)=>a+asgnFor(m.name),0), tp=members.reduce((a,m)=>a+m.pto,0)+tdo();
+  const util=tc>0?Math.round(ta/tc*100):0, totalCount=issues.length, doneCount=issues.filter(i=>i.status==='Done').length;
   const pct=totalCount>0?Math.round(doneCount/totalCount*100):0;
   document.getElementById('k-cap').textContent=tc;
   document.getElementById('k-asgn').textContent=ta;
@@ -346,14 +352,15 @@ function recalc() {
   document.getElementById('k-rem-sub').textContent=doneCount+' of '+totalCount+' issues done';
   document.getElementById('k-util').textContent=util+'%';
   document.getElementById('k-pto').textContent=tp;
+  const kptoSub=document.querySelector('#k-pto')?.closest('.kpi')?.querySelector('.ks');
+  if(kptoSub) kptoSub.textContent='team days off this sprint';
   renderMembers(); renderAvail(); renderCal(); renderBurndown();
 }
 
-// ── JIRA REFRESH BUTTON — tells user to ask Claude ───────────────────
 async function refreshFromJira() {
   const btn=document.getElementById('refresh-btn');
   if(btn){btn.textContent='Ask Claude ↗';btn.disabled=false;}
-  alert('To refresh sprint data, ask Claude:\n"Refresh the WBS sprint dashboard"\n\nClaude will pull live data from Jira via MCP and inject it directly into this page.');
+  alert('To refresh sprint data, ask Claude:\n"Refresh the WBS sprint dashboard"\n\nClaude will pull live Jira data and inject it directly into this page.');
 }
 
 function renderAll() { renderTDO(); renderIssues(); recalc(); }
