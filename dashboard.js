@@ -404,7 +404,7 @@ function renderBurndown() {
 
 function recalc() {
   const tc=members.reduce((a,m)=>a+cap(m),0), ta=members.reduce((a,m)=>a+asgnFor(m.name),0);
-  const tp=members.reduce((a,m)=>a+m.pto,0)+tdo();
+  const tp=tdo();
   const util=tc>0?Math.round(ta/tc*100):0;
   const totalCount=issues.length, doneCount=issues.filter(i=>i.status==='Done').length;
   const pct=totalCount>0?Math.round(doneCount/totalCount*100):0;
