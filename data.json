@@ -7,7 +7,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-17T15:01:26.915579+00:00",
+    "syncedAt": "2026-04-17T15:07:39.858372+00:00",
     "members": [
       {
         "name": "JL",
@@ -147,7 +147,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-17T15:01:28.500793+00:00",
+    "syncedAt": "2026-04-17T15:07:41.321498+00:00",
     "members": [
       {
         "name": "AR",
@@ -266,7 +266,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-17T15:01:30.597605+00:00",
+    "syncedAt": "2026-04-17T15:07:42.714598+00:00",
     "members": [
       {
         "name": "MJ",
@@ -308,7 +308,7 @@
         "assignee": "Unassigned",
         "status": "Open",
         "est": 37,
-        "logged": 1,
+        "logged": 5,
         "subtasks": "MOJO-64, MOJO-65, MOJO-66, MOJO-67"
       },
       {
@@ -318,7 +318,7 @@
         "assignee": "Unassigned",
         "status": "Open",
         "est": 3,
-        "logged": 0,
+        "logged": 2,
         "subtasks": "MOJO-61"
       },
       {
@@ -328,7 +328,7 @@
         "assignee": "Unassigned",
         "status": "Open",
         "est": 6,
-        "logged": 1,
+        "logged": 2,
         "subtasks": "MOJO-60"
       },
       {
@@ -348,14 +348,14 @@
         "assignee": "Unassigned",
         "status": "Open",
         "est": 43,
-        "logged": 1,
+        "logged": 7,
         "subtasks": "MOJO-23, MOJO-24, MOJO-25, MOJO-26"
       }
     ],
     "subtaskHrs": {
       "Unassigned": {
         "est": 132,
-        "logged": 3
+        "logged": 16
       }
     }
   },
@@ -367,7 +367,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-17T15:01:31.782830+00:00",
+    "syncedAt": "2026-04-17T15:07:44.193582+00:00",
     "members": [
       {
         "name": "PL",
@@ -559,7 +559,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-17T15:01:33.312737+00:00",
+    "syncedAt": "2026-04-17T15:07:45.592889+00:00",
     "members": [
       {
         "name": "PL",
