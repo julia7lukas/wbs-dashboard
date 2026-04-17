@@ -3,7 +3,7 @@ fetch_jira_data.py
 Pulls active sprint data from Jira for all Payerpath teams
 and writes data.json to the repo root for the dashboard to consume.
 
-Privacy: names → initials only, issue summaries stripped (key only).
+Subtask hours: pulled directly from subtasks (not parent rollup).
 """
 
 import os, json, math, requests
@@ -11,9 +11,9 @@ from datetime import datetime, timezone
 from requests.auth import HTTPBasicAuth
 
 # ── CONFIG ────────────────────────────────────────────────────────────
-JIRA_BASE   = os.environ["JIRA_BASE_URL"].rstrip("/")
-AUTH        = HTTPBasicAuth(os.environ["JIRA_EMAIL"], os.environ["JIRA_API_TOKEN"])
-HEADERS     = {"Accept": "application/json"}
+JIRA_BASE = os.environ["JIRA_BASE_URL"].rstrip("/")
+AUTH      = HTTPBasicAuth(os.environ["JIRA_EMAIL"], os.environ["JIRA_API_TOKEN"])
+HEADERS   = {"Accept": "application/json"}
 
 TEAMS = {
     "WBS": {
@@ -64,7 +64,6 @@ def secs_to_hrs(secs):
 
 
 def to_initials(name):
-    """'Julia Lukas' -> 'JL'. Never exposes full names in public data.json."""
     return ''.join(w[0] for w in name.strip().split()).upper() if name else '?'
 
 
@@ -104,66 +103,89 @@ def get_active_sprint(project_key):
         return None
 
 
-def get_sprint_issues(project_key):
-    """Fetch all non-subtask issues using cursor-based pagination (new API)."""
-    jql = (f"project = {project_key} AND sprint in openSprints() "
-           f"AND issuetype not in subTaskIssueTypes() ORDER BY created DESC")
-    fields = ("summary,assignee,status,issuetype,subtasks,"
-              "timetracking,aggregatetimeoriginalestimate,aggregatetimespent,priority")
-    all_issues = []
-    next_page_token = None
-
+def fetch_all_jql(jql, fields):
+    """Fetch all issues using cursor-based pagination."""
+    all_issues, next_page_token = [], None
     while True:
         params = {"jql": jql, "fields": fields, "maxResults": 100}
         if next_page_token:
             params["nextPageToken"] = next_page_token
-
         data = jira_get("/search/jql", params=params)
         batch = data.get("issues", [])
         all_issues.extend(batch)
-
-        # New API uses isLast + nextPageToken instead of total/startAt
         if data.get("isLast", True) or not batch:
             break
         next_page_token = data.get("nextPageToken")
         if not next_page_token:
             break
-
     return all_issues
 
 
-def build_subtask_hrs(raw_issues):
-    """Per-assignee hour totals keyed by initials only."""
+def get_sprint_issues(project_key):
+    jql = (f"project = {project_key} AND sprint in openSprints() "
+           f"AND issuetype not in subTaskIssueTypes() ORDER BY created DESC")
+    fields = "summary,assignee,status,issuetype,subtasks,aggregatetimeoriginalestimate,aggregatetimespent"
+    return fetch_all_jql(jql, fields)
+
+
+def get_sprint_subtasks(project_key):
+    jql = (f"project = {project_key} AND sprint in openSprints() "
+           f"AND issuetype in subTaskIssueTypes() ORDER BY created DESC")
+    fields = "assignee,timeoriginalestimate,timespent,status,parent,summary"
+    return fetch_all_jql(jql, fields)
+
+
+def build_subtask_hrs(subtasks):
+    """Aggregate hours per assignee (full name) from subtasks directly."""
     subtask_hrs = {}
-    for issue in raw_issues:
-        full_name = (issue["fields"].get("assignee") or {}).get("displayName", "Unassigned")
-        key       = to_initials(full_name) if full_name != "Unassigned" else "Unassigned"
-        est    = secs_to_hrs(issue["fields"].get("aggregatetimeoriginalestimate"))
-        logged = secs_to_hrs(issue["fields"].get("aggregatetimespent"))
-        if key not in subtask_hrs:
-            subtask_hrs[key] = {"est": 0, "logged": 0}
-        subtask_hrs[key]["est"]    += est
-        subtask_hrs[key]["logged"] += logged
+    for issue in subtasks:
+        f         = issue["fields"]
+        full_name = (f.get("assignee") or {}).get("displayName", "Unassigned")
+        est    = secs_to_hrs(f.get("timeoriginalestimate"))
+        logged = secs_to_hrs(f.get("timespent"))
+        if full_name not in subtask_hrs:
+            subtask_hrs[full_name] = {"est": 0, "logged": 0}
+        subtask_hrs[full_name]["est"]    += est
+        subtask_hrs[full_name]["logged"] += logged
     return subtask_hrs
 
 
-def format_issues(raw_issues):
-    """Initials for assignees, issue key only for summary — no text exposed."""
+def build_subtask_list_per_parent(subtasks):
+    """Build a map of parent_key -> list of subtasks that have hours."""
+    parent_map = {}
+    for issue in subtasks:
+        f      = issue["fields"]
+        est    = secs_to_hrs(f.get("timeoriginalestimate"))
+        logged = secs_to_hrs(f.get("timespent"))
+        # Only include subtasks that have hours
+        if est == 0 and logged == 0:
+            continue
+        parent_key = (f.get("parent") or {}).get("key", "")
+        if not parent_key:
+            continue
+        if parent_key not in parent_map:
+            parent_map[parent_key] = []
+        assignee  = (f.get("assignee") or {}).get("displayName", "Unassigned")
+        parent_map[parent_key].append(f"{issue['key']} ({assignee}, {est}h est, {logged}h logged)")
+    return parent_map
+
+
+def format_issues(raw_issues, subtask_map):
     out = []
     for issue in raw_issues:
         f         = issue["fields"]
         full_name = (f.get("assignee") or {}).get("displayName", "Unassigned")
-        assignee  = to_initials(full_name) if full_name != "Unassigned" else "Unassigned"
-        subtasks  = [s["key"] for s in (f.get("subtasks") or [])]
+        # Show only subtasks with hours for this parent
+        subtasks_with_hrs = subtask_map.get(issue["key"], [])
         out.append({
             "key":      issue["key"],
             "type":     issue_type_label(issue),
-            "summary":  issue["key"],   # key only — no text exposed publicly
-            "assignee": assignee,       # initials only
+            "summary":  issue["key"],
+            "assignee": full_name,          # ← full name restored
             "status":   map_status(issue),
             "est":      secs_to_hrs(f.get("aggregatetimeoriginalestimate")),
             "logged":   secs_to_hrs(f.get("aggregatetimespent")),
-            "subtasks": ", ".join(subtasks) if subtasks else "",
+            "subtasks": ", ".join(subtasks_with_hrs) if subtasks_with_hrs else "",
         })
     return out
 
@@ -180,10 +202,12 @@ def process_team(project_key, team_config):
     end_date    = sprint.get("endDate",   "")[:10]
 
     raw_issues  = get_sprint_issues(project_key)
-    issues      = format_issues(raw_issues)
-    subtask_hrs = build_subtask_hrs(raw_issues)
+    subtasks    = get_sprint_subtasks(project_key)
+    subtask_map = build_subtask_list_per_parent(subtasks)
+    issues      = format_issues(raw_issues, subtask_map)
+    subtask_hrs = build_subtask_hrs(subtasks)
 
-    print(f"  Sprint: {sprint_name} | Issues: {len(issues)}")
+    print(f"  Sprint: {sprint_name} | Issues: {len(issues)} | Subtasks: {len(subtasks)}")
 
     return {
         "team":       team_config["team"],
@@ -194,8 +218,8 @@ def process_team(project_key, team_config):
         "workDays":   WORKING_DAYS,
         "hrsPerDay":  HRS_PER_DAY,
         "syncedAt":   datetime.now(timezone.utc).isoformat(),
-        "members":    [{"name": to_initials(m), "hrs": HRS_PER_DAY, "pto": 0}
-                       for m in team_config["members"]],
+        "members":    [{"name": m, "hrs": HRS_PER_DAY, "pto": 0}
+                       for m in team_config["members"]],  # ← full names restored
         "teamDays":   [],
         "issues":     issues,
         "subtaskHrs": subtask_hrs,
