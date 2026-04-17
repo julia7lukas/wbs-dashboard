@@ -7,7 +7,7 @@ const DATA_URL = 'https://raw.githubusercontent.com/' + REPO + '/main/data.json?
 const API_URL  = 'https://api.github.com/repos/' + REPO + '/contents/data.json';
 
 let TEAMS    = {};
-let GH_TOKEN = localStorage.getItem('wbs-gh-token') || '';
+let GH_TOKEN = (window.__ENV__ && window.__ENV__.WRITE_TOKEN) || localStorage.getItem('wbs-gh-token') || '';
 
 // ── PUBLIC INJECT API (called by Claude via javascript_tool) ──────────────
 window.__injectTeamData = function(jsonStr) {
@@ -184,9 +184,23 @@ function buildTeamSelector() {
 
 function saveAll() {
   const s = getSD();
+  // Persist capacity edits (hrs/day, PTO) and teamDays back into TEAMS so publish captures them
+  TEAMS[currentTeam].members  = members.map(m => ({...m}));
+  TEAMS[currentTeam].teamDays = teamDays.map(d => ({...d}));
+  // Also save locally as fallback
   localStorage.setItem('wbs-'+s.projectKey+'-'+s.sprintName, JSON.stringify({members, teamDays}));
   localStorage.setItem('wbs-teams-cache', JSON.stringify(TEAMS));
-  document.getElementById('sync-ts').textContent += ' · Saved ✓';
+  const el = document.getElementById('sync-ts');
+  if (GH_TOKEN) {
+    if (el) el.textContent = el.textContent.replace(/ · (Saved|Saving|Published).*/, '') + ' · Saving...';
+    window.__publishData().then(() => {
+      if (el) el.textContent = el.textContent.replace(' · Saving...', '') + ' · Saved for everyone ✓';
+    }).catch(() => {
+      if (el) el.textContent = el.textContent.replace(' · Saving...', '') + ' · Saved locally ✓';
+    });
+  } else {
+    if (el) el.textContent += ' · Saved locally ✓';
+  }
 }
 
 function wd()  { return Math.max(1, parseInt(document.getElementById('work-days').value) || 9); }
