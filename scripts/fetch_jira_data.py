@@ -115,10 +115,12 @@ def get_sprint_issues(project_key):
             "jql": jql, "fields": fields,
             "startAt": start, "maxResults": 100
         })
-        all_issues.extend(data["issues"])
-        start += len(data["issues"])
-        if start >= data["total"]:
-            break
+        batch = data.get("issues", [])
+        all_issues.extend(batch)
+        total = data.get("total", len(all_issues))
+        start += len(batch)
+        if not batch or start >= total:
+    break
     return all_issues
 
 
