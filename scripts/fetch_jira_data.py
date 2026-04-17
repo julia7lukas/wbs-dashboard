@@ -111,7 +111,7 @@ def get_sprint_issues(project_key):
               "timetracking,aggregatetimeoriginalestimate,aggregatetimespent,priority")
     start, all_issues = 0, []
     while True:
-        data = jira_get("/search", params={
+        data = jira_get("/search/jql", params={
             "jql": jql, "fields": fields,
             "startAt": start, "maxResults": 100
         })
