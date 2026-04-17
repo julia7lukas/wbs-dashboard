@@ -7,7 +7,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-17T13:48:49.752658+00:00",
+    "syncedAt": "2026-04-17T15:01:26.915579+00:00",
     "members": [
       {
         "name": "JL",
@@ -73,8 +73,8 @@
         "summary": "WBS-52",
         "assignee": "Unassigned",
         "status": "Open",
-        "est": 32,
-        "logged": 9,
+        "est": 16,
+        "logged": 13,
         "subtasks": "WBS-53"
       },
       {
@@ -104,7 +104,7 @@
         "assignee": "Unassigned",
         "status": "Open",
         "est": 20,
-        "logged": 0,
+        "logged": 7,
         "subtasks": "WBS-60, WBS-61"
       },
       {
@@ -113,7 +113,7 @@
         "summary": "WBS-24",
         "assignee": "YH",
         "status": "Open",
-        "est": 20,
+        "est": 28,
         "logged": 4,
         "subtasks": "WBS-25, WBS-26, WBS-27"
       },
@@ -123,19 +123,19 @@
         "summary": "WBS-14",
         "assignee": "Unassigned",
         "status": "Open",
-        "est": 38,
-        "logged": 0,
+        "est": 32,
+        "logged": 6,
         "subtasks": "WBS-15, WBS-16, WBS-17, WBS-28, WBS-29, WBS-30, WBS-51, WBS-62"
       }
     ],
     "subtaskHrs": {
       "YH": {
-        "est": 28,
+        "est": 36,
         "logged": 8
       },
       "Unassigned": {
-        "est": 94,
-        "logged": 9
+        "est": 72,
+        "logged": 26
       }
     }
   },
@@ -147,7 +147,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-17T13:48:50.891220+00:00",
+    "syncedAt": "2026-04-17T15:01:28.500793+00:00",
     "members": [
       {
         "name": "AR",
@@ -266,7 +266,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-17T13:48:52.134458+00:00",
+    "syncedAt": "2026-04-17T15:01:30.597605+00:00",
     "members": [
       {
         "name": "MJ",
@@ -367,7 +367,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-17T13:48:53.380099+00:00",
+    "syncedAt": "2026-04-17T15:01:31.782830+00:00",
     "members": [
       {
         "name": "PL",
@@ -559,7 +559,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-17T13:48:54.501163+00:00",
+    "syncedAt": "2026-04-17T15:01:33.312737+00:00",
     "members": [
       {
         "name": "PL",
