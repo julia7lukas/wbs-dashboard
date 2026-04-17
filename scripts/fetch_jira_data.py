@@ -105,22 +105,30 @@ def get_active_sprint(project_key):
 
 
 def get_sprint_issues(project_key):
+    """Fetch all non-subtask issues using cursor-based pagination (new API)."""
     jql = (f"project = {project_key} AND sprint in openSprints() "
            f"AND issuetype not in subTaskIssueTypes() ORDER BY created DESC")
     fields = ("summary,assignee,status,issuetype,subtasks,"
               "timetracking,aggregatetimeoriginalestimate,aggregatetimespent,priority")
-    start, all_issues = 0, []
+    all_issues = []
+    next_page_token = None
+
     while True:
-        data = jira_get("/search/jql", params={
-            "jql": jql, "fields": fields,
-            "startAt": start, "maxResults": 100
-        })
+        params = {"jql": jql, "fields": fields, "maxResults": 100}
+        if next_page_token:
+            params["nextPageToken"] = next_page_token
+
+        data = jira_get("/search/jql", params=params)
         batch = data.get("issues", [])
         all_issues.extend(batch)
-        total = data.get("total", len(all_issues))
-        start += len(batch)
-        if not batch or start >= total:
+
+        # New API uses isLast + nextPageToken instead of total/startAt
+        if data.get("isLast", True) or not batch:
             break
+        next_page_token = data.get("nextPageToken")
+        if not next_page_token:
+            break
+
     return all_issues
 
 
