@@ -2,6 +2,8 @@
 fetch_jira_data.py
 Pulls active sprint data from Jira for all Payerpath teams
 and writes data.json to the repo root for the dashboard to consume.
+
+Privacy: names → initials only, issue summaries stripped (key only).
 """
 
 import os, json, math, requests
@@ -16,11 +18,12 @@ HEADERS     = {"Accept": "application/json"}
 TEAMS = {
     "WBS": {
         "team": "Webslingers",
-        "members": ["Julia Lukas", "Jeremy Goodman", "Joi Hepler", "Suvarna Damarla", "Yudong He"],
+        "members": ["Julia Lukas", "David Swiezy", "Jeremy Goodman", "Joi Hepler",
+                    "Matt Glick", "Suvarna Damarla", "Yudong He"],
     },
     "GIN": {
         "team": "Gingersnaps",
-        "members": ["Adam Rossman", "Deepthi Manne", "Joel Wheeler",
+        "members": ["Adam Rossman", "Deepthi Manne", "Joel Wheeler", "Matt Glick",
                     "Michael Earley", "Michelle Streeter"],
     },
     "MOJO": {
@@ -42,7 +45,7 @@ TEAMS = {
     },
 }
 
-HRS_PER_DAY = 6
+HRS_PER_DAY  = 6
 WORKING_DAYS = 10
 
 
@@ -60,12 +63,15 @@ def secs_to_hrs(secs):
     return math.ceil(secs / 3600)
 
 
+def to_initials(name):
+    """'Julia Lukas' -> 'JL'. Never exposes full names in public data.json."""
+    return ''.join(w[0] for w in name.strip().split()).upper() if name else '?'
+
+
 def map_status(issue):
     cat = issue["fields"]["status"]["statusCategory"]["key"]
-    if cat == "done":
-        return "Done"
-    if cat == "indeterminate":
-        return "In Progress"
+    if cat == "done":          return "Done"
+    if cat == "indeterminate": return "In Progress"
     return "Open"
 
 
@@ -74,9 +80,7 @@ def issue_type_label(issue):
 
 
 def get_active_sprint(project_key):
-    """Return the first active sprint for the project, or None."""
     try:
-        # Get board for project
         boards = requests.get(
             f"{JIRA_BASE}/rest/agile/1.0/board",
             auth=AUTH, headers=HEADERS,
@@ -86,8 +90,6 @@ def get_active_sprint(project_key):
             print(f"  No scrum board found for {project_key}")
             return None
         board_id = boards["values"][0]["id"]
-
-        # Get active sprints on that board
         sprints = requests.get(
             f"{JIRA_BASE}/rest/agile/1.0/board/{board_id}/sprint",
             auth=AUTH, headers=HEADERS,
@@ -103,7 +105,6 @@ def get_active_sprint(project_key):
 
 
 def get_sprint_issues(project_key):
-    """Fetch all non-subtask issues in the active sprint."""
     jql = (f"project = {project_key} AND sprint in openSprints() "
            f"AND issuetype not in subTaskIssueTypes() ORDER BY created DESC")
     fields = ("summary,assignee,status,issuetype,subtasks,"
@@ -122,33 +123,36 @@ def get_sprint_issues(project_key):
 
 
 def build_subtask_hrs(raw_issues):
-    """Build per-assignee subtask hour totals."""
+    """Per-assignee hour totals keyed by initials only."""
     subtask_hrs = {}
     for issue in raw_issues:
-        assignee = (issue["fields"].get("assignee") or {}).get("displayName", "Unassigned")
-        est = secs_to_hrs(issue["fields"].get("aggregatetimeoriginalestimate"))
+        full_name = (issue["fields"].get("assignee") or {}).get("displayName", "Unassigned")
+        key       = to_initials(full_name) if full_name != "Unassigned" else "Unassigned"
+        est    = secs_to_hrs(issue["fields"].get("aggregatetimeoriginalestimate"))
         logged = secs_to_hrs(issue["fields"].get("aggregatetimespent"))
-        if assignee not in subtask_hrs:
-            subtask_hrs[assignee] = {"est": 0, "logged": 0}
-        subtask_hrs[assignee]["est"] += est
-        subtask_hrs[assignee]["logged"] += logged
+        if key not in subtask_hrs:
+            subtask_hrs[key] = {"est": 0, "logged": 0}
+        subtask_hrs[key]["est"]    += est
+        subtask_hrs[key]["logged"] += logged
     return subtask_hrs
 
 
 def format_issues(raw_issues):
+    """Initials for assignees, issue key only for summary — no text exposed."""
     out = []
     for issue in raw_issues:
-        f = issue["fields"]
-        assignee = (f.get("assignee") or {}).get("displayName", "Unassigned")
-        subtasks = [s["key"] for s in (f.get("subtasks") or [])]
+        f         = issue["fields"]
+        full_name = (f.get("assignee") or {}).get("displayName", "Unassigned")
+        assignee  = to_initials(full_name) if full_name != "Unassigned" else "Unassigned"
+        subtasks  = [s["key"] for s in (f.get("subtasks") or [])]
         out.append({
-            "key": issue["key"],
-            "type": issue_type_label(issue),
-            "summary": f["summary"],
-            "assignee": assignee,
-            "status": map_status(issue),
-            "est": secs_to_hrs(f.get("aggregatetimeoriginalestimate")),
-            "logged": secs_to_hrs(f.get("aggregatetimespent")),
+            "key":      issue["key"],
+            "type":     issue_type_label(issue),
+            "summary":  issue["key"],   # key only — no text exposed publicly
+            "assignee": assignee,       # initials only
+            "status":   map_status(issue),
+            "est":      secs_to_hrs(f.get("aggregatetimeoriginalestimate")),
+            "logged":   secs_to_hrs(f.get("aggregatetimespent")),
             "subtasks": ", ".join(subtasks) if subtasks else "",
         })
     return out
@@ -161,30 +165,30 @@ def process_team(project_key, team_config):
     if not sprint:
         return None
 
-    sprint_name  = sprint.get("name", f"{project_key} Active Sprint")
-    start_date   = (sprint.get("startDate", "")[:10])
-    end_date     = (sprint.get("endDate", "")[:10])
+    sprint_name = sprint.get("name", f"{project_key} Active Sprint")
+    start_date  = sprint.get("startDate", "")[:10]
+    end_date    = sprint.get("endDate",   "")[:10]
 
-    raw_issues   = get_sprint_issues(project_key)
-    issues       = format_issues(raw_issues)
-    subtask_hrs  = build_subtask_hrs(raw_issues)
+    raw_issues  = get_sprint_issues(project_key)
+    issues      = format_issues(raw_issues)
+    subtask_hrs = build_subtask_hrs(raw_issues)
 
     print(f"  Sprint: {sprint_name} | Issues: {len(issues)}")
 
     return {
-        "team":        team_config["team"],
-        "projectKey":  project_key,
-        "sprintName":  sprint_name,
-        "startDate":   start_date,
-        "endDate":     end_date,
-        "workDays":    WORKING_DAYS,
-        "hrsPerDay":   HRS_PER_DAY,
-        "syncedAt":    datetime.now(timezone.utc).isoformat(),
-        "members":     [{"name": m, "hrs": HRS_PER_DAY, "pto": 0}
-                        for m in team_config["members"]],
-        "teamDays":    [],          # Holidays added manually in the dashboard
-        "issues":      issues,
-        "subtaskHrs":  subtask_hrs,
+        "team":       team_config["team"],
+        "projectKey": project_key,
+        "sprintName": sprint_name,
+        "startDate":  start_date,
+        "endDate":    end_date,
+        "workDays":   WORKING_DAYS,
+        "hrsPerDay":  HRS_PER_DAY,
+        "syncedAt":   datetime.now(timezone.utc).isoformat(),
+        "members":    [{"name": to_initials(m), "hrs": HRS_PER_DAY, "pto": 0}
+                       for m in team_config["members"]],
+        "teamDays":   [],
+        "issues":     issues,
+        "subtaskHrs": subtask_hrs,
     }
 
 
