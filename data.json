@@ -1,1 +1,814 @@
-{}
+{
+  "WBS": {
+    "team": "Webslingers",
+    "projectKey": "WBS",
+    "sprintName": "WBS 2026 Q2S2",
+    "startDate": "2026-04-15",
+    "endDate": "2026-04-29",
+    "workDays": 10,
+    "hrsPerDay": 6,
+    "syncedAt": "2026-04-17T13:48:49.752658+00:00",
+    "members": [
+      {
+        "name": "JL",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "DS",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "JG",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "JH",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "MG",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "SD",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "YH",
+        "hrs": 6,
+        "pto": 0
+      }
+    ],
+    "teamDays": [],
+    "issues": [
+      {
+        "key": "WBS-66",
+        "type": "Task",
+        "summary": "WBS-66",
+        "assignee": "YH",
+        "status": "Done",
+        "est": 0,
+        "logged": 2,
+        "subtasks": ""
+      },
+      {
+        "key": "WBS-63",
+        "type": "Bug",
+        "summary": "WBS-63",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 1,
+        "logged": 0,
+        "subtasks": "WBS-64, WBS-65"
+      },
+      {
+        "key": "WBS-52",
+        "type": "Story",
+        "summary": "WBS-52",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 32,
+        "logged": 9,
+        "subtasks": "WBS-53"
+      },
+      {
+        "key": "WBS-50",
+        "type": "Bug",
+        "summary": "WBS-50",
+        "assignee": "YH",
+        "status": "Open",
+        "est": 8,
+        "logged": 2,
+        "subtasks": "WBS-54, WBS-55"
+      },
+      {
+        "key": "WBS-45",
+        "type": "Story",
+        "summary": "WBS-45",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 3,
+        "logged": 0,
+        "subtasks": "WBS-56, WBS-57, WBS-58, WBS-59"
+      },
+      {
+        "key": "WBS-39",
+        "type": "Story",
+        "summary": "WBS-39",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 20,
+        "logged": 0,
+        "subtasks": "WBS-60, WBS-61"
+      },
+      {
+        "key": "WBS-24",
+        "type": "Story",
+        "summary": "WBS-24",
+        "assignee": "YH",
+        "status": "Open",
+        "est": 20,
+        "logged": 4,
+        "subtasks": "WBS-25, WBS-26, WBS-27"
+      },
+      {
+        "key": "WBS-14",
+        "type": "Story",
+        "summary": "WBS-14",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 38,
+        "logged": 0,
+        "subtasks": "WBS-15, WBS-16, WBS-17, WBS-28, WBS-29, WBS-30, WBS-51, WBS-62"
+      }
+    ],
+    "subtaskHrs": {
+      "YH": {
+        "est": 28,
+        "logged": 8
+      },
+      "Unassigned": {
+        "est": 94,
+        "logged": 9
+      }
+    }
+  },
+  "GIN": {
+    "team": "Gingersnaps",
+    "projectKey": "GIN",
+    "sprintName": "GIN 2026 Q2S2",
+    "startDate": "2026-04-15",
+    "endDate": "2026-04-29",
+    "workDays": 10,
+    "hrsPerDay": 6,
+    "syncedAt": "2026-04-17T13:48:50.891220+00:00",
+    "members": [
+      {
+        "name": "AR",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "DM",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "JW",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "MG",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "ME",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "MS",
+        "hrs": 6,
+        "pto": 0
+      }
+    ],
+    "teamDays": [],
+    "issues": [
+      {
+        "key": "GIN-61",
+        "type": "Story",
+        "summary": "GIN-61",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "GIN-62, GIN-63, GIN-64"
+      },
+      {
+        "key": "GIN-40",
+        "type": "Story",
+        "summary": "GIN-40",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 0,
+        "logged": 0,
+        "subtasks": ""
+      },
+      {
+        "key": "GIN-39",
+        "type": "Story",
+        "summary": "GIN-39",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 0,
+        "logged": 0,
+        "subtasks": ""
+      },
+      {
+        "key": "GIN-38",
+        "type": "Story",
+        "summary": "GIN-38",
+        "assignee": "AR",
+        "status": "In Progress",
+        "est": 65,
+        "logged": 11,
+        "subtasks": "GIN-69, GIN-70, GIN-71, GIN-72, GIN-73, GIN-74, GIN-75, GIN-76, GIN-77"
+      },
+      {
+        "key": "GIN-37",
+        "type": "Story",
+        "summary": "GIN-37",
+        "assignee": "ME",
+        "status": "Open",
+        "est": 74,
+        "logged": 0,
+        "subtasks": "GIN-78, GIN-79, GIN-80, GIN-83, GIN-81, GIN-82"
+      },
+      {
+        "key": "GIN-36",
+        "type": "Story",
+        "summary": "GIN-36",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 5,
+        "logged": 0,
+        "subtasks": "GIN-65, GIN-66, GIN-67"
+      }
+    ],
+    "subtaskHrs": {
+      "Unassigned": {
+        "est": 5,
+        "logged": 0
+      },
+      "AR": {
+        "est": 65,
+        "logged": 11
+      },
+      "ME": {
+        "est": 74,
+        "logged": 0
+      }
+    }
+  },
+  "MOJO": {
+    "team": "Mojo",
+    "projectKey": "MOJO",
+    "sprintName": "Mojo Q2S2",
+    "startDate": "2026-04-15",
+    "endDate": "2026-04-28",
+    "workDays": 10,
+    "hrsPerDay": 6,
+    "syncedAt": "2026-04-17T13:48:52.134458+00:00",
+    "members": [
+      {
+        "name": "MJ",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "SP",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "ID",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "TT",
+        "hrs": 6,
+        "pto": 0
+      }
+    ],
+    "teamDays": [],
+    "issues": [
+      {
+        "key": "MOJO-55",
+        "type": "Story",
+        "summary": "MOJO-55",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 31,
+        "logged": 0,
+        "subtasks": "MOJO-68, MOJO-69, MOJO-70, MOJO-71"
+      },
+      {
+        "key": "MOJO-54",
+        "type": "Story",
+        "summary": "MOJO-54",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 37,
+        "logged": 1,
+        "subtasks": "MOJO-64, MOJO-65, MOJO-66, MOJO-67"
+      },
+      {
+        "key": "MOJO-51",
+        "type": "Story",
+        "summary": "MOJO-51",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 3,
+        "logged": 0,
+        "subtasks": "MOJO-61"
+      },
+      {
+        "key": "MOJO-45",
+        "type": "Story",
+        "summary": "MOJO-45",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 6,
+        "logged": 1,
+        "subtasks": "MOJO-60"
+      },
+      {
+        "key": "MOJO-21",
+        "type": "Story",
+        "summary": "MOJO-21",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 12,
+        "logged": 0,
+        "subtasks": "MOJO-35"
+      },
+      {
+        "key": "MOJO-18",
+        "type": "Story",
+        "summary": "MOJO-18",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 43,
+        "logged": 1,
+        "subtasks": "MOJO-23, MOJO-24, MOJO-25, MOJO-26"
+      }
+    ],
+    "subtaskHrs": {
+      "Unassigned": {
+        "est": 132,
+        "logged": 3
+      }
+    }
+  },
+  "MAV": {
+    "team": "Mavericks",
+    "projectKey": "MAV",
+    "sprintName": "MAV 2026 Q2S2",
+    "startDate": "2026-04-14",
+    "endDate": "2026-04-28",
+    "workDays": 10,
+    "hrsPerDay": 6,
+    "syncedAt": "2026-04-17T13:48:53.380099+00:00",
+    "members": [
+      {
+        "name": "PL",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "AP",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "AH",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "CR",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "KK",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "KK",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "MK",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "MN",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "RK",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "SA",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "SD",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "VH",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "VC",
+        "hrs": 6,
+        "pto": 0
+      }
+    ],
+    "teamDays": [],
+    "issues": [
+      {
+        "key": "MAV-70",
+        "type": "Task",
+        "summary": "MAV-70",
+        "assignee": "KK",
+        "status": "In Progress",
+        "est": 3,
+        "logged": 4,
+        "subtasks": ""
+      },
+      {
+        "key": "MAV-56",
+        "type": "Story",
+        "summary": "MAV-56",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 0,
+        "logged": 0,
+        "subtasks": ""
+      },
+      {
+        "key": "MAV-51",
+        "type": "Story",
+        "summary": "MAV-51",
+        "assignee": "RK",
+        "status": "Open",
+        "est": 14,
+        "logged": 8,
+        "subtasks": "MAV-83, MAV-84, MAV-85, MAV-86"
+      },
+      {
+        "key": "MAV-40",
+        "type": "Story",
+        "summary": "MAV-40",
+        "assignee": "KK",
+        "status": "In Progress",
+        "est": 13,
+        "logged": 6,
+        "subtasks": "MAV-73, MAV-75, MAV-76, MAV-77"
+      },
+      {
+        "key": "MAV-38",
+        "type": "Story",
+        "summary": "MAV-38",
+        "assignee": "KK",
+        "status": "Open",
+        "est": 14,
+        "logged": 0,
+        "subtasks": "MAV-72, MAV-78"
+      },
+      {
+        "key": "MAV-33",
+        "type": "Story",
+        "summary": "MAV-33",
+        "assignee": "RK",
+        "status": "Open",
+        "est": 42,
+        "logged": 10,
+        "subtasks": "MAV-79, MAV-80, MAV-81"
+      },
+      {
+        "key": "MAV-27",
+        "type": "Story",
+        "summary": "MAV-27",
+        "assignee": "MK",
+        "status": "In Progress",
+        "est": 18,
+        "logged": 8,
+        "subtasks": "MAV-71, MAV-82"
+      },
+      {
+        "key": "MAV-25",
+        "type": "Story",
+        "summary": "MAV-25",
+        "assignee": "SD",
+        "status": "Open",
+        "est": 9,
+        "logged": 0,
+        "subtasks": "MAV-74"
+      },
+      {
+        "key": "MAV-24",
+        "type": "Story",
+        "summary": "MAV-24",
+        "assignee": "KK",
+        "status": "In Progress",
+        "est": 60,
+        "logged": 6,
+        "subtasks": "MAV-67, MAV-68, MAV-69"
+      }
+    ],
+    "subtaskHrs": {
+      "KK": {
+        "est": 90,
+        "logged": 16
+      },
+      "Unassigned": {
+        "est": 0,
+        "logged": 0
+      },
+      "RK": {
+        "est": 56,
+        "logged": 18
+      },
+      "MK": {
+        "est": 18,
+        "logged": 8
+      },
+      "SD": {
+        "est": 9,
+        "logged": 0
+      }
+    }
+  },
+  "AMGO": {
+    "team": "Amigos",
+    "projectKey": "AMGO",
+    "sprintName": "AMGO 2026 Q2S2",
+    "startDate": "2026-04-16",
+    "endDate": "2026-04-28",
+    "workDays": 10,
+    "hrsPerDay": 6,
+    "syncedAt": "2026-04-17T13:48:54.501163+00:00",
+    "members": [
+      {
+        "name": "PL",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "AK",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "GJ",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "HJ",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "KD",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "KT",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "ST",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "SA",
+        "hrs": 6,
+        "pto": 0
+      },
+      {
+        "name": "YK",
+        "hrs": 6,
+        "pto": 0
+      }
+    ],
+    "teamDays": [],
+    "issues": [
+      {
+        "key": "AMGO-74",
+        "type": "Bug",
+        "summary": "AMGO-74",
+        "assignee": "HJ",
+        "status": "Open",
+        "est": 6,
+        "logged": 0,
+        "subtasks": "AMGO-93, AMGO-96"
+      },
+      {
+        "key": "AMGO-73",
+        "type": "Bug",
+        "summary": "AMGO-73",
+        "assignee": "HJ",
+        "status": "Open",
+        "est": 8,
+        "logged": 0,
+        "subtasks": "AMGO-92, AMGO-95"
+      },
+      {
+        "key": "AMGO-72",
+        "type": "Bug",
+        "summary": "AMGO-72",
+        "assignee": "YK",
+        "status": "Open",
+        "est": 6,
+        "logged": 0,
+        "subtasks": "AMGO-88"
+      },
+      {
+        "key": "AMGO-71",
+        "type": "Bug",
+        "summary": "AMGO-71",
+        "assignee": "YK",
+        "status": "Done",
+        "est": 2,
+        "logged": 0,
+        "subtasks": "AMGO-91"
+      },
+      {
+        "key": "AMGO-70",
+        "type": "Bug",
+        "summary": "AMGO-70",
+        "assignee": "AK",
+        "status": "In Progress",
+        "est": 12,
+        "logged": 0,
+        "subtasks": "AMGO-79, AMGO-83"
+      },
+      {
+        "key": "AMGO-69",
+        "type": "Bug",
+        "summary": "AMGO-69",
+        "assignee": "YK",
+        "status": "Done",
+        "est": 4,
+        "logged": 0,
+        "subtasks": "AMGO-90"
+      },
+      {
+        "key": "AMGO-68",
+        "type": "Bug",
+        "summary": "AMGO-68",
+        "assignee": "KD",
+        "status": "Open",
+        "est": 14,
+        "logged": 0,
+        "subtasks": "AMGO-75, AMGO-94"
+      },
+      {
+        "key": "AMGO-67",
+        "type": "Bug",
+        "summary": "AMGO-67",
+        "assignee": "KT",
+        "status": "Open",
+        "est": 18,
+        "logged": 0,
+        "subtasks": "AMGO-80, AMGO-84"
+      },
+      {
+        "key": "AMGO-66",
+        "type": "Story",
+        "summary": "AMGO-66",
+        "assignee": "AK",
+        "status": "Open",
+        "est": 6,
+        "logged": 0,
+        "subtasks": "AMGO-87"
+      },
+      {
+        "key": "AMGO-61",
+        "type": "Story",
+        "summary": "AMGO-61",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 0,
+        "logged": 0,
+        "subtasks": ""
+      },
+      {
+        "key": "AMGO-57",
+        "type": "Story",
+        "summary": "AMGO-57",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 0,
+        "logged": 0,
+        "subtasks": ""
+      },
+      {
+        "key": "AMGO-39",
+        "type": "Story",
+        "summary": "AMGO-39",
+        "assignee": "KT",
+        "status": "Open",
+        "est": 22,
+        "logged": 0,
+        "subtasks": "AMGO-86, AMGO-98"
+      },
+      {
+        "key": "AMGO-34",
+        "type": "Story",
+        "summary": "AMGO-34",
+        "assignee": "YK",
+        "status": "Open",
+        "est": 36,
+        "logged": 0,
+        "subtasks": "AMGO-82, AMGO-85"
+      },
+      {
+        "key": "AMGO-33",
+        "type": "Story",
+        "summary": "AMGO-33",
+        "assignee": "ST",
+        "status": "Open",
+        "est": 10,
+        "logged": 0,
+        "subtasks": "AMGO-97"
+      },
+      {
+        "key": "AMGO-26",
+        "type": "Story",
+        "summary": "AMGO-26",
+        "assignee": "KD",
+        "status": "In Progress",
+        "est": 18,
+        "logged": 0,
+        "subtasks": "AMGO-76, AMGO-77, AMGO-78"
+      },
+      {
+        "key": "AMGO-11",
+        "type": "Bug",
+        "summary": "AMGO-11",
+        "assignee": "KT",
+        "status": "In Progress",
+        "est": 6,
+        "logged": 0,
+        "subtasks": "AMGO-89"
+      },
+      {
+        "key": "AMGO-7",
+        "type": "Story",
+        "summary": "AMGO-7",
+        "assignee": "ST",
+        "status": "In Progress",
+        "est": 20,
+        "logged": 0,
+        "subtasks": "AMGO-18, AMGO-15, AMGO-81"
+      }
+    ],
+    "subtaskHrs": {
+      "HJ": {
+        "est": 14,
+        "logged": 0
+      },
+      "YK": {
+        "est": 48,
+        "logged": 0
+      },
+      "AK": {
+        "est": 18,
+        "logged": 0
+      },
+      "KD": {
+        "est": 32,
+        "logged": 0
+      },
+      "KT": {
+        "est": 46,
+        "logged": 0
+      },
+      "Unassigned": {
+        "est": 0,
+        "logged": 0
+      },
+      "ST": {
+        "est": 30,
+        "logged": 0
+      }
+    }
+  }
+}
