@@ -2,7 +2,7 @@
 // data.json is written daily by GitHub Actions (fetch_jira_data.py).
 // Claude can also inject live data via window.__injectTeamData() for
 // on-demand refreshes using the Chrome extension.
-const REPO     = 'payerpath/wbs-dashboard';
+const REPO = 'julia7lukas/wbs-dashboard';
 const DATA_URL = 'https://raw.githubusercontent.com/' + REPO + '/main/data.json?cb=' + Date.now();
 const API_URL  = 'https://api.github.com/repos/' + REPO + '/contents/data.json';
 
