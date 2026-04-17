@@ -17,8 +17,8 @@ window.__injectTeamData = function(jsonStr) {
     buildTeamSelector();
     switchTeam(currentTeam || Object.keys(TEAMS)[0]);
     const el = document.getElementById('sync-ts');
-    if (el) el.textContent = 'Jira sync: ' + new Date().toLocaleString([], {
-      dateStyle: 'short', timeStyle: 'short'
+    if (el) el.textContent = 'Jira sync: ' + new Date().toLocaleString('en-US', {
+      dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Chicago'
     }) + ' · Live ✓';
     if (GH_TOKEN) window.__publishData();
   } catch (e) {
@@ -93,8 +93,8 @@ function switchTeam(key) {
   document.getElementById('hrs-day').value               = SD.hrsPerDay;
   const ts = new Date(SD.syncedAt);
   document.getElementById('sync-ts').textContent = 'Jira sync: ' +
-    ts.toLocaleDateString() + ' ' +
-    ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    ts.toLocaleDateString('en-US', { timeZone: 'America/Chicago' }) + ' ' +
+    ts.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Chicago' });
   document.getElementById('team-badge').textContent = key;
   document.querySelectorAll('.team-btn').forEach(b => {
     b.style.background  = b.dataset.key === key ? 'var(--green)' : 'var(--bg3)';
@@ -136,8 +136,8 @@ async function load() {
         buildTeamSelector();
         switchTeam(Object.keys(TEAMS)[0]);
         if (el) el.textContent = 'Jira sync: ' +
-          new Date(Object.values(TEAMS)[0].syncedAt).toLocaleString([], {
-            dateStyle: 'short', timeStyle: 'short'
+          new Date(Object.values(TEAMS)[0].syncedAt).toLocaleString('en-US', {
+            dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Chicago'
           }) + ' · Auto ✓';
         return;
       }
@@ -404,7 +404,7 @@ function renderBurndown() {
 
 function recalc() {
   const tc=members.reduce((a,m)=>a+cap(m),0), ta=members.reduce((a,m)=>a+asgnFor(m.name),0);
-  const tp=tdo();
+  const tp=members.reduce((a,m)=>a+m.pto,0)+tdo();
   const util=tc>0?Math.round(ta/tc*100):0;
   const totalCount=issues.length, doneCount=issues.filter(i=>i.status==='Done').length;
   const pct=totalCount>0?Math.round(doneCount/totalCount*100):0;
