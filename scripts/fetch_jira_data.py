@@ -120,7 +120,7 @@ def get_sprint_issues(project_key):
         total = data.get("total", len(all_issues))
         start += len(batch)
         if not batch or start >= total:
-    break
+            break
     return all_issues
 
 
