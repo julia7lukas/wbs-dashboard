@@ -1,0 +1,72 @@
+name: Daily Sprint Data Refresh
+
+on:
+  schedule:
+    - cron: '0 11 * * 1-5'   # 6am CT (11am UTC)
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch sprint data from Jira
+        env:
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_BASE_URL: https://veradigm.atlassian.net
+        run: python scripts/fetch_jira_data.py
+
+      - name: Commit updated data.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git diff --cached --quiet || git commit -m "Auto refresh: sprint data $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push
+
+      - name: Deploy to GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages artifact (with env.js injected, never committed)
+        env:
+          WRITE_TOKEN: ${{ secrets.DASHBOARD_WRITE_TOKEN }}
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp dashboard.js _site/
+          cp data.json _site/
+          # Write env.js with the token — goes to Pages but never to the repo
+          echo "window.__ENV__ = { WRITE_TOKEN: '${WRITE_TOKEN}' };" > _site/env.js
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: refresh
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
