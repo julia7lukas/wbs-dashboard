@@ -2,7 +2,7 @@
 // data.json is written daily by GitHub Actions (fetch_jira_data.py).
 // Claude can also inject live data via window.__injectTeamData() for
 // on-demand refreshes using the Chrome extension.
-const REPO = 'julia7lukas/wbs-dashboard';
+const REPO     = 'julia7lukas/wbs-dashboard';
 const DATA_URL = 'https://raw.githubusercontent.com/' + REPO + '/main/data.json?cb=' + Date.now();
 const API_URL  = 'https://api.github.com/repos/' + REPO + '/contents/data.json';
 
@@ -404,7 +404,7 @@ function renderBurndown() {
 
 function recalc() {
   const tc=members.reduce((a,m)=>a+cap(m),0), ta=members.reduce((a,m)=>a+asgnFor(m.name),0);
-  const tp=members.reduce((a,m)=>a+m.pto,0)+tdo();
+  const tp=tdo();
   const util=tc>0?Math.round(ta/tc*100):0;
   const totalCount=issues.length, doneCount=issues.filter(i=>i.status==='Done').length;
   const pct=totalCount>0?Math.round(doneCount/totalCount*100):0;
