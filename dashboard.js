@@ -15,6 +15,8 @@ let GH_TOKEN = (window.__ENV__ && window.__ENV__.WRITE_TOKEN) || localStorage.ge
 
 // Track the state of issues at load time so we only push actual diffs to Jira
 let _issueSnapshot = {};
+// Track members removed this session so saveAll can unassign their issues
+let _removedMembers = [];
 
 // ── SPRINT-SCOPED CACHE ──────────────────────────────────────────────────────
 function cacheKey(projectKey, sprintName) {
@@ -170,6 +172,8 @@ function switchTeam(key) {
     teamDays = SD.teamDays ? SD.teamDays.map(d => ({...d})) : [];
   }
   issues = SD.issues.map(i => ({...i}));
+  // Reset per-session tracking on team switch
+  _removedMembers = [];
   // Snapshot issue state so we can diff on save
   _issueSnapshot = Object.fromEntries(issues.map(i => [i.key, {assignee:i.assignee, status:i.status, est:i.est}]));
 
@@ -265,7 +269,7 @@ async function saveAll() {
 
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Saving...'; }
 
-  // 1. Detect which issues changed vs snapshot
+  // 1. Detect which issues changed vs snapshot (includes auto-unassigns from removed members)
   const changedIssues = issues.filter(iss => {
     const snap = _issueSnapshot[iss.key];
     if (!snap) return false;
@@ -307,6 +311,7 @@ async function saveAll() {
 
   // Update snapshot so next save only diffs new changes
   _issueSnapshot = Object.fromEntries(issues.map(i => [i.key, {assignee:i.assignee, status:i.status, est:i.est}]));
+  _removedMembers = [];
 
   if (btn) { btn.disabled = false; btn.textContent = '✓ Save changes'; }
   if (el) el.textContent = (el.textContent||'').replace(/ · (Saving|Saved|Jira|Confluence).*/g, '') +
@@ -324,7 +329,14 @@ function memberOpts(sel) {
   return '<option value="Unassigned"'+(!sel||sel==='Unassigned'?' selected':'')+'>Unassigned</option>' +
     members.map(m=>'<option value="'+m.name+'"'+(m.name===sel?' selected':'')+'>'+m.name+'</option>').join('');
 }
-function removeMember(i) { members.splice(i,1); renderAll(); }
+function removeMember(i) {
+  const removed = members[i];
+  _removedMembers.push(removed.name);
+  // Unassign any issues currently assigned to this member
+  issues.forEach(iss => { if (iss.assignee === removed.name) iss.assignee = 'Unassigned'; });
+  members.splice(i, 1);
+  renderAll();
+}
 function addMemberPrompt() {
   const n=(prompt('Name:')||'').trim(); if(!n) return;
   if(members.find(m=>m.name===n)){alert(n+' already listed.');return;}
