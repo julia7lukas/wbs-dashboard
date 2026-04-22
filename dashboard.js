@@ -2,37 +2,22 @@
 // data.json is written daily by GitHub Actions (fetch_jira_data.py).
 // Claude can also inject live data via window.__injectTeamData() for
 // on-demand refreshes using the Chrome extension.
-// On Save: changes persist to localStorage, data.json (GitHub), Jira, AND Confluence.
-const REPO = 'julia7lukas/wbs-dashboard';
+// On Save: changes persist to localStorage, Jira, and Confluence.
+// GitHub data.json is updated only by the daily Action — never from the browser.
+const REPO     = 'julia7lukas/wbs-dashboard';
 const DATA_URL = 'https://raw.githubusercontent.com/' + REPO + '/main/data.json?cb=' + Date.now();
-const API_URL = 'https://api.github.com/repos/' + REPO + '/contents/data.json';
-const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
-const ATLASSIAN_MCP = 'https://mcp.atlassian.com/v1/sse';
-const CONFLUENCE_PAGE_IDS = { WBS: '6627524645', GIN: null, MOJO: null, MAV: null, AMGO: null };
+const ANTHROPIC_API  = 'https://api.anthropic.com/v1/messages';
+const ATLASSIAN_MCP  = 'https://mcp.atlassian.com/v1/sse';
+const CONFLUENCE_PAGE_IDS = { WBS:'6627524645', GIN:null, MOJO:null, MAV:null, AMGO:null };
 
 let TEAMS = {};
-// Token: env.js (gitignored) → sessionStorage (clears on browser close, never on disk)
-// Never localStorage — that persists indefinitely and is readable by anyone with DevTools.
-let GH_TOKEN = (window.__ENV__ && window.__ENV__.WRITE_TOKEN) || sessionStorage.getItem('wbs-gh-token') || '';
 
-// Track the state of issues at load time so we only push actual diffs to Jira
+// Track issue state at load time so we only push actual diffs to Jira
 let _issueSnapshot = {};
 // Track members removed this session so saveAll can unassign their issues
 let _removedMembers = [];
 
-// ── SECURITY: migrate any token previously stored in localStorage ────────────
-// Old versions of dashboard.js stored the GH token in localStorage (persists
-// indefinitely). This removes it and re-stores in sessionStorage (session-only).
-(function migrateToken() {
-  const legacy = localStorage.getItem('wbs-gh-token');
-  if (legacy) {
-    sessionStorage.setItem('wbs-gh-token', legacy);
-    localStorage.removeItem('wbs-gh-token');
-    console.warn('Migrated GH token from localStorage → sessionStorage for security.');
-  }
-})();
-
-// ── SPRINT-SCOPED CACHE ──────────────────────────────────────────────────────
+// ── SPRINT-SCOPED CACHE (localStorage — capacity edits only, no secrets) ────
 function cacheKey(projectKey, sprintName) {
   return 'wbs-cache-' + projectKey + '-' + sprintName.replace(/\s+/g, '-');
 }
@@ -52,16 +37,16 @@ function saveCapacity(projectKey, sprintName, members, teamDays) {
 }
 function purgeStaleCaches(projectKey, currentSprintName) {
   const prefix = 'wbs-cache-' + projectKey + '-';
-  const keep = cacheKey(projectKey, currentSprintName);
+  const keep   = cacheKey(projectKey, currentSprintName);
   Object.keys(localStorage).forEach(k => { if (k.startsWith(prefix) && k !== keep) localStorage.removeItem(k); });
 }
 
-// ── PUBLIC INJECT API ────────────────────────────────────────────────────────
+// ── PUBLIC INJECT API (called by Claude via javascript_tool) ─────────────────
 window.__injectTeamData = function(jsonStr) {
   try {
     const incoming = typeof jsonStr === 'string' ? JSON.parse(jsonStr) : jsonStr;
     Object.keys(incoming).forEach(teamKey => {
-      const nd = incoming[teamKey];
+      const nd    = incoming[teamKey];
       const saved = loadSavedCapacity(nd.projectKey, nd.sprintName);
       if (saved) { nd.members = saved.members; nd.teamDays = saved.teamDays; }
       TEAMS[teamKey] = nd;
@@ -69,39 +54,15 @@ window.__injectTeamData = function(jsonStr) {
     buildTeamSelector();
     switchTeam(currentTeam || Object.keys(TEAMS)[0]);
     const el = document.getElementById('sync-ts');
-    if (el) el.textContent = 'Jira sync: ' + new Date().toLocaleString('en-US', { dateStyle:'short', timeStyle:'short', timeZone:'America/Chicago' }) + ' · Live ✓';
-    if (GH_TOKEN) window.__publishData();
+    if (el) el.textContent = 'Jira sync: ' + new Date().toLocaleString('en-US', {
+      dateStyle:'short', timeStyle:'short', timeZone:'America/Chicago'
+    }) + ' · Live ✓';
   } catch(e) { console.error('__injectTeamData failed:', e); alert('Inject failed: ' + e.message); }
 };
 
-// ── PUBLISH TO GITHUB ────────────────────────────────────────────────────────
-window.__publishData = async function() {
-  if (!GH_TOKEN) { alert('No GitHub token set. Call window.__setToken("your_token") first.'); return; }
-  try {
-    const meta = await fetch(API_URL, { headers: { 'Authorization':'token '+GH_TOKEN, 'Accept':'application/vnd.github.v3+json' } }).then(r=>r.json());
-    const content = btoa(unescape(encodeURIComponent(JSON.stringify(TEAMS, null, 2))));
-    const res = await fetch(API_URL, {
-      method:'PUT',
-      headers: { 'Authorization':'token '+GH_TOKEN, 'Content-Type':'application/json' },
-      body: JSON.stringify({ message:'Sprint capacity update '+new Date().toISOString(), content, sha:meta.sha })
-    });
-    if (res.ok) console.log('Data published to GitHub');
-    else console.error('GitHub publish failed:', await res.text());
-  } catch(e) { console.error('__publishData failed:', e); }
-};
-
-window.__setToken = function(token) {
-  GH_TOKEN = token;
-  sessionStorage.setItem('wbs-gh-token', token);
-  // Explicitly make sure it's NOT in localStorage
-  localStorage.removeItem('wbs-gh-token');
-  console.log('GitHub token saved to sessionStorage (clears when browser closes).');
-};
-
-// ── ANTHROPIC → ATLASSIAN MCP WRITE-BACKS ───────────────────────────────────
-// All Jira + Confluence saves go through api.anthropic.com with the MCP server,
-// which avoids CORS issues from the static GitHub Pages site.
-
+// ── ANTHROPIC → ATLASSIAN MCP WRITE-BACKS ────────────────────────────────────
+// Saves route through api.anthropic.com → Atlassian MCP → Jira / Confluence.
+// No secrets needed in the browser — auth is handled by the Anthropic session.
 async function callAtlassianMCP(prompt) {
   const res = await fetch(ANTHROPIC_API, {
     method: 'POST',
@@ -118,11 +79,9 @@ async function callAtlassianMCP(prompt) {
   return data.content.filter(b => b.type === 'text').map(b => b.text).join('\n');
 }
 
-// Push issue changes (assignee, status, estimate) to Jira
 async function syncIssuesToJira(changedIssues) {
   if (!changedIssues.length) return;
   const cloudId = '0affc225-bae5-4e42-ba94-341cbdb24213';
-
   const lines = changedIssues.map(iss => {
     const parts = [];
     if (iss._assigneeChanged) parts.push('assignee → "' + iss.assignee + '"');
@@ -130,7 +89,6 @@ async function syncIssuesToJira(changedIssues) {
     if (iss._estChanged)      parts.push('originalEstimate → ' + iss.est + 'h');
     return iss.key + ': ' + parts.join(', ');
   }).join('\n');
-
   const prompt =
     'You are updating Jira issues on cloudId ' + cloudId + '. ' +
     'For each issue below apply the changes using editJiraIssue and/or transitionJiraIssue tools. ' +
@@ -139,24 +97,18 @@ async function syncIssuesToJira(changedIssues) {
     'For estimate changes, set timetracking.originalEstimate in hours (e.g. "6h"). ' +
     'Apply all changes silently — no explanations needed, just do it.\n\n' +
     'Issues to update:\n' + lines;
-
   return callAtlassianMCP(prompt);
 }
 
-// Push capacity data (member hrs/PTO + team days off) to Confluence page
 async function syncCapacityToConfluence() {
-  const sd = getSD();
+  const sd     = getSD();
   const pageId = CONFLUENCE_PAGE_IDS[currentTeam];
   if (!pageId) { console.log('No Confluence page ID configured for', currentTeam); return; }
-
-  const cloudId = '0affc225-bae5-4e42-ba94-341cbdb24213';
-  const memberRows = members.map(m =>
-    m.name + ': ' + (m.hrs||6) + ' hrs/day, ' + (m.pto||0) + ' PTO days'
-  ).join('\n');
+  const cloudId    = '0affc225-bae5-4e42-ba94-341cbdb24213';
+  const memberRows = members.map(m => m.name + ': ' + (m.hrs||6) + ' hrs/day, ' + (m.pto||0) + ' PTO days').join('\n');
   const daysOffRows = teamDays.length
-    ? teamDays.map(d => d.date + ' (' + d.type + ')' + (d.note ? ' — '+d.note : '')).join('\n')
+    ? teamDays.map(d => d.date + ' (' + d.type + ')' + (d.note ? ' — ' + d.note : '')).join('\n')
     : 'None';
-
   const prompt =
     'Update the Confluence page ID ' + pageId + ' on cloudId ' + cloudId + '. ' +
     'Find the capacity table section and update it with the current sprint capacity data below. ' +
@@ -165,12 +117,11 @@ async function syncCapacityToConfluence() {
     'Sprint: ' + sd.sprintName + ' (' + sd.startDate + ' → ' + sd.endDate + ')\n' +
     'Team members:\n' + memberRows + '\n' +
     'Team days off:\n' + daysOffRows + '\n' +
-    'Total net capacity: ' + members.reduce((a,m)=>a+cap(m),0) + 'h';
-
+    'Total net capacity: ' + members.reduce((a,m) => a+cap(m), 0) + 'h';
   return callAtlassianMCP(prompt);
 }
 
-// ── TEAM SELECTOR ────────────────────────────────────────────────────────────
+// ── TEAM SELECTOR ─────────────────────────────────────────────────────────────
 let currentTeam = null;
 
 function switchTeam(key) {
@@ -181,33 +132,31 @@ function switchTeam(key) {
   const saved = loadSavedCapacity(SD.projectKey, SD.sprintName);
   if (saved) {
     const savedMap = Object.fromEntries(saved.members.map(m => [m.name, m]));
-    members = SD.members.map(m => savedMap[m.name] ? {...savedMap[m.name]} : {...m});
+    members  = SD.members.map(m => savedMap[m.name] ? {...savedMap[m.name]} : {...m});
     teamDays = saved.teamDays.map(d => ({...d}));
   } else {
-    members = SD.members.map(m => ({...m}));
+    members  = SD.members.map(m => ({...m}));
     teamDays = SD.teamDays ? SD.teamDays.map(d => ({...d})) : [];
   }
   issues = SD.issues.map(i => ({...i}));
-  // Reset per-session tracking on team switch
   _removedMembers = [];
-  // Snapshot issue state so we can diff on save
-  _issueSnapshot = Object.fromEntries(issues.map(i => [i.key, {assignee:i.assignee, status:i.status, est:i.est}]));
+  _issueSnapshot  = Object.fromEntries(issues.map(i => [i.key, {assignee:i.assignee, status:i.status, est:i.est}]));
 
-  document.getElementById('sprint-name').value = SD.sprintName;
-  document.getElementById('hdr-sprint').textContent = SD.sprintName;
-  document.getElementById('hdr-team').textContent = SD.team + ' (' + SD.projectKey + ')';
-  document.getElementById('start-date').value = SD.startDate;
-  document.getElementById('end-date').value = SD.endDate;
-  document.getElementById('work-days').value = SD.workDays;
-  document.getElementById('hrs-day').value = SD.hrsPerDay;
+  document.getElementById('sprint-name').value       = SD.sprintName;
+  document.getElementById('hdr-sprint').textContent  = SD.sprintName;
+  document.getElementById('hdr-team').textContent    = SD.team + ' (' + SD.projectKey + ')';
+  document.getElementById('start-date').value        = SD.startDate;
+  document.getElementById('end-date').value          = SD.endDate;
+  document.getElementById('work-days').value         = SD.workDays;
+  document.getElementById('hrs-day').value           = SD.hrsPerDay;
   const ts = new Date(SD.syncedAt);
   document.getElementById('sync-ts').textContent = 'Jira sync: ' +
     ts.toLocaleDateString('en-US', {timeZone:'America/Chicago'}) + ' ' +
     ts.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', timeZone:'America/Chicago'});
   document.getElementById('team-badge').textContent = key;
   document.querySelectorAll('.team-btn').forEach(b => {
-    b.style.background = b.dataset.key===key ? 'var(--green)' : 'var(--bg3)';
-    b.style.color = b.dataset.key===key ? '#000' : 'var(--t2)';
+    b.style.background  = b.dataset.key===key ? 'var(--green)' : 'var(--bg3)';
+    b.style.color       = b.dataset.key===key ? '#000'         : 'var(--t2)';
     b.style.borderColor = b.dataset.key===key ? 'var(--green)' : 'var(--bdr)';
   });
   renderAll();
@@ -218,11 +167,11 @@ const AVB = AVC.map(c => c + '22');
 function ini(n) { return (n||'').trim().split(/\s+/).map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?'; }
 
 let members, teamDays, issues, charts = {}, sortKey = 'key', sortDir = 1;
-function getSD() { return TEAMS[currentTeam]; }
-function parseDate(str) { if (!str) return null; const [y,m,d]=str.split('-').map(Number); return new Date(y,m-1,d); }
-function isoDate(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function getSD()       { return TEAMS[currentTeam]; }
+function parseDate(s)  { if (!s) return null; const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function isoDate(d)    { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 
-// ── LOAD ─────────────────────────────────────────────────────────────────────
+// ── LOAD ──────────────────────────────────────────────────────────────────────
 async function load() {
   const el = document.getElementById('sync-ts');
   if (el) el.textContent = 'Loading sprint data...';
@@ -232,11 +181,11 @@ async function load() {
       const data = await res.json();
       if (data && Object.keys(data).length > 0) {
         Object.keys(data).forEach(teamKey => {
-          const sd = data[teamKey];
+          const sd    = data[teamKey];
           const saved = loadSavedCapacity(sd.projectKey, sd.sprintName);
           if (saved) {
             const savedMap = Object.fromEntries(saved.members.map(m=>[m.name,m]));
-            sd.members = sd.members.map(m => savedMap[m.name] ? {...savedMap[m.name]} : {...m});
+            sd.members  = sd.members.map(m => savedMap[m.name] ? {...savedMap[m.name]} : {...m});
             sd.teamDays = saved.teamDays.map(d=>({...d}));
           }
         });
@@ -245,14 +194,14 @@ async function load() {
         switchTeam(Object.keys(TEAMS)[0]);
         if (el) {
           const ts = new Date(Object.values(TEAMS)[0].syncedAt);
-          el.textContent = 'Jira sync: ' + ts.toLocaleString('en-US',{dateStyle:'short',timeStyle:'short',timeZone:'America/Chicago'}) + ' · Auto ✓';
+          el.textContent = 'Jira sync: ' + ts.toLocaleString('en-US', {
+            dateStyle:'short', timeStyle:'short', timeZone:'America/Chicago'
+          }) + ' · Auto ✓';
         }
         return;
       }
     }
   } catch(e) { console.log('Could not fetch data.json:', e); }
-  const legacy = localStorage.getItem('wbs-teams-cache');
-  if (legacy) { try { TEAMS=JSON.parse(legacy); buildTeamSelector(); switchTeam(Object.keys(TEAMS)[0]); return; } catch(e) {} }
   showLoadPrompt();
 }
 
@@ -277,15 +226,14 @@ function buildTeamSelector() {
   });
 }
 
-// ── SAVE — persists to localStorage + GitHub + Jira + Confluence ─────────────
+// ── SAVE — localStorage + Jira + Confluence ───────────────────────────────────
 async function saveAll() {
-  const s = getSD();
+  const s   = getSD();
   const btn = document.querySelector('.btn-g');
-  const el = document.getElementById('sync-ts');
-
+  const el  = document.getElementById('sync-ts');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Saving...'; }
 
-  // 1. Detect which issues changed vs snapshot (includes auto-unassigns from removed members)
+  // Detect changed issues vs snapshot
   const changedIssues = issues.filter(iss => {
     const snap = _issueSnapshot[iss.key];
     if (!snap) return false;
@@ -295,71 +243,66 @@ async function saveAll() {
     return iss._assigneeChanged || iss._statusChanged || iss._estChanged;
   });
 
-  // 2. Write back into TEAMS in memory
-  TEAMS[currentTeam].members = members.map(m=>({...m}));
-  TEAMS[currentTeam].teamDays = teamDays.map(d=>({...d}));
-
-  // 3. Sprint-scoped localStorage (persists until sprint name changes)
+  // Sprint-scoped localStorage (capacity edits — no secrets)
   saveCapacity(s.projectKey, s.sprintName, members, teamDays);
 
-  // 4. GitHub data.json
-  if (GH_TOKEN) window.__publishData().catch(e => console.error('GitHub publish failed:', e));
-
-  // 5. Jira + Confluence in parallel
+  // Jira + Confluence in parallel
   let jiraStatus = '', confluenceStatus = '';
   const promises = [];
 
   if (changedIssues.length > 0) {
     promises.push(
       syncIssuesToJira(changedIssues)
-        .then(() => { jiraStatus = ' · Jira ✓'; })
-        .catch(e => { console.error('Jira sync failed:', e); jiraStatus = ' · Jira ✗'; })
+        .then(()  => { jiraStatus = ' · Jira ✓'; })
+        .catch(e  => { console.error('Jira sync failed:', e); jiraStatus = ' · Jira ✗'; })
     );
   }
 
   promises.push(
     syncCapacityToConfluence()
-      .then(() => { confluenceStatus = ' · Confluence ✓'; })
-      .catch(e => { console.error('Confluence sync failed:', e); confluenceStatus = ' · Confluence ✗'; })
+      .then(()  => { confluenceStatus = ' · Confluence ✓'; })
+      .catch(e  => { console.error('Confluence sync failed:', e); confluenceStatus = ' · Confluence ✗'; })
   );
 
   await Promise.all(promises);
 
   // Update snapshot so next save only diffs new changes
-  _issueSnapshot = Object.fromEntries(issues.map(i => [i.key, {assignee:i.assignee, status:i.status, est:i.est}]));
+  _issueSnapshot  = Object.fromEntries(issues.map(i => [i.key, {assignee:i.assignee, status:i.status, est:i.est}]));
   _removedMembers = [];
 
   if (btn) { btn.disabled = false; btn.textContent = '✓ Save changes'; }
-  if (el) el.textContent = (el.textContent||'').replace(/ · (Saving|Saved|Jira|Confluence).*/g, '') +
+  if (el)  el.textContent = (el.textContent||'').replace(/ · (Saving|Saved|Jira|Confluence).*/g, '') +
     jiraStatus + confluenceStatus + ' · Saved ✓';
 }
 
-// ── CAPACITY HELPERS ─────────────────────────────────────────────────────────
-function wd() { return Math.max(1, parseInt(document.getElementById('work-days').value)||9); }
-function hd() { return Math.max(1, parseInt(document.getElementById('hrs-day').value)||6); }
-function tdo() { return teamDays.length; }
-function cap(m) { return Math.max(0, wd()-tdo()-(m.pto||0)) * (m.hrs||hd()); }
-function asgnFor(n) { const sd=getSD(); return sd && sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).est||0 : 0; }
-function logFor(n)  { const sd=getSD(); return sd && sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).logged||0 : 0; }
+// ── CAPACITY HELPERS ──────────────────────────────────────────────────────────
+function wd()       { return Math.max(1, parseInt(document.getElementById('work-days').value)||9); }
+function hd()       { return Math.max(1, parseInt(document.getElementById('hrs-day').value)||6); }
+function tdo()      { return teamDays.length; }
+function cap(m)     { return Math.max(0, wd()-tdo()-(m.pto||0)) * (m.hrs||hd()); }
+function asgnFor(n) { const sd=getSD(); return sd&&sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).est||0    : 0; }
+function logFor(n)  { const sd=getSD(); return sd&&sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).logged||0 : 0; }
+
 function memberOpts(sel) {
   return '<option value="Unassigned"'+(!sel||sel==='Unassigned'?' selected':'')+'>Unassigned</option>' +
     members.map(m=>'<option value="'+m.name+'"'+(m.name===sel?' selected':'')+'>'+m.name+'</option>').join('');
 }
+
 function removeMember(i) {
   const removed = members[i];
   _removedMembers.push(removed.name);
-  // Unassign any issues currently assigned to this member
   issues.forEach(iss => { if (iss.assignee === removed.name) iss.assignee = 'Unassigned'; });
   members.splice(i, 1);
   renderAll();
 }
+
 function addMemberPrompt() {
-  const n=(prompt('Name:')||'').trim(); if(!n) return;
-  if(members.find(m=>m.name===n)){alert(n+' already listed.');return;}
+  const n = (prompt('Name:')||'').trim(); if (!n) return;
+  if (members.find(m=>m.name===n)) { alert(n+' already listed.'); return; }
   members.push({name:n, hrs:hd(), pto:0}); renderAll();
 }
 
-// ── RENDER MEMBERS ────────────────────────────────────────────────────────────
+// ── RENDER MEMBERS ─────────────────────────────────────────────────────────────
 function renderMembers() {
   const tb = document.getElementById('mtbody');
   tb.innerHTML = members.map((m,i) => {
@@ -395,7 +338,11 @@ function renderTDO() {
   document.getElementById('tdo-list').innerHTML = teamDays.map((d,i)=>
     '<div class="dor">'+
     '<input type="date" class="si2" value="'+d.date+'" '+a+' oninput="teamDays['+i+'].date=this.value;renderTDO();recalc()">'+
-    '<select class="si2" oninput="teamDays['+i+'].type=this.value"><option '+(d.type==='Holiday'?'selected':'')+'>Holiday</option><option '+(d.type==='Recharge'?'selected':'')+'>Recharge</option><option '+(d.type==='Company'?'selected':'')+'>Company</option></select>'+
+    '<select class="si2" oninput="teamDays['+i+'].type=this.value">'+
+      '<option '+(d.type==='Holiday' ?'selected':'')+'>Holiday</option>'+
+      '<option '+(d.type==='Recharge'?'selected':'')+'>Recharge</option>'+
+      '<option '+(d.type==='Company' ?'selected':'')+'>Company</option>'+
+    '</select>'+
     '<input type="text" class="si2" value="'+(d.note||'')+'" placeholder="Note..." oninput="teamDays['+i+'].note=this.value">'+
     '<button class="rb" onclick="teamDays.splice('+i+',1);renderTDO();recalc()">×</button></div>'
   ).join('');
@@ -409,14 +356,14 @@ function addTDO() {
   teamDays.push({date:sg,type:'Holiday',note:''}); renderTDO(); recalc();
 }
 
-// ── RENDER ISSUES ─────────────────────────────────────────────────────────────
+// ── RENDER ISSUES ──────────────────────────────────────────────────────────────
 function setSort(k) { if(sortKey===k) sortDir*=-1; else{sortKey=k;sortDir=1;} renderIssues(); }
 function sortedIssues() {
   const ord={Done:3,'In Progress':2,Blocked:1,Open:0};
   return [...issues].sort((a,b)=>{
     let av,bv;
-    if(sortKey==='status'){av=ord[a.status]||0;bv=ord[b.status]||0;}
-    else if(sortKey==='est'){av=a.est||0;bv=b.est||0;}
+    if(sortKey==='status')  {av=ord[a.status]||0;  bv=ord[b.status]||0;}
+    else if(sortKey==='est'){av=a.est||0;           bv=b.est||0;}
     else if(sortKey==='assignee'){av=a.assignee||'';bv=b.assignee||'';}
     else{av=a.key;bv=b.key;}
     return av<bv?-sortDir:av>bv?sortDir:0;
@@ -458,10 +405,10 @@ function renderIssues() {
         '<div style="font-size:10px;color:var(--t3)">'+pct+'% done</div></td>'+
       '<td class="'+(sc[iss.status]||'s-open')+'">'+(si[iss.status]||'📋')+
         ' <select style="background:transparent;border:none;color:inherit;font-size:12px;cursor:pointer" onchange="issues['+i+'].status=this.value;renderAll()">'+
-          '<option '+(iss.status==='Open'?'selected':'')+'>Open</option>'+
-          '<option '+(iss.status==='In Progress'?'selected':'')+'>In Progress</option>'+
-          '<option '+(iss.status==='Done'?'selected':'')+'>Done</option>'+
-          '<option '+(iss.status==='Blocked'?'selected':'')+'>Blocked</option>'+
+          '<option '+(iss.status==='Open'        ?'selected':'')+'>Open</option>'+
+          '<option '+(iss.status==='In Progress' ?'selected':'')+'>In Progress</option>'+
+          '<option '+(iss.status==='Done'        ?'selected':'')+'>Done</option>'+
+          '<option '+(iss.status==='Blocked'     ?'selected':'')+'>Blocked</option>'+
         '</select></td></tr>';
   }).join('');
   const te=issues.reduce((a,i)=>a+(+i.est||0),0);
@@ -514,20 +461,20 @@ function renderCal() {
   const w=document.getElementById('work-days'); if(w&&wc>0) w.value=wc;
 }
 
-// ── BURNDOWN CHART (hours-based, Jira sprint dates) ───────────────────────────
+// ── BURNDOWN CHART ─────────────────────────────────────────────────────────────
 function renderBurndown() {
   const sd=getSD();
   const startStr=(sd&&sd.startDate)||document.getElementById('start-date').value||'';
-  const endStr=(sd&&sd.endDate)||document.getElementById('end-date').value||'';
+  const endStr  =(sd&&sd.endDate)  ||document.getElementById('end-date').value  ||'';
   const s=parseDate(startStr), e=parseDate(endStr);
   if(!s||!e) return;
   const _n=new Date(), todayIso=isoDate(_n), off=new Set(teamDays.map(d=>d.date));
   const workDays=[]; const cur=new Date(s);
   while(cur<=e){ const dow=cur.getDay(), iso=isoDate(cur); if(dow!==0&&dow!==6&&!off.has(iso)) workDays.push(iso); cur.setDate(cur.getDate()+1);}
   if(!workDays.length) return;
-  const totalEst=issues.reduce((a,i)=>a+(+i.est||0),0);
-  const totalLogged=issues.reduce((a,i)=>a+(+i.logged||0),0);
-  const remainingNow=Math.max(0,totalEst-totalLogged);
+  const totalEst     =issues.reduce((a,i)=>a+(+i.est||0),0);
+  const totalLogged  =issues.reduce((a,i)=>a+(+i.logged||0),0);
+  const remainingNow =Math.max(0,totalEst-totalLogged);
   const n=workDays.length;
   const ideal=workDays.map((_,i)=>Math.round(totalEst*(1-i/Math.max(n-1,1))*10)/10);
   const pivotIdx=workDays.findIndex(d=>d>=todayIso);
