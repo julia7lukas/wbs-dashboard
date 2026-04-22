@@ -11,12 +11,26 @@ const ATLASSIAN_MCP = 'https://mcp.atlassian.com/v1/sse';
 const CONFLUENCE_PAGE_IDS = { WBS: '6627524645', GIN: null, MOJO: null, MAV: null, AMGO: null };
 
 let TEAMS = {};
-let GH_TOKEN = (window.__ENV__ && window.__ENV__.WRITE_TOKEN) || localStorage.getItem('wbs-gh-token') || '';
+// Token: env.js (gitignored) → sessionStorage (clears on browser close, never on disk)
+// Never localStorage — that persists indefinitely and is readable by anyone with DevTools.
+let GH_TOKEN = (window.__ENV__ && window.__ENV__.WRITE_TOKEN) || sessionStorage.getItem('wbs-gh-token') || '';
 
 // Track the state of issues at load time so we only push actual diffs to Jira
 let _issueSnapshot = {};
 // Track members removed this session so saveAll can unassign their issues
 let _removedMembers = [];
+
+// ── SECURITY: migrate any token previously stored in localStorage ────────────
+// Old versions of dashboard.js stored the GH token in localStorage (persists
+// indefinitely). This removes it and re-stores in sessionStorage (session-only).
+(function migrateToken() {
+  const legacy = localStorage.getItem('wbs-gh-token');
+  if (legacy) {
+    sessionStorage.setItem('wbs-gh-token', legacy);
+    localStorage.removeItem('wbs-gh-token');
+    console.warn('Migrated GH token from localStorage → sessionStorage for security.');
+  }
+})();
 
 // ── SPRINT-SCOPED CACHE ──────────────────────────────────────────────────────
 function cacheKey(projectKey, sprintName) {
@@ -78,8 +92,10 @@ window.__publishData = async function() {
 
 window.__setToken = function(token) {
   GH_TOKEN = token;
-  localStorage.setItem('wbs-gh-token', token);
-  console.log('GitHub token saved.');
+  sessionStorage.setItem('wbs-gh-token', token);
+  // Explicitly make sure it's NOT in localStorage
+  localStorage.removeItem('wbs-gh-token');
+  console.log('GitHub token saved to sessionStorage (clears when browser closes).');
 };
 
 // ── ANTHROPIC → ATLASSIAN MCP WRITE-BACKS ───────────────────────────────────
