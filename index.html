@@ -26,7 +26,10 @@
     .kbar{position:absolute;top:0;left:0;right:0;height:2px}.kl{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
     .kv{font-size:28px;font-weight:300;line-height:1;margin-bottom:3px}.ks{font-size:11px;color:var(--t3)}
     .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+    /* Team days off takes less space — fixed small column */
+    .two-asymmetric{display:grid;grid-template-columns:1fr 280px;gap:12px;margin-bottom:12px}
     .card{background:var(--bg1);border:1px solid var(--bdr);border-radius:12px;padding:16px}
+    .card-sm{background:var(--bg1);border:1px solid var(--bdr);border-radius:12px;padding:12px}
     .chd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:3px}
     .ctit{font-size:13px;font-weight:500}.csub{font-size:11px;color:var(--t3);margin-bottom:12px}
     .chip{background:var(--bg3);border:1px solid var(--bdr);border-radius:20px;font-size:11px;padding:2px 8px;color:var(--t2)}
@@ -42,7 +45,8 @@
     .addl{font-size:12px;color:var(--green);cursor:pointer;background:none;border:none;padding:0;font-family:var(--font);margin-top:8px;display:block}
     .mc{display:flex;align-items:center;gap:7px}.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
     .netc{color:var(--green);font-weight:500}.overc{color:var(--red);font-weight:500}
-    .dor{display:grid;grid-template-columns:110px 120px 1fr 16px;gap:6px;align-items:center;margin-bottom:7px}
+    /* Compact team days off rows */
+    .dor{display:grid;grid-template-columns:100px 90px 16px;gap:4px;align-items:center;margin-bottom:5px}
     .clbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
     .ar{margin-bottom:9px}.ar-hd{display:flex;justify-content:space-between;margin-bottom:3px;font-size:12px}
     .ar-bg{background:var(--bg3);border-radius:4px;height:6px;overflow:hidden}.ar-fill{height:100%;border-radius:4px;transition:width .4s}
@@ -95,42 +99,51 @@
     <div class="kpi"><div class="kbar" style="background:var(--red)"></div><div class="kl">Days deducted</div><div class="kv" id="k-pto">0</div><div class="ks">team days off this sprint</div></div>
   </div>
 
-  <!-- Capacity + Team days off -->
-  <div class="two">
+  <!-- Capacity + compact Team days off -->
+  <div class="two-asymmetric">
     <div class="card">
       <div class="chd"><div>
         <div class="ctit">Individual capacity</div>
-        <div class="csub">Net hrs = (working days &minus; team days off &minus; PTO) &times; hrs/day</div>
+        <div class="csub">Net hrs = (working days &minus; team days off &minus; PTO) &times; hrs/day &nbsp;·&nbsp; <span style="color:var(--red)">Red remaining</span> = behind pace</div>
       </div></div>
       <table>
         <thead><tr>
           <th>Member</th>
           <th class="c">Hrs/day</th>
-          <th class="c">PTO days</th>
-          <th class="c">Net capacity</th>
+          <th class="c">PTO</th>
+          <th class="c">Capacity</th>
           <th class="c">Assigned</th>
+          <th class="c">Logged</th>
+          <th class="c">Remaining</th>
           <th class="c">Util %</th>
         </tr></thead>
         <tbody id="mtbody"></tbody>
         <tfoot><tr class="tr2">
           <td>Total</td><td></td>
-          <td class="c" id="t-pto" title="Total PTO days across all members">0</td>
-          <td class="c netc" id="t-cap" title="Total net capacity hours">0</td>
-          <td class="c" id="t-asgn" title="Total hours assigned from Jira subtasks" style="color:var(--blue)">0</td>
+          <td class="c" id="t-pto">0</td>
+          <td class="c netc" id="t-cap">0</td>
+          <td class="c" style="color:var(--blue)" id="t-asgn">0</td>
+          <td class="c" style="color:var(--t2)" id="t-log">0</td>
+          <td class="c" id="t-rem2">0</td>
           <td></td>
         </tr></tfoot>
       </table>
     </div>
-    <div class="card">
-      <div class="chd">
-        <div><div class="ctit">Team days off</div><div class="csub">Holidays, recharge &amp; company days &mdash; deducted from all members</div></div>
+
+    <!-- Compact team days off -->
+    <div class="card-sm">
+      <div class="chd" style="margin-bottom:8px">
+        <div>
+          <div class="ctit">Days off</div>
+          <div style="font-size:10px;color:var(--t3)">Deducted from all members</div>
+        </div>
         <span class="chip" id="tdo-chip">0 days</span>
       </div>
-      <div style="display:grid;grid-template-columns:110px 120px 1fr 16px;gap:6px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--bdr)">
-        <span class="clbl">Date</span><span class="clbl">Type</span><span class="clbl">Note</span><span></span>
+      <div style="display:grid;grid-template-columns:100px 90px 16px;gap:4px;margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid var(--bdr)">
+        <span class="clbl">Date</span><span class="clbl">Type</span><span></span>
       </div>
       <div id="tdo-list"></div>
-      <button class="addl" onclick="addTDO()">+ Add holiday / recharge / company day</button>
+      <button class="addl" onclick="addTDO()">+ Add day</button>
     </div>
   </div>
 
