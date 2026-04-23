@@ -12,6 +12,31 @@ const CONFLUENCE_PAGE_IDS = { WBS:'6627524645', GIN:null, MOJO:null, MAV:null, A
 
 let TEAMS = {};
 
+// ── SECURITY CONFIG ──────────────────────────────────────────────────────────
+// Restrict API calls to known origins only — prevents hotlinking from unknown domains
+const ALLOWED_ORIGINS = [
+  'https://julia7lukas.github.io',
+  'http://localhost',
+  'http://127.0.0.1'
+];
+const CLOUD_ID = '0affc225-bae5-4e42-ba94-341cbdb24213';
+
+function isAllowedOrigin() {
+  return ALLOWED_ORIGINS.some(o => window.location.origin === o || window.location.origin.startsWith(o));
+}
+
+// Sanitize any string before writing to innerHTML
+// Strips script tags, event handlers, and javascript: URIs
+function sanitize(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 // Track issue state at load time so we only push actual diffs to Jira
 let _issueSnapshot = {};
 // Track members removed this session so saveAll can unassign their issues
@@ -64,6 +89,10 @@ window.__injectTeamData = function(jsonStr) {
 // Saves route through api.anthropic.com → Atlassian MCP → Jira / Confluence.
 // No secrets needed in the browser — auth is handled by the Anthropic session.
 async function callAtlassianMCP(prompt) {
+  if (!isAllowedOrigin()) {
+    console.error('Security: API call blocked — unauthorized origin:', window.location.origin);
+    throw new Error('Unauthorized origin');
+  }
   const res = await fetch(ANTHROPIC_API, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -81,7 +110,7 @@ async function callAtlassianMCP(prompt) {
 
 async function syncIssuesToJira(changedIssues) {
   if (!changedIssues.length) return;
-  const cloudId = '0affc225-bae5-4e42-ba94-341cbdb24213';
+  const cloudId = CLOUD_ID;
   const lines = changedIssues.map(iss => {
     const parts = [];
     if (iss._assigneeChanged) parts.push('assignee → "' + iss.assignee + '"');
@@ -104,7 +133,7 @@ async function syncCapacityToConfluence() {
   const sd     = getSD();
   const pageId = CONFLUENCE_PAGE_IDS[currentTeam];
   if (!pageId) { console.log('No Confluence page ID configured for', currentTeam); return; }
-  const cloudId    = '0affc225-bae5-4e42-ba94-341cbdb24213';
+  const cloudId = CLOUD_ID;
   const memberRows = members.map(m => m.name + ': ' + (m.hrs||6) + ' hrs/day, ' + (m.pto||0) + ' PTO days').join('\n');
   const daysOffRows = teamDays.length
     ? teamDays.map(d => d.date + ' (' + d.type + ')' + (d.note ? ' — ' + d.note : '')).join('\n')
@@ -166,7 +195,7 @@ const AVC = ['#00d4aa','#4da6ff','#a78bfa','#f472b6','#fbbf24','#f87171','#34d39
 const AVB = AVC.map(c => c + '22');
 function ini(n) { return (n||'').trim().split(/\s+/).map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?'; }
 
-let members, teamDays, issues, charts = {}, sortKey = 'key', sortDir = 1;
+let members, teamDays, issues, charts = {};
 function getSD()       { return TEAMS[currentTeam]; }
 function parseDate(s)  { if (!s) return null; const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
 function isoDate(d)    { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
@@ -293,38 +322,45 @@ function removeMember(i) {
   _removedMembers.push(removed.name);
   issues.forEach(iss => { if (iss.assignee === removed.name) iss.assignee = 'Unassigned'; });
   members.splice(i, 1);
+  autoSave();
   renderAll();
 }
 
 function addMemberPrompt() {
   const n = (prompt('Name:')||'').trim(); if (!n) return;
   if (members.find(m=>m.name===n)) { alert(n+' already listed.'); return; }
-  members.push({name:n, hrs:hd(), pto:0}); renderAll();
+  members.push({name:n, hrs:hd(), pto:0});
+  autoSave();
+  renderAll();
 }
 
 // ── RENDER MEMBERS ─────────────────────────────────────────────────────────────
 function renderMembers() {
   const tb = document.getElementById('mtbody');
-  tb.innerHTML = members.map((m,i) => {
-    const c=cap(m), asgn=asgnFor(m.name), logged=logFor(m.name);
+  const sd = getSD();
+  const today = new Date();
+  const start = parseDate(sd&&sd.startDate), end = parseDate(sd&&sd.endDate);
+  const totalMs = (end&&start) ? (end-start) : 1;
+  const elapsedMs = start ? Math.min(today-start, totalMs) : 0;
+  const sprintPct = totalMs > 0 ? elapsedMs/totalMs : 0;
+
+  tb.innerHTML = members.filter(m => asgnFor(m.name) > 0).map((m,i) => {
+    const c = cap(m);
+    const asgn = asgnFor(m.name);
+    const logged = logFor(m.name);
     const remaining = Math.max(0, asgn - logged);
-    const util=c>0?Math.min(100,Math.round(asgn/c*100)):0;
-    const utilCol=util>100?'var(--red)':util>85?'var(--amber)':'var(--green)';
-    // Remaining is red when >80% of capacity still unlogged with <50% sprint elapsed
-    const sd=getSD();
-    const sprintDays = wd();
-    const today=new Date(), start=parseDate(sd&&sd.startDate), end=parseDate(sd&&sd.endDate);
-    const totalMs=(end&&start)?(end-start):1, elapsedMs=start?Math.min(today-start,totalMs):0;
-    const sprintPct=totalMs>0?elapsedMs/totalMs:0;
-    // Red if remaining hrs > expected remaining capacity (you're behind)
-    const expectedRemaining = c * (1 - sprintPct);
-    const remCol = (remaining > 0 && remaining > expectedRemaining * 1.2) ? 'var(--red)'
+    // Util = logged vs capacity (actual progress)
+    const util = c > 0 ? Math.round(logged/c*100) : 0;
+    const utilCol = util > 100 ? 'var(--red)' : util > 85 ? 'var(--amber)' : 'var(--green)';
+    // Red remaining = you should have logged more by now given sprint elapsed %
+    const expectedLogged = asgn * sprintPct;
+    const remCol = (remaining > 0 && logged < expectedLogged * 0.8) ? 'var(--red)'
                  : remaining > 0 ? 'var(--amber)' : 'var(--green)';
     return '<tr class="dr">'+
       '<td><div class="mc"><div class="av" style="background:'+AVB[i%8]+';color:'+AVC[i%8]+'">'+ini(m.name)+'</div>'+
-      '<input style="background:transparent;border:none;color:var(--t1);font-family:var(--font);font-size:13px;width:130px" value="'+m.name+'" onchange="members['+i+'].name=this.value.trim();renderAll()"></div></td>'+
-      '<td class="c"><input class="ni" type="number" min="1" max="12" value="'+(m.hrs||hd())+'" oninput="members['+i+'].hrs=Math.max(1,+this.value||'+hd()+');recalc()"></td>'+
-      '<td class="c"><input class="ni" type="number" min="0" value="'+(m.pto||0)+'" oninput="members['+i+'].pto=Math.max(0,+this.value||0);recalc()"></td>'+
+      '<input style="background:transparent;border:none;color:var(--t1);font-family:var(--font);font-size:13px;width:130px" value="'+sanitize(m.name)+'" onchange="members['+i+'].name=this.value.trim();autoSave();renderAll()"></div></td>'+
+      '<td class="c"><input class="ni" type="number" min="1" max="12" value="'+(m.hrs||hd())+'" oninput="members['+i+'].hrs=Math.max(1,+this.value||'+hd()+');autoSave();recalc()"></td>'+
+      '<td class="c"><input class="ni" type="number" min="0" value="'+(m.pto||0)+'" oninput="members['+i+'].pto=Math.max(0,+this.value||0);autoSave();recalc()"></td>'+
       '<td class="c netc">'+c+'h</td>'+
       '<td class="c" style="color:var(--blue)">'+asgn+'h</td>'+
       '<td class="c" style="color:var(--t2)">'+logged+'h</td>'+
@@ -333,16 +369,28 @@ function renderMembers() {
       '<td><button class="rb" onclick="removeMember('+i+')">×</button></td></tr>';
   }).join('')+
   '<tr><td colspan="9" style="padding:6px 0"><button class="addl" onclick="addMemberPrompt()">+ Add team member</button></td></tr>';
-  const tp=members.reduce((a,m)=>a+(m.pto||0),0);
-  const tc=members.reduce((a,m)=>a+cap(m),0);
-  const ta=members.reduce((s,m)=>s+asgnFor(m.name),0);
-  const tl=members.reduce((s,m)=>s+logFor(m.name),0);
-  const tr2=Math.max(0,ta-tl);
-  document.getElementById('t-pto').textContent=tp;
-  document.getElementById('t-cap').textContent=tc+'h';
-  const el=document.getElementById('t-asgn'); if(el) el.textContent=ta+'h';
-  const el2=document.getElementById('t-log'); if(el2) el2.textContent=tl+'h';
-  const el3=document.getElementById('t-rem2'); if(el3) el3.textContent=tr2+'h';
+
+  // Totals only for members with assigned hours (hidden members excluded entirely)
+  const activeMembers = members.filter(m => asgnFor(m.name) > 0);
+  const tp = activeMembers.reduce((a,m) => a+(m.pto||0), 0);
+  const tc = activeMembers.reduce((a,m) => a+cap(m), 0);
+  const ta = activeMembers.reduce((s,m) => s+asgnFor(m.name), 0);
+  const tl = activeMembers.reduce((s,m) => s+logFor(m.name), 0);
+  const tr2 = Math.max(0, ta-tl);
+  document.getElementById('t-pto').textContent = tp;
+  document.getElementById('t-cap').textContent = tc+'h';
+  const ea=document.getElementById('t-asgn'); if(ea) ea.textContent=ta+'h';
+  const el=document.getElementById('t-log');  if(el) el.textContent=tl+'h';
+  const er=document.getElementById('t-rem2'); if(er) er.textContent=tr2+'h';
+}
+
+// ── AUTO-SAVE — persists to localStorage instantly on every change ────────────
+// This ensures changes survive tab close/open without needing to hit Save.
+// Save button additionally pushes to Jira + Confluence.
+function autoSave() {
+  const s = getSD();
+  if (!s) return;
+  saveCapacity(s.projectKey, s.sprintName, members, teamDays);
 }
 
 // ── RENDER TEAM DAYS OFF ───────────────────────────────────────────────────────
@@ -354,13 +402,13 @@ function renderTDO() {
   const a=sprintDateAttrs();
   document.getElementById('tdo-list').innerHTML = teamDays.map((d,i)=>
     '<div class="dor">'+
-    '<input type="date" class="si2" style="font-size:11px;padding:3px 5px" value="'+d.date+'" '+a+' oninput="teamDays['+i+'].date=this.value;renderTDO();recalc()">'+
-    '<select class="si2" style="font-size:11px;padding:3px 5px" oninput="teamDays['+i+'].type=this.value">'+
+    '<input type="date" class="si2" style="font-size:11px;padding:3px 5px" value="'+d.date+'" '+a+' oninput="teamDays['+i+'].date=this.value;autoSave();renderTDO();recalc()">'+
+    '<select class="si2" style="font-size:11px;padding:3px 5px" oninput="teamDays['+i+'].type=this.value;autoSave()">'+
       '<option '+(d.type==='Holiday' ?'selected':'')+'>Holiday</option>'+
       '<option '+(d.type==='Recharge'?'selected':'')+'>Recharge</option>'+
       '<option '+(d.type==='Company' ?'selected':'')+'>Company</option>'+
     '</select>'+
-    '<button class="rb" onclick="teamDays.splice('+i+',1);renderTDO();recalc()">×</button></div>'
+    '<button class="rb" onclick="teamDays.splice('+i+',1);autoSave();renderTDO();recalc()">×</button></div>'
   ).join('');
   document.getElementById('tdo-chip').textContent=teamDays.length+' day'+(teamDays.length!==1?'s':'');
 }
@@ -369,83 +417,21 @@ function addTDO() {
   const e=document.getElementById('end-date').value||getSD().endDate;
   const ex=new Set(teamDays.map(d=>d.date)); let cur=parseDate(s); const end=parseDate(e); let sg='';
   while(cur<=end){const iso=isoDate(cur); if(cur.getDay()!==0&&cur.getDay()!==6&&!ex.has(iso)){sg=iso;break;} cur.setDate(cur.getDate()+1);}
-  teamDays.push({date:sg,type:'Holiday',note:''}); renderTDO(); recalc();
+  teamDays.push({date:sg,type:'Holiday',note:''}); autoSave(); renderTDO(); recalc();
 }
 
-// ── RENDER ISSUES ──────────────────────────────────────────────────────────────
-function setSort(k) { if(sortKey===k) sortDir*=-1; else{sortKey=k;sortDir=1;} renderIssues(); }
-function sortedIssues() {
-  const ord={Done:3,'In Progress':2,Blocked:1,Open:0};
-  return [...issues].sort((a,b)=>{
-    let av,bv;
-    if(sortKey==='status')  {av=ord[a.status]||0;  bv=ord[b.status]||0;}
-    else if(sortKey==='est'){av=a.est||0;           bv=b.est||0;}
-    else if(sortKey==='assignee'){av=a.assignee||'';bv=b.assignee||'';}
-    else{av=a.key;bv=b.key;}
-    return av<bv?-sortDir:av>bv?sortDir:0;
-  });
-}
-function renderIssues() {
-  const hdr=document.getElementById('issues-hdr');
-  const ar=k=>sortKey===k?(sortDir>0?' ▲':' ▼'):'';
-  if(hdr) hdr.innerHTML=
-    '<th style="width:78px;cursor:pointer" onclick="setSort(\'key\')">Issue'+ar('key')+'</th>'+
-    '<th style="width:55px">Type</th><th>Summary</th>'+
-    '<th style="width:125px;cursor:pointer" onclick="setSort(\'assignee\')">Assignee'+ar('assignee')+'</th>'+
-    '<th class="c" style="width:65px;cursor:pointer" onclick="setSort(\'est\')">Est hrs'+ar('est')+'</th>'+
-    '<th class="c" style="width:58px">Logged</th>'+
-    '<th class="c" style="width:80px">Remaining</th>'+
-    '<th style="width:108px;cursor:pointer" onclick="setSort(\'status\')">Status'+ar('status')+'</th>';
-  const si={Done:'✅','In Progress':'🔄',Open:'📋',Blocked:'🚫'};
-  const sc={Done:'s-done','In Progress':'s-prog',Open:'s-open',Blocked:'s-blok'};
-  document.getElementById('issues-tbody').innerHTML = sortedIssues().map(iss=>{
-    const i=issues.indexOf(iss);
-    const rem=Math.max(0,(iss.est||0)-(iss.logged||0));
-    const pct=iss.est>0?Math.round((iss.logged||0)/iss.est*100):0;
-    const subtaskHtml=iss.subtasks
-      ?'<div style="font-size:10px;color:var(--t3);margin-top:3px;line-height:1.5">'+
-        iss.subtasks.split(', ').map(s=>{
-          const m=s.match(/^(\w+-\d+)\s+\(([^,]+),\s+(\d+)h est,\s+(\d+)h logged\)$/);
-          if(!m) return '<span style="opacity:.6">'+s+'</span>';
-          const[,key,who,est,log]=m; const done=parseInt(log)>=parseInt(est);
-          return '<span style="color:'+(done?'var(--green)':'var(--t3)')+'">'+key+' '+who+' '+log+'/'+est+'h</span>';
-        }).join(' · ')+'</div>':'';
-    return '<tr class="dr">'+
-      '<td><span class="jkey">'+iss.key+'</span></td>'+
-      '<td style="font-size:11px;color:var(--t3)">'+iss.type+'</td>'+
-      '<td style="font-size:12px">'+iss.summary+subtaskHtml+'</td>'+
-      '<td><select class="si2" style="width:120px" onchange="issues['+i+'].assignee=this.value;recalc()">'+memberOpts(iss.assignee)+'</select></td>'+
-      '<td class="c"><input class="ni" type="number" min="0" step="0.5" value="'+(iss.est||0)+'" oninput="issues['+i+'].est=+this.value;recalc()"></td>'+
-      '<td class="c" style="color:var(--t2)">'+(iss.logged||'—')+'</td>'+
-      '<td class="c"><div style="font-size:12px;font-weight:500;color:'+(rem>0?'var(--amber)':'var(--green)')+'">'+rem+'h</div>'+
-        '<div style="font-size:10px;color:var(--t3)">'+pct+'% done</div></td>'+
-      '<td class="'+(sc[iss.status]||'s-open')+'">'+(si[iss.status]||'📋')+
-        ' <select style="background:transparent;border:none;color:inherit;font-size:12px;cursor:pointer" onchange="issues['+i+'].status=this.value;renderAll()">'+
-          '<option '+(iss.status==='Open'        ?'selected':'')+'>Open</option>'+
-          '<option '+(iss.status==='In Progress' ?'selected':'')+'>In Progress</option>'+
-          '<option '+(iss.status==='Done'        ?'selected':'')+'>Done</option>'+
-          '<option '+(iss.status==='Blocked'     ?'selected':'')+'>Blocked</option>'+
-        '</select></td></tr>';
-  }).join('');
-  const te=issues.reduce((a,i)=>a+(+i.est||0),0);
-  const tl=issues.reduce((a,i)=>a+(+i.logged||0),0);
-  const doneCount=issues.filter(i=>i.status==='Done').length;
-  const pc=issues.length>0?Math.round(doneCount/issues.length*100):0;
-  document.getElementById('i-est').textContent=Math.round(te*10)/10||0;
-  document.getElementById('i-log').textContent=Math.round(tl*10)/10||0;
-  document.getElementById('i-rem').textContent=(Math.round(Math.max(0,te-tl)*10)/10||0)+'h · '+pc+'% done';
-}
 
 // ── AVAILABILITY BARS ──────────────────────────────────────────────────────────
 function renderAvail() {
   document.getElementById('avail-list').innerHTML = members.map(m=>{
-    const c=cap(m), a=asgnFor(m.name), logged=logFor(m.name);
-    const p=c>0?Math.min(100,Math.round(a/c*100)):0;
-    const col=p>100?'var(--red)':p>80?'var(--amber)':'var(--green)';
+    const c=cap(m), asgn=asgnFor(m.name), logged=logFor(m.name);
+    // Use logged/cap for actual utilization matching Jira reality
+    const p = c>0 ? Math.round(logged/c*100) : 0;
+    const col = p>100?'var(--red)':p>85?'var(--amber)':'var(--green)';
     return '<div class="ar"><div class="ar-hd">'+
-      '<span style="color:var(--t2);font-size:12px">'+m.name+'</span>'+
-      '<span style="color:var(--t3);font-size:11px">'+a+'h est / '+logged+'h logged / '+c+'h cap ('+p+'%)</span></div>'+
-      '<div class="ar-bg"><div class="ar-fill" style="width:'+p+'%;background:'+col+'"></div></div></div>';
+      '<span style="color:var(--t2);font-size:12px">'+sanitize(m.name)+'</span>'+
+      '<span style="color:var(--t3);font-size:11px">'+logged+'h logged / '+asgn+'h assigned / '+c+'h cap ('+p+'%)</span></div>'+
+      '<div class="ar-bg"><div class="ar-fill" style="width:'+Math.min(p,100)+'%;background:'+col+'"></div></div></div>';
   }).join('');
 }
 
@@ -479,42 +465,174 @@ function renderCal() {
 
 // ── BURNDOWN CHART ─────────────────────────────────────────────────────────────
 function renderBurndown() {
-  const sd=getSD();
-  const startStr=(sd&&sd.startDate)||document.getElementById('start-date').value||'';
-  const endStr  =(sd&&sd.endDate)  ||document.getElementById('end-date').value  ||'';
-  const s=parseDate(startStr), e=parseDate(endStr);
-  if(!s||!e) return;
-  const _n=new Date(), todayIso=isoDate(_n), off=new Set(teamDays.map(d=>d.date));
-  const workDays=[]; const cur=new Date(s);
-  while(cur<=e){ const dow=cur.getDay(), iso=isoDate(cur); if(dow!==0&&dow!==6&&!off.has(iso)) workDays.push(iso); cur.setDate(cur.getDate()+1);}
-  if(!workDays.length) return;
-  const totalEst     =issues.reduce((a,i)=>a+(+i.est||0),0);
-  const totalLogged  =issues.reduce((a,i)=>a+(+i.logged||0),0);
-  const remainingNow =Math.max(0,totalEst-totalLogged);
-  const n=workDays.length;
-  const ideal=workDays.map((_,i)=>Math.round(totalEst*(1-i/Math.max(n-1,1))*10)/10);
-  const pivotIdx=workDays.findIndex(d=>d>=todayIso);
-  const pivot=pivotIdx===-1?n-1:pivotIdx;
-  const actual=workDays.map((day,i)=>{
-    if(i>pivot) return null;
-    if(pivot===0) return totalEst;
-    if(i===pivot) return remainingNow;
-    return Math.round((totalEst-(totalEst-remainingNow)*(i/pivot))*10)/10;
+  const sd = getSD();
+  const startStr = (sd&&sd.startDate) || document.getElementById('start-date').value || '';
+  const endStr   = (sd&&sd.endDate)   || document.getElementById('end-date').value   || '';
+  const s = parseDate(startStr), e = parseDate(endStr);
+  if (!s || !e) return;
+
+  const todayIso = isoDate(new Date());
+  const off = new Set(teamDays.map(d => d.date));
+
+  // Working days list (no weekends, no team days off)
+  const workDays = [];
+  const cur = new Date(s);
+  while (cur <= e) {
+    const dow = cur.getDay(), iso = isoDate(cur);
+    if (dow !== 0 && dow !== 6 && !off.has(iso)) workDays.push(iso);
+    cur.setDate(cur.getDate()+1);
+  }
+  if (!workDays.length) return;
+
+  const activeMembers = members.filter(m => asgnFor(m.name) > 0);
+  const originalScope  = activeMembers.reduce((a,m) => a + asgnFor(m.name), 0);
+  const totalLogged    = activeMembers.reduce((a,m) => a + logFor(m.name),  0);
+  const remainingNow   = Math.max(0, originalScope - totalLogged);
+
+  // Total team capacity for sprint = sum of all active member caps
+  const totalCapacity  = activeMembers.reduce((a,m) => a + cap(m), 0);
+
+  const n = workDays.length;
+  const pivotIdx = workDays.findIndex(d => d >= todayIso);
+  const pivot = pivotIdx === -1 ? n-1 : Math.min(pivotIdx, n-1);
+  const daysLeft = n - 1 - pivot;
+  const pctDone  = originalScope > 0 ? Math.round(totalLogged/originalScope*100) : 0;
+  const scopeIncrease = 0; // flat for now — rises if work added mid-sprint
+
+  // ── IDEAL TREND ───────────────────────────────────────────────────────────
+  // Grey line: originalScope → 0 linearly across all working days
+  const ideal = workDays.map((_,i) =>
+    Math.round(originalScope * (1 - i/Math.max(n-1,1)) * 10) / 10
+  );
+
+  // ── REMAINING WORK ────────────────────────────────────────────────────────
+  // Blue filled: actual hours remaining (assigned - logged from Jira)
+  // Anchored: day 0 = originalScope, today = remainingNow, future = null
+  const remaining = workDays.map((_,i) => {
+    if (i > pivot) return null;
+    if (i === 0)   return originalScope;
+    if (i === pivot) return remainingNow;
+    return Math.round((originalScope - (originalScope - remainingNow) * (i/Math.max(pivot,1))) * 10) / 10;
   });
-  const labels=workDays.map(d=>{const[,m,day]=d.split('-'); return parseInt(m)+'/'+parseInt(day);});
-  if(charts.bd) charts.bd.destroy();
-  charts.bd=new Chart(document.getElementById('burndown-chart'),{
-    type:'line',
-    data:{labels,datasets:[
-      {label:'Ideal',data:ideal,borderColor:'rgba(77,166,255,.45)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:false,tension:0},
-      {label:'Actual',data:actual,borderColor:'#00d4aa',backgroundColor:'rgba(0,212,170,.08)',borderWidth:2,pointRadius:3,pointBackgroundColor:'#00d4aa',fill:true,tension:0,spanGaps:false}
-    ]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.raw+'h remaining'}}},
-      scales:{
-        x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5a6580',font:{size:10},maxTicksLimit:8}},
-        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5a6580',font:{size:10},precision:0},min:0,max:Math.max(10,totalEst),title:{display:true,text:'Hours remaining',color:'#5a6580',font:{size:10}}}
+
+  // ── REMAINING CAPACITY ────────────────────────────────────────────────────
+  // Green dashed: team capacity counting DOWN as sprint days pass
+  // Day 0 = totalCapacity, last day = 0 (all capacity consumed)
+  // Only plotted from today forward (shows what capacity is still available)
+  const remainingCap = workDays.map((_,i) => {
+    // capacity per remaining day = totalCapacity / n working days
+    const capPerDay = totalCapacity / Math.max(n, 1);
+    const capLeft = Math.max(0, totalCapacity - capPerDay * i);
+    return Math.round(capLeft * 10) / 10;
+  });
+
+  const labels = workDays.map(d => {
+    const [,m,day] = d.split('-');
+    return parseInt(m)+'/'+parseInt(day);
+  });
+
+  // ── KPI CHIPS ─────────────────────────────────────────────────────────────
+  const scopeBurndown = totalLogged; // work completed
+  const notEstimated  = issues.filter(i => !i.est || i.est === 0).length;
+  const capLeft = Math.max(0, Math.round(totalCapacity * (daysLeft / Math.max(n,1))));
+
+  // Update or create KPI strip above chart
+  let kpi = document.getElementById('bd-kpis');
+  if (!kpi) {
+    kpi = document.createElement('div');
+    kpi.id = 'bd-kpis';
+    kpi.style.cssText = 'display:flex;gap:24px;justify-content:flex-end;margin-bottom:8px;flex-wrap:wrap';
+    document.getElementById('burndown-chart').parentElement.before(kpi);
+  }
+  const chip = (label, val, col) =>
+    '<div style="text-align:right"><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">'+label+'</div>'+
+    '<div style="font-size:22px;font-weight:300;color:'+(col||'var(--t1)')+'">'+val+'</div></div>';
+  kpi.innerHTML =
+    chip('Scope Burndown', '+'+scopeBurndown+'h', 'var(--green)') +
+    chip('Items not estimated', notEstimated, notEstimated > 0 ? 'var(--amber)' : 'var(--t1)') +
+    chip('Remaining Work', remainingNow+'h', remainingNow > capLeft ? 'var(--red)' : 'var(--t1)') +
+    chip('Capacity Left', capLeft+'h', 'var(--blue)');
+
+  if (charts.bd) charts.bd.destroy();
+  charts.bd = new Chart(document.getElementById('burndown-chart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Ideal Trend',
+          data: ideal,
+          borderColor: 'rgba(180,180,180,.5)',
+          borderWidth: 1.5,
+          borderDash: [],
+          pointRadius: 0,
+          fill: false,
+          tension: 0,
+          order: 3
+        },
+        {
+          label: 'Remaining Capacity',
+          data: remainingCap,
+          borderColor: 'rgba(0,212,170,.7)',
+          borderWidth: 1.5,
+          borderDash: [5,4],
+          pointRadius: 0,
+          fill: false,
+          tension: 0,
+          order: 2
+        },
+        {
+          label: 'Remaining',
+          data: remaining,
+          borderColor: '#4da6ff',
+          backgroundColor: 'rgba(77,166,255,.25)',
+          borderWidth: 2,
+          pointRadius: (ctx) => ctx.dataIndex === pivot ? 5 : 0,
+          pointBackgroundColor: '#4da6ff',
+          fill: true,
+          tension: 0,
+          spanGaps: false,
+          order: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          align: 'start',
+          labels: { color: '#5a6580', font: { size: 10 }, boxWidth: 20, padding: 12, usePointStyle: true }
+        },
+        tooltip: {
+          callbacks: {
+            title: items => workDays[items[0]?.dataIndex] || '',
+            label: ctx => {
+              if (ctx.raw === null) return null;
+              return ctx.dataset.label + ': ' + ctx.raw + 'h';
+            },
+            afterBody: items => {
+              const idx = items[0]?.dataIndex;
+              return workDays[idx] === todayIso ? ['Today'] : [];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,255,255,.04)' },
+          ticks: { color: '#5a6580', font: { size: 10 }, maxTicksLimit: 10 }
+        },
+        y: {
+          grid: { color: 'rgba(255,255,255,.04)' },
+          ticks: { color: '#5a6580', font: { size: 10 }, precision: 0 },
+          min: 0,
+          max: Math.ceil(Math.max(originalScope, totalCapacity) * 1.05) || 10,
+          title: { display: true, text: 'Hours', color: '#5a6580', font: { size: 10 } }
+        }
       }
     }
   });
@@ -522,10 +640,12 @@ function renderBurndown() {
 
 // ── RECALC / RENDER ALL ────────────────────────────────────────────────────────
 function recalc() {
-  const tc=members.reduce((a,m)=>a+cap(m),0);
-  const ta=members.reduce((a,m)=>a+asgnFor(m.name),0);
-  const tp=tdo();
-  const util=tc>0?Math.round(ta/tc*100):0;
+  const active = members.filter(m => asgnFor(m.name) > 0);
+  const tc = active.reduce((a,m) => a+cap(m), 0);
+  const ta = active.reduce((a,m) => a+asgnFor(m.name), 0);
+  const tl = active.reduce((a,m) => a+logFor(m.name), 0);
+  const tp = tdo();
+  const util = tc>0 ? Math.round(tl/tc*100) : 0;
   const totalCount=issues.length, doneCount=issues.filter(i=>i.status==='Done').length;
   const pct=totalCount>0?Math.round(doneCount/totalCount*100):0;
   document.getElementById('k-cap').textContent=tc;
@@ -537,7 +657,7 @@ function recalc() {
   renderMembers(); renderAvail(); renderCal(); renderBurndown();
 }
 
-function renderAll() { renderTDO(); renderIssues(); recalc(); }
+function renderAll() { renderTDO(); recalc(); }
 
 async function refreshFromJira() {
   const btn=document.getElementById('refresh-btn');
