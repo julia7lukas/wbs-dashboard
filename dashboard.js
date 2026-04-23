@@ -307,25 +307,42 @@ function renderMembers() {
   const tb = document.getElementById('mtbody');
   tb.innerHTML = members.map((m,i) => {
     const c=cap(m), asgn=asgnFor(m.name), logged=logFor(m.name);
+    const remaining = Math.max(0, asgn - logged);
     const util=c>0?Math.min(100,Math.round(asgn/c*100)):0;
     const utilCol=util>100?'var(--red)':util>85?'var(--amber)':'var(--green)';
+    // Remaining is red when >80% of capacity still unlogged with <50% sprint elapsed
+    const sd=getSD();
+    const sprintDays = wd();
+    const today=new Date(), start=parseDate(sd&&sd.startDate), end=parseDate(sd&&sd.endDate);
+    const totalMs=(end&&start)?(end-start):1, elapsedMs=start?Math.min(today-start,totalMs):0;
+    const sprintPct=totalMs>0?elapsedMs/totalMs:0;
+    // Red if remaining hrs > expected remaining capacity (you're behind)
+    const expectedRemaining = c * (1 - sprintPct);
+    const remCol = (remaining > 0 && remaining > expectedRemaining * 1.2) ? 'var(--red)'
+                 : remaining > 0 ? 'var(--amber)' : 'var(--green)';
     return '<tr class="dr">'+
       '<td><div class="mc"><div class="av" style="background:'+AVB[i%8]+';color:'+AVC[i%8]+'">'+ini(m.name)+'</div>'+
       '<input style="background:transparent;border:none;color:var(--t1);font-family:var(--font);font-size:13px;width:130px" value="'+m.name+'" onchange="members['+i+'].name=this.value.trim();renderAll()"></div></td>'+
       '<td class="c"><input class="ni" type="number" min="1" max="12" value="'+(m.hrs||hd())+'" oninput="members['+i+'].hrs=Math.max(1,+this.value||'+hd()+');recalc()"></td>'+
       '<td class="c"><input class="ni" type="number" min="0" value="'+(m.pto||0)+'" oninput="members['+i+'].pto=Math.max(0,+this.value||0);recalc()"></td>'+
       '<td class="c netc">'+c+'h</td>'+
-      '<td class="c" style="color:var(--blue)">'+asgn+'h<div style="font-size:10px;color:var(--t3)">'+logged+'h logged</div></td>'+
+      '<td class="c" style="color:var(--blue)">'+asgn+'h</td>'+
+      '<td class="c" style="color:var(--t2)">'+logged+'h</td>'+
+      '<td class="c"><div style="font-size:12px;font-weight:600;color:'+remCol+'">'+remaining+'h</div></td>'+
       '<td class="c"><div style="font-size:11px;font-weight:600;color:'+utilCol+'">'+util+'%</div></td>'+
       '<td><button class="rb" onclick="removeMember('+i+')">×</button></td></tr>';
   }).join('')+
-  '<tr><td colspan="7" style="padding:6px 0"><button class="addl" onclick="addMemberPrompt()">+ Add team member</button></td></tr>';
+  '<tr><td colspan="9" style="padding:6px 0"><button class="addl" onclick="addMemberPrompt()">+ Add team member</button></td></tr>';
   const tp=members.reduce((a,m)=>a+(m.pto||0),0);
   const tc=members.reduce((a,m)=>a+cap(m),0);
   const ta=members.reduce((s,m)=>s+asgnFor(m.name),0);
+  const tl=members.reduce((s,m)=>s+logFor(m.name),0);
+  const tr2=Math.max(0,ta-tl);
   document.getElementById('t-pto').textContent=tp;
   document.getElementById('t-cap').textContent=tc+'h';
   const el=document.getElementById('t-asgn'); if(el) el.textContent=ta+'h';
+  const el2=document.getElementById('t-log'); if(el2) el2.textContent=tl+'h';
+  const el3=document.getElementById('t-rem2'); if(el3) el3.textContent=tr2+'h';
 }
 
 // ── RENDER TEAM DAYS OFF ───────────────────────────────────────────────────────
@@ -337,13 +354,12 @@ function renderTDO() {
   const a=sprintDateAttrs();
   document.getElementById('tdo-list').innerHTML = teamDays.map((d,i)=>
     '<div class="dor">'+
-    '<input type="date" class="si2" value="'+d.date+'" '+a+' oninput="teamDays['+i+'].date=this.value;renderTDO();recalc()">'+
-    '<select class="si2" oninput="teamDays['+i+'].type=this.value">'+
+    '<input type="date" class="si2" style="font-size:11px;padding:3px 5px" value="'+d.date+'" '+a+' oninput="teamDays['+i+'].date=this.value;renderTDO();recalc()">'+
+    '<select class="si2" style="font-size:11px;padding:3px 5px" oninput="teamDays['+i+'].type=this.value">'+
       '<option '+(d.type==='Holiday' ?'selected':'')+'>Holiday</option>'+
       '<option '+(d.type==='Recharge'?'selected':'')+'>Recharge</option>'+
       '<option '+(d.type==='Company' ?'selected':'')+'>Company</option>'+
     '</select>'+
-    '<input type="text" class="si2" value="'+(d.note||'')+'" placeholder="Note..." oninput="teamDays['+i+'].note=this.value">'+
     '<button class="rb" onclick="teamDays.splice('+i+',1);renderTDO();recalc()">×</button></div>'
   ).join('');
   document.getElementById('tdo-chip').textContent=teamDays.length+' day'+(teamDays.length!==1?'s':'');
