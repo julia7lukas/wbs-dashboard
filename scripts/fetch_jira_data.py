@@ -136,9 +136,9 @@ def get_sprint_issues(project_key):
     jql = (f'project = {project_key} AND sprint in openSprints() '
            f'AND issuetype not in subTaskIssueTypes() ORDER BY created DESC')
     return fetch_all_jql(jql,
-        'summary,assignee,status,issuetype,subtasks,'
+        'summary,assignee,status,issuetype,subtasks,parent,'
         'aggregatetimeoriginalestimate,aggregatetimespent,'
-        'timeoriginalestimate,timespent')
+        'timeoriginalestimate,timespent,customfield_10016')
 
 def get_sprint_subtasks(project_key):
     """Get all issues/subtasks in the sprint with time data."""
@@ -249,6 +249,7 @@ def format_issues(raw_issues, subtask_map):
             'est':      secs_to_hrs(f.get('aggregatetimeoriginalestimate')),
             'logged':   secs_to_hrs(f.get('aggregatetimespent')),
             'subtasks': ', '.join(subs) if subs else '',
+            'points':   f.get('customfield_10016') or 0,
         })
     return out
 
