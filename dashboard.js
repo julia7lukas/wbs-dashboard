@@ -423,9 +423,10 @@ function addTDO() {
 
 // ── AVAILABILITY BARS ──────────────────────────────────────────────────────────
 function renderAvail() {
-  document.getElementById('avail-list').innerHTML = members.map(m=>{
+  // Only show members visible in the individual capacity table (assigned hrs > 0)
+  const activeMembers = members.filter(m => asgnFor(m.name) > 0);
+  document.getElementById('avail-list').innerHTML = activeMembers.map(m=>{
     const c=cap(m), asgn=asgnFor(m.name), logged=logFor(m.name);
-    // Use logged/cap for actual utilization matching Jira reality
     const p = c>0 ? Math.round(logged/c*100) : 0;
     const col = p>100?'var(--red)':p>85?'var(--amber)':'var(--green)';
     return '<div class="ar"><div class="ar-hd">'+
