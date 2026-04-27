@@ -37,9 +37,7 @@ function sanitize(str) {
     .replace(/'/g, '&#x27;');
 }
 
-// Track issue state at load time so we only push actual diffs to Jira
-let _issueSnapshot = {};
-// Track members removed this session so saveAll can unassign their issues
+// Track members removed this session
 let _removedMembers = [];
 
 // ── SPRINT-SCOPED CACHE (localStorage — capacity edits only, no secrets) ────
@@ -108,26 +106,6 @@ async function callAtlassianMCP(prompt) {
   return data.content.filter(b => b.type === 'text').map(b => b.text).join('\n');
 }
 
-async function syncIssuesToJira(changedIssues) {
-  if (!changedIssues.length) return;
-  const cloudId = CLOUD_ID;
-  const lines = changedIssues.map(iss => {
-    const parts = [];
-    if (iss._assigneeChanged) parts.push('assignee → "' + iss.assignee + '"');
-    if (iss._statusChanged)   parts.push('status → "' + iss.status + '"');
-    if (iss._estChanged)      parts.push('originalEstimate → ' + iss.est + 'h');
-    return iss.key + ': ' + parts.join(', ');
-  }).join('\n');
-  const prompt =
-    'You are updating Jira issues on cloudId ' + cloudId + '. ' +
-    'For each issue below apply the changes using editJiraIssue and/or transitionJiraIssue tools. ' +
-    'For assignee changes, look up the account ID using lookupJiraAccountId first. ' +
-    'For status changes, get available transitions with getTransitionsForJiraIssue then apply the right one. ' +
-    'For estimate changes, set timetracking.originalEstimate in hours (e.g. "6h"). ' +
-    'Apply all changes silently — no explanations needed, just do it.\n\n' +
-    'Issues to update:\n' + lines;
-  return callAtlassianMCP(prompt);
-}
 
 async function syncCapacityToConfluence() {
   const sd     = getSD();
@@ -167,9 +145,8 @@ function switchTeam(key) {
     members  = SD.members.map(m => ({...m}));
     teamDays = SD.teamDays ? SD.teamDays.map(d => ({...d})) : [];
   }
-  issues = SD.issues.map(i => ({...i}));
   _removedMembers = [];
-  _issueSnapshot  = Object.fromEntries(issues.map(i => [i.key, {assignee:i.assignee, status:i.status, est:i.est}]));
+  _issueSnapshot  = {};
 
   document.getElementById('sprint-name').value       = SD.sprintName;
   document.getElementById('hdr-sprint').textContent  = SD.sprintName;
@@ -195,7 +172,7 @@ const AVC = ['#00d4aa','#4da6ff','#a78bfa','#f472b6','#fbbf24','#f87171','#34d39
 const AVB = AVC.map(c => c + '22');
 function ini(n) { return (n||'').trim().split(/\s+/).map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?'; }
 
-let members, teamDays, issues, charts = {};
+let members, teamDays, charts = {};
 function getSD()       { return TEAMS[currentTeam]; }
 function parseDate(s)  { if (!s) return null; const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
 function isoDate(d)    { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
@@ -262,30 +239,12 @@ async function saveAll() {
   const el  = document.getElementById('sync-ts');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Saving...'; }
 
-  // Detect changed issues vs snapshot
-  const changedIssues = issues.filter(iss => {
-    const snap = _issueSnapshot[iss.key];
-    if (!snap) return false;
-    iss._assigneeChanged = snap.assignee !== iss.assignee;
-    iss._statusChanged   = snap.status   !== iss.status;
-    iss._estChanged      = snap.est       !== iss.est;
-    return iss._assigneeChanged || iss._statusChanged || iss._estChanged;
-  });
-
   // Sprint-scoped localStorage (capacity edits — no secrets)
   saveCapacity(s.projectKey, s.sprintName, members, teamDays);
 
   // Jira + Confluence in parallel
-  let jiraStatus = '', confluenceStatus = '';
+  let confluenceStatus = '';
   const promises = [];
-
-  if (changedIssues.length > 0) {
-    promises.push(
-      syncIssuesToJira(changedIssues)
-        .then(()  => { jiraStatus = ' · Jira ✓'; })
-        .catch(e  => { console.error('Jira sync failed:', e); jiraStatus = ' · Jira ✗'; })
-    );
-  }
 
   promises.push(
     syncCapacityToConfluence()
@@ -295,13 +254,11 @@ async function saveAll() {
 
   await Promise.all(promises);
 
-  // Update snapshot so next save only diffs new changes
-  _issueSnapshot  = Object.fromEntries(issues.map(i => [i.key, {assignee:i.assignee, status:i.status, est:i.est}]));
   _removedMembers = [];
 
   if (btn) { btn.disabled = false; btn.textContent = '✓ Save changes'; }
   if (el)  el.textContent = (el.textContent||'').replace(/ · (Saving|Saved|Jira|Confluence).*/g, '') +
-    jiraStatus + confluenceStatus + ' · Saved ✓';
+    confluenceStatus + ' · Saved ✓';
 }
 
 // ── CAPACITY HELPERS ──────────────────────────────────────────────────────────
@@ -312,15 +269,10 @@ function cap(m)     { return Math.max(0, wd()-tdo()-(m.pto||0)) * (m.hrs||hd());
 function asgnFor(n) { const sd=getSD(); return sd&&sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).est||0    : 0; }
 function logFor(n)  { const sd=getSD(); return sd&&sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).logged||0 : 0; }
 
-function memberOpts(sel) {
-  return '<option value="Unassigned"'+(!sel||sel==='Unassigned'?' selected':'')+'>Unassigned</option>' +
-    members.map(m=>'<option value="'+m.name+'"'+(m.name===sel?' selected':'')+'>'+m.name+'</option>').join('');
-}
 
 function removeMember(i) {
   const removed = members[i];
   _removedMembers.push(removed.name);
-  issues.forEach(iss => { if (iss.assignee === removed.name) iss.assignee = 'Unassigned'; });
   members.splice(i, 1);
   autoSave();
   renderAll();
@@ -338,24 +290,14 @@ function addMemberPrompt() {
 function renderMembers() {
   const tb = document.getElementById('mtbody');
   const sd = getSD();
-  const today = new Date();
-  const start = parseDate(sd&&sd.startDate), end = parseDate(sd&&sd.endDate);
-  const totalMs = (end&&start) ? (end-start) : 1;
-  const elapsedMs = start ? Math.min(today-start, totalMs) : 0;
-  const sprintPct = totalMs > 0 ? elapsedMs/totalMs : 0;
-
   tb.innerHTML = members.map((m, i) => ({m, i})).filter(({m}) => asgnFor(m.name) > 0).map(({m, i}) => {
     const c = cap(m);
     const asgn = asgnFor(m.name);
     const logged = logFor(m.name);
     const remaining = Math.max(0, asgn - logged);
     // Util = logged vs capacity (actual progress)
-    const util = c > 0 ? Math.round(logged/c*100) : 0;
-    const utilCol = util > 100 ? 'var(--red)' : util > 85 ? 'var(--amber)' : 'var(--green)';
-    // Red remaining = you should have logged more by now given sprint elapsed %
-    const expectedLogged = asgn * sprintPct;
-    const remCol = (remaining > 0 && logged < expectedLogged * 0.8) ? 'var(--red)'
-                 : remaining > 0 ? 'var(--amber)' : 'var(--green)';
+    // Remaining is amber when hours left, green when done
+    const remCol = remaining > 0 ? 'var(--amber)' : 'var(--green)';
     return '<tr class="dr">'+
       '<td><div class="mc"><div class="av" style="background:'+AVB[i%8]+';color:'+AVC[i%8]+'">'+ini(m.name)+'</div>'+
       '<input style="background:transparent;border:none;color:var(--t1);font-family:var(--font);font-size:13px;width:130px" value="'+sanitize(m.name)+'" onchange="members['+i+'].name=this.value.trim();autoSave();renderAll()"></div></td>'+
@@ -365,10 +307,9 @@ function renderMembers() {
       '<td class="c" style="color:var(--blue)">'+asgn+'h</td>'+
       '<td class="c" style="color:var(--t2)">'+logged+'h</td>'+
       '<td class="c"><div style="font-size:12px;font-weight:600;color:'+remCol+'">'+remaining+'h</div></td>'+
-      '<td class="c"><div style="font-size:11px;font-weight:600;color:'+utilCol+'">'+util+'%</div></td>'+
       '<td><button class="rb" onclick="removeMember('+i+')">×</button></td></tr>';
   }).join('')+
-  '<tr><td colspan="9" style="padding:6px 0"><button class="addl" onclick="addMemberPrompt()">+ Add team member</button></td></tr>';
+  '<tr><td colspan="8" style="padding:6px 0"><button class="addl" onclick="addMemberPrompt()">+ Add team member</button></td></tr>';
 
   // Totals only for members with assigned hours (hidden members excluded entirely)
   const activeMembers = members.filter(m => asgnFor(m.name) > 0);
@@ -423,16 +364,16 @@ function addTDO() {
 
 // ── AVAILABILITY BARS ──────────────────────────────────────────────────────────
 function renderAvail() {
-  // Only show members visible in the individual capacity table (assigned hrs > 0)
   const activeMembers = members.filter(m => asgnFor(m.name) > 0);
   document.getElementById('avail-list').innerHTML = activeMembers.map(m=>{
-    const c=cap(m), asgn=asgnFor(m.name), logged=logFor(m.name);
-    const p = c>0 ? Math.round(logged/c*100) : 0;
-    const col = p>100?'var(--red)':p>85?'var(--amber)':'var(--green)';
+    const asgn=asgnFor(m.name), logged=logFor(m.name);
+    const remaining = Math.max(0, asgn - logged);
+    const p = asgn>0 ? Math.round(remaining/asgn*100) : 0;
+    const col = p===0?'var(--green)':p<30?'var(--amber)':'var(--blue)';
     return '<div class="ar"><div class="ar-hd">'+
       '<span style="color:var(--t2);font-size:12px">'+sanitize(m.name)+'</span>'+
-      '<span style="color:var(--t3);font-size:11px">'+logged+'h logged / '+asgn+'h assigned / '+c+'h cap ('+p+'%)</span></div>'+
-      '<div class="ar-bg"><div class="ar-fill" style="width:'+Math.min(p,100)+'%;background:'+col+'"></div></div></div>';
+      '<span style="color:var(--t3);font-size:11px">'+remaining+'h remaining / '+asgn+'h assigned ('+p+'% left)</span></div>'+
+      '<div class="ar-bg"><div class="ar-fill" style="width:'+p+'%;background:'+col+'"></div></div></div>';
   }).join('');
 }
 
@@ -538,7 +479,7 @@ function renderBurndown() {
   // Average daily burndown = total logged / days elapsed (negative = burning down)
   const daysElapsed   = pivot; // days since sprint start
   const avgBurndown   = daysElapsed > 0 ? Math.round((totalLogged / daysElapsed) * 10) / 10 : 0;
-  const notEstimated  = issues.filter(i => !i.est || i.est === 0).length;
+  const notEstimated  = 0; // issues table removed
   // Total scope increase = 0 for now (rises if work added mid-sprint)
   const scopeIncrease = 0;
 
@@ -654,14 +595,12 @@ function recalc() {
   const ta = active.reduce((a,m) => a+asgnFor(m.name), 0);
   const tl = active.reduce((a,m) => a+logFor(m.name), 0);
   const tp = tdo();
-  const util = tc>0 ? Math.round(tl/tc*100) : 0;
-  const totalCount=issues.length, doneCount=issues.filter(i=>i.status==='Done').length;
-  const pct=totalCount>0?Math.round(doneCount/totalCount*100):0;
+
   document.getElementById('k-cap').textContent=tc;
   document.getElementById('k-asgn').textContent=ta;
-  document.getElementById('k-rem').textContent=pct+'%';
-  document.getElementById('k-rem-sub').textContent=doneCount+' of '+totalCount+' issues done';
-  document.getElementById('k-util').textContent=util+'%';
+  document.getElementById('k-rem').textContent=Math.round((tl/Math.max(ta,1))*100)+'%';
+  document.getElementById('k-rem-sub').textContent=tl+'h logged of '+ta+'h assigned';
+  document.getElementById('k-util').textContent=tc>0?Math.round(tl/tc*100)+'%':'0%';
   document.getElementById('k-pto').textContent=tp;
   renderMembers(); renderAvail(); renderCal(); renderBurndown();
 }
