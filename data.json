@@ -7,7 +7,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T15:31:55.559432+00:00",
+    "syncedAt": "2026-04-27T16:02:07.497230+00:00",
     "members": [
       {
         "name": "Julia Lukas",
@@ -139,9 +139,13 @@
       }
     ],
     "subtaskHrs": {
-      "Yudong He": {
-        "est": 52,
-        "logged": 32
+      "Jeremy Goodman": {
+        "est": 8,
+        "logged": 0
+      },
+      "Joi Hepler": {
+        "est": 24,
+        "logged": 3
       },
       "Julia Lukas": {
         "est": 29,
@@ -151,17 +155,9 @@
         "est": 36,
         "logged": 16
       },
-      "Joi Hepler": {
-        "est": 24,
-        "logged": 3
-      },
-      "Jeremy Goodman": {
-        "est": 8,
-        "logged": 0
-      },
-      "Unassigned": {
-        "est": 0,
-        "logged": 0
+      "Yudong He": {
+        "est": 68,
+        "logged": 36
       }
     }
   },
@@ -173,7 +169,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T15:31:57.355195+00:00",
+    "syncedAt": "2026-04-27T16:02:09.462157+00:00",
     "members": [
       {
         "name": "Adam Rossman",
@@ -280,25 +276,25 @@
       }
     ],
     "subtaskHrs": {
-      "Unassigned": {
-        "est": 0,
-        "logged": 0
-      },
       "Deepthi Manne": {
         "est": 34,
         "logged": 33
       },
-      "Michael Earley": {
-        "est": 45,
-        "logged": 35
+      "Joel Wheeler": {
+        "est": 33,
+        "logged": 30
       },
       "John Coniff": {
         "est": 30,
         "logged": 3
       },
-      "Joel Wheeler": {
-        "est": 33,
-        "logged": 30
+      "Michael Earley": {
+        "est": 45,
+        "logged": 35
+      },
+      "Adam Rossman": {
+        "est": 6,
+        "logged": 0
       }
     }
   },
@@ -310,7 +306,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T15:31:58.809997+00:00",
+    "syncedAt": "2026-04-27T16:02:11.786602+00:00",
     "members": [
       {
         "name": "Mike Jessen",
@@ -397,17 +393,17 @@
       }
     ],
     "subtaskHrs": {
-      "Serguei Pozdniakov": {
-        "est": 51,
-        "logged": 26
+      "Ilya Dyakov": {
+        "est": 40,
+        "logged": 38
       },
       "Mike Jessen": {
         "est": 41,
         "logged": 36
       },
-      "Ilya Dyakov": {
-        "est": 40,
-        "logged": 38
+      "Serguei Pozdniakov": {
+        "est": 51,
+        "logged": 26
       }
     }
   },
@@ -419,7 +415,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T15:32:00.168108+00:00",
+    "syncedAt": "2026-04-27T16:02:13.952357+00:00",
     "members": [
       {
         "name": "Peter Lobo",
@@ -611,33 +607,33 @@
       }
     ],
     "subtaskHrs": {
-      "Rohan Kiran": {
-        "est": 6,
-        "logged": 19
+      "Chethan Rangaswamy": {
+        "est": 4,
+        "logged": 8
+      },
+      "Kumaraswamy Krishnan": {
+        "est": 52,
+        "logged": 44
+      },
+      "Kumar Kuppusamy": {
+        "est": 27,
+        "logged": 36
       },
       "Muthu Kumaran": {
         "est": 16,
         "logged": 20
       },
+      "Rohan Kiran": {
+        "est": 6,
+        "logged": 19
+      },
       "Sougata Das": {
         "est": 33,
         "logged": 12
       },
-      "Kumaraswamy Krishnan": {
-        "est": 34,
-        "logged": 8
-      },
       "Vikshani Chitlur": {
         "est": 39,
         "logged": 17
-      },
-      "Chethan Rangaswamy": {
-        "est": 4,
-        "logged": 2
-      },
-      "Kumar Kuppusamy": {
-        "est": 24,
-        "logged": 32
       }
     }
   },
@@ -649,7 +645,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T15:32:02.105455+00:00",
+    "syncedAt": "2026-04-27T16:02:15.751636+00:00",
     "members": [
       {
         "name": "Peter Lobo",
@@ -901,33 +897,29 @@
       }
     ],
     "subtaskHrs": {
-      "Unassigned": {
-        "est": 12,
-        "logged": 0
-      },
       "Akshay Kompelli": {
         "est": 30,
         "logged": 4
-      },
-      "Yashodhara Kulal": {
-        "est": 48,
-        "logged": 22
-      },
-      "Seetharamkumar Thummala": {
-        "est": 46,
-        "logged": 16
       },
       "Harsh Jain": {
         "est": 10,
         "logged": 0
       },
+      "Kapil Darji": {
+        "est": 24,
+        "logged": 30
+      },
       "Kashish Thakur": {
         "est": 32,
         "logged": 12
       },
-      "Kapil Darji": {
-        "est": 24,
-        "logged": 30
+      "Seetharamkumar Thummala": {
+        "est": 46,
+        "logged": 16
+      },
+      "Yashodhara Kulal": {
+        "est": 68,
+        "logged": 22
       }
     }
   }
