@@ -89,7 +89,8 @@ def fetch_all_jql(jql, fields):
         if not token: break
     return all_issues
 
-def get_active_sprint(project_key):
+def get_sprints(project_key):
+    """Returns (active_sprint, all_sprints) where all_sprints = active + future."""
     try:
         boards = requests.get(
             f'{JIRA_BASE}/rest/agile/1.0/board',
@@ -98,20 +99,38 @@ def get_active_sprint(project_key):
         ).json()
         if not boards.get('values'):
             print(f'  No scrum board for {project_key}')
-            return None
+            return None, []
         board_id = boards['values'][0]['id']
-        sprints  = requests.get(
+
+        # Fetch active sprints
+        active = requests.get(
             f'{JIRA_BASE}/rest/agile/1.0/board/{board_id}/sprint',
             auth=AUTH, headers=HEADERS,
             params={'state': 'active'}
-        ).json()
-        if not sprints.get('values'):
-            print(f'  No active sprint for {project_key}')
-            return None
-        return sprints['values'][0]
+        ).json().get('values', [])
+
+        # Fetch future sprints
+        future = requests.get(
+            f'{JIRA_BASE}/rest/agile/1.0/board/{board_id}/sprint',
+            auth=AUTH, headers=HEADERS,
+            params={'state': 'future'}
+        ).json().get('values', [])
+
+        all_sprints = active + future
+        if not all_sprints:
+            print(f'  No active or future sprints for {project_key}')
+            return None, []
+
+        active_sprint = active[0] if active else None
+        return active_sprint, all_sprints
     except Exception as e:
-        print(f'  Error fetching sprint for {project_key}: {e}')
-        return None
+        print(f'  Error fetching sprints for {project_key}: {e}')
+        return None, []
+
+def get_active_sprint(project_key):
+    """Legacy wrapper — returns active sprint only."""
+    sprint, _ = get_sprints(project_key)
+    return sprint
 
 def get_sprint_issues(project_key):
     jql = (f'project = {project_key} AND sprint in openSprints() '
@@ -257,31 +276,36 @@ def merge(fresh, saved_team, new_sprint_name):
     print(f'  New sprint detected: {saved_sprint} → {new_sprint_name}')
     print(f'  Carrying over member list + hrs/day, resetting PTO + team days off')
 
-    saved_members = saved_team.get('members', [])
-    # Build a map of saved hrs/day per member name
-    saved_hrs = {m['name']: m.get('hrs', HRS_PER_DAY) for m in saved_members}
-    # Keep only members that were in the previous sprint roster (respects removals)
-    # Reset PTO to 0 for new sprint
-    carried_members = [
-        {'name': m['name'], 'hrs': saved_hrs.get(m['name'], HRS_PER_DAY), 'pto': 0}
-        for m in saved_members  # use saved roster order, not default
-    ]
-
-    fresh['members']  = carried_members
-    fresh['teamDays'] = []  # fresh start — no days off yet for new sprint
+    # New sprint = fresh start for capacity planning.
+    # Capacity is set during sprint planning, not carried over.
+    # Default roster from Jira assignees, 6h/day, 0 PTO — team fills in during planning.
+    fresh['members']  = fresh['members']  # use default roster (6h/day, 0 PTO)
+    fresh['teamDays'] = []
     return fresh
 
 
 # ── MAIN ─────────────────────────────────────────────────────────────────────
 def process_team(key, config, existing):
     print(f'\nProcessing {key} ({config["team"]})...')
-    sprint = get_active_sprint(key)
+    sprint, all_sprints = get_sprints(key)
     if not sprint:
         return None
 
     sprint_name = sprint.get('name', f'{key} Active Sprint')
     start_date  = sprint.get('startDate', '')[:10]
     end_date    = sprint.get('endDate',   '')[:10]
+
+    # Build sprint list for planning dropdown
+    all_sprints_data = [
+        {
+            'name':      s.get('name', ''),
+            'startDate': s.get('startDate', '')[:10],
+            'endDate':   s.get('endDate', '')[:10],
+            'state':     s.get('state', 'future'),
+            'id':        s.get('id')
+        }
+        for s in all_sprints
+    ]
 
     raw_issues  = get_sprint_issues(key)
     subtasks    = get_sprint_subtasks(key)
@@ -315,6 +339,7 @@ def process_team(key, config, existing):
         'teamDays':   [],
         'issues':     issues,
         'subtaskHrs': subtask_hrs,
+        'allSprints':  all_sprints_data,
     }
 
     return merge(fresh, existing.get(key), sprint_name)
