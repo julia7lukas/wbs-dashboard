@@ -531,10 +531,10 @@ async function saveAll() {
 }
 
 // ── CAPACITY HELPERS ──────────────────────────────────────────────────────────
-function wd()       { return Math.max(1, parseInt(document.getElementById('work-days').value)||10); }
-function hd()       { return Math.max(1, parseInt(document.getElementById('hrs-day').value)||6); }
+function wd()       { const v = parseInt(document.getElementById('work-days').value); return Math.max(1, isNaN(v) ? 10 : v); }
+function hd()       { const v = parseInt(document.getElementById('hrs-day').value);  return Math.max(1, isNaN(v) ? 6  : v); }
 function tdo()      { return teamDays.length; }
-function cap(m)     { return Math.max(0, wd()-tdo()-(m.pto||0)) * (m.hrs||hd()); }
+function cap(m)     { const sd = getSD(); const days = (sd && sd.workDays) ? sd.workDays : wd(); return Math.max(0, days-tdo()-(m.pto||0)) * (m.hrs||hd()); }
 function asgnFor(n) { const sd=getSD(); return sd&&sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).est||0    : 0; }
 function logFor(n)  { const sd=getSD(); return sd&&sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).logged||0 : 0; }
 
