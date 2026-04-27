@@ -534,7 +534,7 @@ async function saveAll() {
 function wd()       { const v = parseInt(document.getElementById('work-days').value); return Math.max(1, isNaN(v) ? 10 : v); }
 function hd()       { const v = parseInt(document.getElementById('hrs-day').value);  return Math.max(1, isNaN(v) ? 6  : v); }
 function tdo()      { return teamDays.length; }
-function cap(m)     { const sd = getSD(); const days = (sd && sd.workDays) ? sd.workDays : wd(); return Math.max(0, days-tdo()-(m.pto||0)) * (m.hrs||hd()); }
+function cap(m)     { const domWd = parseInt(document.getElementById('work-days').value); const sd = getSD(); const days = (!isNaN(domWd) && domWd > 0) ? domWd : (sd && sd.workDays ? sd.workDays : 10); return Math.max(0, days-tdo()-(m.pto||0)) * (m.hrs||hd()); }
 function asgnFor(n) { const sd=getSD(); return sd&&sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).est||0    : 0; }
 function logFor(n)  { const sd=getSD(); return sd&&sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).logged||0 : 0; }
 
@@ -983,7 +983,7 @@ function recalc() {
   document.getElementById('k-asgn').textContent=ta;
   document.getElementById('k-rem').textContent=Math.round((tl/Math.max(ta,1))*100)+'%';
   document.getElementById('k-rem-sub').textContent=tl+'h logged of '+ta+'h assigned';
-  document.getElementById('k-util').textContent=tc>0?Math.round(tl/tc*100)+'%':'0%';
+  document.getElementById('k-util').textContent=tc>0?Math.round(ta/tc*100)+'%':'0%';
   document.getElementById('k-pto').textContent=tp;
   renderMembers(); renderAvail(); renderCal(); renderBurndown(); renderEffort(); renderSprintChips();
 }
