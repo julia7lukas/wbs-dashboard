@@ -498,7 +498,6 @@ function renderBurndown() {
   const pivot = pivotIdx === -1 ? n-1 : Math.min(pivotIdx, n-1);
   const daysLeft = n - 1 - pivot;
   const pctDone  = originalScope > 0 ? Math.round(totalLogged/originalScope*100) : 0;
-  const scopeIncrease = 0; // flat for now — rises if work added mid-sprint
 
   // ── IDEAL TREND ───────────────────────────────────────────────────────────
   // Grey line: originalScope → 0 linearly across all working days
@@ -517,42 +516,46 @@ function renderBurndown() {
   });
 
   // ── REMAINING CAPACITY ────────────────────────────────────────────────────
-  // Green dashed: team capacity counting DOWN as sprint days pass
-  // Day 0 = totalCapacity, last day = 0 (all capacity consumed)
-  // Only plotted from today forward (shows what capacity is still available)
+  // Counts down from totalCapacity at sprint start → 0 at sprint end
+  // capPerDay = total team hours / working days in sprint
+  // This correctly accounts for all active members × their hrs/day
+  const capPerDay = totalCapacity / Math.max(n, 1);
   const remainingCap = workDays.map((_,i) => {
-    // capacity per remaining day = totalCapacity / n working days
-    const capPerDay = totalCapacity / Math.max(n, 1);
     const capLeft = Math.max(0, totalCapacity - capPerDay * i);
     return Math.round(capLeft * 10) / 10;
   });
 
-  const labels = workDays.map(d => {
-    const [,m,day] = d.split('-');
-    return parseInt(m)+'/'+parseInt(day);
-  });
+  // KPI: capacity remaining from today forward
+  const capLeftNow = Math.max(0, Math.round(capPerDay * daysLeft * 10) / 10);
 
-  // ── KPI CHIPS ─────────────────────────────────────────────────────────────
-  const scopeBurndown = totalLogged; // work completed
+  // ── KPI CALCULATIONS (matching Azure DevOps) ──────────────────────────────
+  const completedPct  = pctDone; // % of scope logged
+  // Average daily burndown = total logged / days elapsed (negative = burning down)
+  const daysElapsed   = pivot; // days since sprint start
+  const avgBurndown   = daysElapsed > 0 ? Math.round((totalLogged / daysElapsed) * 10) / 10 : 0;
   const notEstimated  = issues.filter(i => !i.est || i.est === 0).length;
-  const capLeft = Math.max(0, Math.round(totalCapacity * (daysLeft / Math.max(n,1))));
+  // Total scope increase = 0 for now (rises if work added mid-sprint)
+  const scopeIncrease = 0;
 
   // Update or create KPI strip above chart
   let kpi = document.getElementById('bd-kpis');
   if (!kpi) {
     kpi = document.createElement('div');
     kpi.id = 'bd-kpis';
-    kpi.style.cssText = 'display:flex;gap:24px;justify-content:flex-end;margin-bottom:8px;flex-wrap:wrap';
+    kpi.style.cssText = 'display:flex;gap:20px;justify-content:space-between;align-items:flex-end;margin-bottom:10px;flex-wrap:wrap';
     document.getElementById('burndown-chart').parentElement.before(kpi);
   }
-  const chip = (label, val, col) =>
-    '<div style="text-align:right"><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">'+label+'</div>'+
-    '<div style="font-size:22px;font-weight:300;color:'+(col||'var(--t1)')+'">'+val+'</div></div>';
+  const chip = (label, val, col, sub) =>
+    '<div style="text-align:left"><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">'+label+'</div>'+
+    '<div style="font-size:26px;font-weight:300;line-height:1;color:'+(col||'var(--t1)')+'">'+val+'</div>'+
+    (sub ? '<div style="font-size:10px;color:var(--t3)">'+sub+'</div>' : '')+
+    '</div>';
   kpi.innerHTML =
-    chip('Scope Burndown', '+'+scopeBurndown+'h', 'var(--green)') +
+    chip('Completed', completedPct+'%', completedPct > 80 ? 'var(--green)' : 'var(--t1)') +
+    chip('Avg Burndown', (avgBurndown > 0 ? '-' : '')+avgBurndown+'h/day', 'var(--t1)', 'per working day') +
     chip('Items not estimated', notEstimated, notEstimated > 0 ? 'var(--amber)' : 'var(--t1)') +
-    chip('Remaining Work', remainingNow+'h', remainingNow > capLeft ? 'var(--red)' : 'var(--t1)') +
-    chip('Capacity Left', capLeft+'h', 'var(--blue)');
+    chip('Total Scope Increase', (scopeIncrease > 0 ? '+' : '')+scopeIncrease+'h', scopeIncrease > 0 ? 'var(--amber)' : 'var(--t1)') +
+    chip('Remaining Work', remainingNow+'h', remainingNow > capLeftNow ? 'var(--red)' : 'var(--t1)', remainingNow > capLeftNow ? '⚠ exceeds capacity' : 'of '+originalScope+'h scope');
 
   if (charts.bd) charts.bd.destroy();
   charts.bd = new Chart(document.getElementById('burndown-chart'), {
