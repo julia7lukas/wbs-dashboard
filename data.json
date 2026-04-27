@@ -7,7 +7,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T18:39:52.338175+00:00",
+    "syncedAt": "2026-04-27T20:58:05.998099+00:00",
     "members": [
       {
         "name": "Julia Lukas",
@@ -140,7 +140,7 @@
         "type": "Story",
         "summary": "  26.1.1 Pract Perf Testing/ Deployment DEV02",
         "assignee": "Julia Lukas",
-        "status": "In Progress",
+        "status": "Done",
         "est": 32,
         "logged": 6,
         "subtasks": "WBS-62 (Suvarna Damarla, 6h est, 0h logged), WBS-51 (Yudong He, 6h est, 0h logged), WBS-30 (Suvarna Damarla, 1h est, 0h logged), WBS-28 (Yudong He, 1h est, 0h logged), WBS-17 (Julia Lukas, 6h est, 3h logged), WBS-16 (Joi Hepler, 12h est, 3h logged)",
@@ -222,7 +222,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T18:39:54.242875+00:00",
+    "syncedAt": "2026-04-27T20:58:08.131610+00:00",
     "members": [
       {
         "name": "Adam Rossman",
@@ -406,7 +406,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T18:39:56.323037+00:00",
+    "syncedAt": "2026-04-27T20:58:10.500498+00:00",
     "members": [
       {
         "name": "Mike Jessen",
@@ -565,7 +565,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T18:39:58.650958+00:00",
+    "syncedAt": "2026-04-27T20:58:13.221150+00:00",
     "members": [
       {
         "name": "Peter Lobo",
@@ -851,7 +851,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T18:40:00.942371+00:00",
+    "syncedAt": "2026-04-27T20:58:15.688887+00:00",
     "members": [
       {
         "name": "Peter Lobo",
