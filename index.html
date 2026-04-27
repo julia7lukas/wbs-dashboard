@@ -87,10 +87,15 @@
     <div id="team-selector" style="display:flex;gap:6px;flex-wrap:wrap"></div>
   </div>
   <div class="tr">
+    <input id="user-name-input" class="fi" placeholder="Your name..." style="width:140px;font-size:12px;padding:5px 8px" oninput="window.__currentUser=this.value.trim()" title="Enter your name so saves are attributed to you">
     <button id="refresh-btn" class="btn" onclick="refreshFromJira()">&#8635; Jira</button>
+    <button id="planning-btn" class="btn" onclick="openPlanning()" style="background:var(--bg3);border-color:var(--bdr2)">📋 Planning</button>
     <button class="btn btn-g" onclick="saveAll()">&#10003; Save changes</button>
   </div>
 </div>
+
+<!-- Sprint planning banner -->
+<div id="planning-banner" style="display:none;align-items:center;gap:12px;padding:8px 20px;background:var(--bg2);border-bottom:1px solid var(--bdr);flex-wrap:wrap"></div>
 
 <div class="main">
 
