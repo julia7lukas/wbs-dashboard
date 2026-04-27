@@ -42,6 +42,7 @@ function sanitize(str) {
 
 // Track members removed this session
 let _removedMembers = [];
+let _issueSnapshot = {};
 
 // ── SPRINT-SCOPED CACHE (localStorage — capacity edits only, no secrets) ────
 function cacheKey(projectKey, sprintName) {
@@ -193,234 +194,258 @@ function openPlanning() {
   _planningMode = true;
   _planningTeam = currentTeam;
   _planningSprint = null;
+  document.querySelector('.main').style.display = 'none';
+  document.getElementById('planning-view').style.display = 'block';
+  document.getElementById('planning-btn').textContent = 'x Close';
   renderPlanningView();
 }
 
 function closePlanning() {
   _planningMode = false;
-  renderAll();
   document.querySelector('.main').style.display = '';
   document.getElementById('planning-view').style.display = 'none';
-  document.getElementById('planning-btn').textContent = '📋 Planning';
+  document.getElementById('planning-btn').textContent = 'Select Sprint';
+  renderAll();
+}
+
+function getAllSprintsForAllTeams() {
+  var result = {};
+  Object.keys(TEAMS).forEach(function(k) {
+    var sd = TEAMS[k];
+    var all = sd.allSprints || [{ name: sd.sprintName, startDate: sd.startDate, endDate: sd.endDate, state: 'active' }];
+    result[k] = all;
+  });
+  return result;
 }
 
 function renderPlanningView() {
-  const SD = TEAMS[_planningTeam];
-  if (!SD) return;
+  var pv = document.getElementById('planning-view');
+  if (!pv) return;
 
-  document.querySelector('.main').style.display = 'none';
+  var SD = TEAMS[_planningTeam];
+  if (!SD) { pv.innerHTML = '<div style="padding:40px;color:var(--t3)">No team data loaded.</div>'; return; }
 
-  let pv = document.getElementById('planning-view');
-  if (!pv) {
-    pv = document.createElement('div');
-    pv.id = 'planning-view';
-    pv.style.cssText = 'padding:16px 20px;max-width:1440px;margin:0 auto';
-    document.querySelector('.main').after(pv);
+  var allSprints = SD.allSprints || [{ name: SD.sprintName, startDate: SD.startDate, endDate: SD.endDate, state: 'active' }];
+  var selName = _planningSprint || SD.sprintName;
+  var selSprint = allSprints.find(function(s){ return s.name === selName; }) || allSprints[0];
+  if (!_planningSprint) _planningSprint = selSprint.name;
+
+  var saved = loadSavedCapacity(SD.projectKey, selSprint.name);
+  var planMembers = saved ? saved.members.map(function(m){ return Object.assign({},m); }) 
+                          : SD.members.map(function(m){ return { name:m.name, hrs:6, pto:0 }; });
+  var planDays = saved ? saved.teamDays.map(function(d){ return Object.assign({},d); }) : [];
+  var wdays = 10;
+
+  // Sprint dropdown — all teams, all active + future sprints
+  var allTeamSprints = getAllSprintsForAllTeams();
+  var sprintOptHtml = '';
+  Object.keys(allTeamSprints).forEach(function(teamKey) {
+    var sprints = allTeamSprints[teamKey];
+    sprintOptHtml += '<optgroup label="' + teamKey + ' — ' + sanitize(TEAMS[teamKey].team) + '">';
+    sprints.forEach(function(s) {
+      var sel = (teamKey === _planningTeam && s.name === selSprint.name) ? ' selected' : '';
+      sprintOptHtml += '<option value="' + teamKey + '||' + sanitize(s.name) + '"' + sel + '>'
+        + sanitize(s.name) + ' (' + s.startDate + ' to ' + s.endDate + ')'
+        + (s.state === 'active' ? ' · Active' : ' · Future') + '</option>';
+    });
+    sprintOptHtml += '</optgroup>';
+  });
+
+  // Saved by line
+  var savedLine = '';
+  if (saved && saved.lastSavedBy && saved.lastSavedAt) {
+    var at = new Date(saved.lastSavedAt).toLocaleString('en-US',{dateStyle:'short',timeStyle:'short',timeZone:'America/Chicago'});
+    savedLine = '<div style="font-size:11px;color:var(--t3);margin-top:10px">Last saved by <strong style="color:var(--t2)">'
+      + sanitize(saved.lastSavedBy) + '</strong> · ' + at + '</div>';
+  } else {
+    savedLine = '<div style="font-size:11px;color:var(--amber);margin-top:10px">Not yet set for this sprint</div>';
   }
-  pv.style.display = 'block';
 
-  // Build sprint options: active + future
-  const allSprints = SD.allSprints || [{ name: SD.sprintName, startDate: SD.startDate, endDate: SD.endDate, state: 'active' }];
-  const sprintOpts = allSprints.map(s =>
-    `<option value="${sanitize(s.name)}" ${s.name === (_planningSprint || SD.sprintName) ? 'selected' : ''}>
-      ${sanitize(s.name)} (${s.startDate} → ${s.endDate}) ${s.state === 'active' ? '· Active' : '· Future'}
-    </option>`
-  ).join('');
+  // Member rows
+  var memberRows = '';
+  planMembers.forEach(function(m, i) {
+    var net = Math.max(0, (wdays - planDays.length - (m.pto||0)) * (m.hrs||6));
+    memberRows += '<tr class="dr">'
+      + '<td><div class="mc"><div class="av" style="background:' + AVB[i%8] + ';color:' + AVC[i%8] + '">' + sanitize(ini(m.name)) + '</div>'
+      + '<span style="font-size:13px;color:var(--t1)">' + sanitize(m.name) + '</span></div></td>'
+      + '<td class="c"><input class="ni" type="number" min="1" max="12" value="' + (m.hrs||6) + '" oninput="onPlanMemberChange(' + i + ',\'hrs\',+this.value)"></td>'
+      + '<td class="c"><input class="ni" type="number" min="0" value="' + (m.pto||0) + '" oninput="onPlanMemberChange(' + i + ',\'pto\',+this.value)"></td>'
+      + '<td class="c netc" id="plan-net-' + i + '">' + net + 'h</td>'
+      + '</tr>';
+  });
+  var totalCap = planMembers.reduce(function(a,m){ return a + Math.max(0,(wdays-planDays.length-(m.pto||0))*(m.hrs||6)); }, 0);
 
-  // Get selected sprint data
-  const selSprint = allSprints.find(s => s.name === (_planningSprint || SD.sprintName)) || allSprints[0];
-  const saved = loadSavedCapacity(SD.projectKey, selSprint.name);
-  const planMembers = saved ? saved.members : SD.members.map(m => ({ ...m, hrs: 6, pto: 0 }));
-  const planDays = saved ? saved.teamDays : [];
-  const savedBy = saved?.lastSavedBy;
-  const savedAt = saved?.lastSavedAt ? new Date(saved.lastSavedAt).toLocaleString('en-US', { dateStyle:'short', timeStyle:'short', timeZone:'America/Chicago' }) : null;
+  // Team days off rows
+  var tdoRows = '';
+  planDays.forEach(function(d, i) {
+    tdoRows += '<div class="dor">'
+      + '<input type="date" class="si2" style="font-size:11px;padding:3px 5px" value="' + (d.date||'') + '" oninput="onPlanDayChange(' + i + ',\'date\',this.value)">'
+      + '<select class="si2" style="font-size:11px;padding:3px 5px" onchange="onPlanDayChange(' + i + ',\'type\',this.value)">'
+      + '<option ' + (d.type==='Holiday'?'selected':'') + '>Holiday</option>'
+      + '<option ' + (d.type==='Recharge'?'selected':'') + '>Recharge</option>'
+      + '<option ' + (d.type==='Company'?'selected':'') + '>Company</option>'
+      + '</select>'
+      + '<button class="rb" onclick="onPlanDayRemove(' + i + ')">x</button>'
+      + '</div>';
+  });
 
-  pv.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-      <div>
-        <div style="font-size:18px;font-weight:500;color:var(--t1)">📋 Sprint Planning <span style="color:var(--t3);font-size:13px;font-weight:400">— ${sanitize(SD.team)}</span></div>
-        <div style="font-size:11px;color:var(--t3);margin-top:2px">Select a sprint and set each member's availability. Auto-saves as you edit.</div>
-      </div>
-      <button class="btn" onclick="closePlanning()" style="font-size:12px">← Back to Dashboard</button>
-    </div>
-
-    <!-- Sprint selector -->
-    <div class="card" style="margin-bottom:16px;padding:14px 18px">
-      <div style="display:grid;grid-template-columns:1fr 160px 160px 160px;gap:12px;align-items:end">
-        <div class="field">
-          <div class="fl">Sprint</div>
-          <select class="fi" id="plan-sprint-select" onchange="onPlanSprintChange(this.value)">${sprintOpts}</select>
-        </div>
-        <div class="field">
-          <div class="fl">Start date</div>
-          <input class="fi" type="date" id="plan-start" value="${selSprint.startDate}" readonly style="opacity:.7;cursor:default">
-        </div>
-        <div class="field">
-          <div class="fl">End date</div>
-          <input class="fi" type="date" id="plan-end" value="${selSprint.endDate}" readonly style="opacity:.7;cursor:default">
-        </div>
-        <div class="field">
-          <div class="fl">Working days</div>
-          <input class="fi" type="number" id="plan-workdays" value="10" min="1" max="30" oninput="onPlanWorkdaysChange(this.value)">
-        </div>
-      </div>
-      ${savedBy && savedAt ? `<div style="font-size:11px;color:var(--t3);margin-top:10px">Last saved by <strong style="color:var(--t2)">${sanitize(savedBy)}</strong> · ${savedAt}</div>` : `<div style="font-size:11px;color:var(--amber);margin-top:10px">⚠ Capacity not yet set for this sprint</div>`}
-    </div>
-
-    <!-- Capacity table -->
-    <div style="display:grid;grid-template-columns:1fr 280px;gap:12px;margin-bottom:16px">
-      <div class="card">
-        <div class="ctit" style="margin-bottom:12px">Member capacity</div>
-        <table>
-          <thead><tr>
-            <th>Member</th>
-            <th class="c">Hrs/day</th>
-            <th class="c">PTO days</th>
-            <th class="c">Net capacity</th>
-          </tr></thead>
-          <tbody id="plan-members">
-            ${planMembers.map((m, i) => {
-              const wdays = parseInt(document.getElementById('plan-workdays')?.value || 10);
-              const net = Math.max(0, (wdays - planDays.length - (m.pto||0)) * (m.hrs||6));
-              return `<tr class="dr">
-                <td><div class="mc"><div class="av" style="background:${AVB[i%8]};color:${AVC[i%8]}">${ini(m.name)}</div>
-                <span style="font-size:13px">${sanitize(m.name)}</span></div></td>
-                <td class="c"><input class="ni" type="number" min="1" max="12" value="${m.hrs||6}"
-                  oninput="onPlanMemberChange(${i},'hrs',+this.value)"></td>
-                <td class="c"><input class="ni" type="number" min="0" value="${m.pto||0}"
-                  oninput="onPlanMemberChange(${i},'pto',+this.value)"></td>
-                <td class="c netc" id="plan-net-${i}">${net}h</td>
-              </tr>`;
-            }).join('')}
-          </tbody>
-          <tfoot><tr class="tr2">
-            <td>Total</td><td></td><td></td>
-            <td class="c netc" id="plan-total-cap">${planMembers.reduce((a,m)=>a+Math.max(0,(10-planDays.length-(m.pto||0))*(m.hrs||6)),0)}h</td>
-          </tr></tfoot>
-        </table>
-      </div>
-
-      <!-- Team days off -->
-      <div class="card-sm">
-        <div class="chd" style="margin-bottom:8px">
-          <div><div class="ctit">Days off</div><div style="font-size:10px;color:var(--t3)">Deducted from all members</div></div>
-          <span class="chip" id="plan-tdo-chip">${planDays.length} day${planDays.length!==1?'s':''}</span>
-        </div>
-        <div style="display:grid;grid-template-columns:100px 90px 16px;gap:4px;margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid var(--bdr)">
-          <span class="clbl">Date</span><span class="clbl">Type</span><span></span>
-        </div>
-        <div id="plan-tdo-list">
-          ${planDays.map((d,i) => `
-            <div class="dor">
-              <input type="date" class="si2" style="font-size:11px;padding:3px 5px" value="${d.date}"
-                oninput="onPlanDayChange(${i},'date',this.value)">
-              <select class="si2" style="font-size:11px;padding:3px 5px" onchange="onPlanDayChange(${i},'type',this.value)">
-                <option ${d.type==='Holiday'?'selected':''}>Holiday</option>
-                <option ${d.type==='Recharge'?'selected':''}>Recharge</option>
-                <option ${d.type==='Company'?'selected':''}>Company</option>
-              </select>
-              <button class="rb" onclick="onPlanDayRemove(${i})">×</button>
-            </div>`).join('')}
-        </div>
-        <button class="addl" onclick="onPlanDayAdd()">+ Add day</button>
-      </div>
-    </div>
-  `;
+  pv.innerHTML = ''
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">'
+    +   '<div><div style="font-size:18px;font-weight:500;color:var(--t1)">Sprint Planning</div>'
+    +   '<div style="font-size:11px;color:var(--t3);margin-top:2px">Select a sprint and set each member availability. Auto-saves as you edit.</div></div>'
+    + '</div>'
+    // Sprint selector card
+    + '<div class="card" style="margin-bottom:16px;padding:14px 18px">'
+    +   '<div style="display:grid;grid-template-columns:1fr 150px 150px 130px;gap:12px;align-items:end">'
+    +     '<div class="field"><div class="fl">Sprint</div>'
+    +       '<select class="fi" id="plan-sprint-select" onchange="onPlanSprintChange(this.value)">' + sprintOptHtml + '</select>'
+    +     '</div>'
+    +     '<div class="field"><div class="fl">Start date</div>'
+    +       '<input class="fi" type="date" id="plan-start" value="' + selSprint.startDate + '" readonly style="opacity:.7">'
+    +     '</div>'
+    +     '<div class="field"><div class="fl">End date</div>'
+    +       '<input class="fi" type="date" id="plan-end" value="' + selSprint.endDate + '" readonly style="opacity:.7">'
+    +     '</div>'
+    +     '<div class="field"><div class="fl">Working days</div>'
+    +       '<input class="fi" type="number" id="plan-workdays" value="' + wdays + '" min="1" max="30" oninput="onPlanWorkdaysChange(+this.value)">'
+    +     '</div>'
+    +   '</div>'
+    +   savedLine
+    + '</div>'
+    // Capacity + days off
+    + '<div style="display:grid;grid-template-columns:1fr 280px;gap:12px">'
+    +   '<div class="card">'
+    +     '<div class="ctit" style="margin-bottom:12px">Member capacity</div>'
+    +     '<table><thead><tr>'
+    +       '<th>Member</th><th class="c">Hrs/day</th><th class="c">PTO days</th><th class="c">Net capacity</th>'
+    +     '</tr></thead><tbody id="plan-members">' + memberRows + '</tbody>'
+    +     '<tfoot><tr class="tr2"><td>Total</td><td></td><td></td>'
+    +       '<td class="c netc" id="plan-total-cap">' + totalCap + 'h</td>'
+    +     '</tr></tfoot></table>'
+    +   '</div>'
+    +   '<div class="card-sm">'
+    +     '<div class="chd" style="margin-bottom:8px">'
+    +       '<div><div class="ctit">Days off</div><div style="font-size:10px;color:var(--t3)">Deducted from all members</div></div>'
+    +       '<span class="chip" id="plan-tdo-chip">' + planDays.length + ' day' + (planDays.length!==1?'s':'') + '</span>'
+    +     '</div>'
+    +     '<div style="display:grid;grid-template-columns:100px 90px 16px;gap:4px;margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid var(--bdr)">'
+    +       '<span class="clbl">Date</span><span class="clbl">Type</span><span></span>'
+    +     '</div>'
+    +     '<div id="plan-tdo-list">' + tdoRows + '</div>'
+    +     '<button class="addl" onclick="onPlanDayAdd()">+ Add day</button>'
+    +   '</div>'
+    + '</div>';
 }
 
 // ── PLANNING EVENT HANDLERS ────────────────────────────────────────────────────
 function getPlanState() {
-  const SD = TEAMS[_planningTeam];
-  const allSprints = SD.allSprints || [{ name: SD.sprintName, startDate: SD.startDate, endDate: SD.endDate }];
-  const selSprint = allSprints.find(s => s.name === (_planningSprint || SD.sprintName)) || allSprints[0];
-  const saved = loadSavedCapacity(SD.projectKey, selSprint.name);
-  const planMembers = saved ? saved.members.map(m=>({...m})) : SD.members.map(m=>({...m, hrs:6, pto:0}));
-  const planDays = saved ? saved.teamDays.map(d=>({...d})) : [];
-  return { SD, selSprint, planMembers, planDays };
+  var SD = TEAMS[_planningTeam];
+  var allSprints = SD.allSprints || [{ name: SD.sprintName, startDate: SD.startDate, endDate: SD.endDate }];
+  var selSprint = allSprints.find(function(s){ return s.name === _planningSprint; }) || allSprints[0];
+  var saved = loadSavedCapacity(SD.projectKey, selSprint.name);
+  var planMembers = saved ? saved.members.map(function(m){ return Object.assign({},m); })
+                          : SD.members.map(function(m){ return { name:m.name, hrs:6, pto:0 }; });
+  var planDays = saved ? saved.teamDays.map(function(d){ return Object.assign({},d); }) : [];
+  return { SD:SD, selSprint:selSprint, planMembers:planMembers, planDays:planDays };
 }
 
 function planAutoSave(planMembers, planDays) {
-  const SD = TEAMS[_planningTeam];
-  const allSprints = SD.allSprints || [];
-  const selSprint = allSprints.find(s => s.name === _planningSprint) || { name: SD.sprintName };
-  const savedBy = (document.getElementById('user-name-input')?.value.trim()) || window.__currentUser || 'Team member';
+  var SD = TEAMS[_planningTeam];
+  var allSprints = SD.allSprints || [];
+  var selSprint = allSprints.find(function(s){ return s.name === _planningSprint; }) || { name: SD.sprintName };
+  var savedBy = (document.getElementById('user-name-input') && document.getElementById('user-name-input').value.trim())
+              || window.__currentUser || 'Team member';
   saveCapacity(SD.projectKey, selSprint.name, planMembers, planDays, savedBy);
-  // Update saved-by line
-  const pv = document.getElementById('planning-view');
-  if (pv) {
-    const lines = pv.querySelectorAll('.saved-by-line');
-    const now = new Date().toLocaleString('en-US',{dateStyle:'short',timeStyle:'short',timeZone:'America/Chicago'});
-    lines.forEach(l => l.textContent = `Last saved by ${savedBy} · ${now}`);
-  }
 }
 
 function recalcPlanTotals(planMembers, planDays) {
-  const wdays = parseInt(document.getElementById('plan-workdays')?.value || 10);
-  let total = 0;
-  planMembers.forEach((m, i) => {
-    const net = Math.max(0, (wdays - planDays.length - (m.pto||0)) * (m.hrs||6));
-    const el = document.getElementById('plan-net-'+i);
-    if (el) el.textContent = net+'h';
+  var wdays = parseInt((document.getElementById('plan-workdays') && document.getElementById('plan-workdays').value) || 10);
+  var total = 0;
+  planMembers.forEach(function(m, i) {
+    var net = Math.max(0, (wdays - planDays.length - (m.pto||0)) * (m.hrs||6));
+    var el = document.getElementById('plan-net-' + i);
+    if (el) el.textContent = net + 'h';
     total += net;
   });
-  const tc = document.getElementById('plan-total-cap');
-  if (tc) tc.textContent = total+'h';
-  const chip = document.getElementById('plan-tdo-chip');
-  if (chip) chip.textContent = planDays.length+' day'+(planDays.length!==1?'s':'');
+  var tc = document.getElementById('plan-total-cap');
+  if (tc) tc.textContent = total + 'h';
+  var chip = document.getElementById('plan-tdo-chip');
+  if (chip) chip.textContent = planDays.length + ' day' + (planDays.length!==1?'s':'');
 }
 
-function onPlanSprintChange(sprintName) {
-  _planningSprint = sprintName;
-  const SD = TEAMS[_planningTeam];
-  const allSprints = SD.allSprints || [];
-  const sel = allSprints.find(s => s.name === sprintName);
-  if (sel) {
-    const s = document.getElementById('plan-start'); if(s) s.value = sel.startDate;
-    const e = document.getElementById('plan-end');   if(e) e.value = sel.endDate;
-  }
-  renderPlanningView(); // re-render with new sprint's saved data
+function onPlanSprintChange(val) {
+  // val = "TEAMKEY||SprintName"
+  var parts = val.split('||');
+  _planningTeam = parts[0];
+  _planningSprint = parts.slice(1).join('||');
+  renderPlanningView();
 }
 
 function onPlanMemberChange(idx, field, val) {
-  const { SD, selSprint, planMembers, planDays } = getPlanState();
-  planMembers[idx][field] = Math.max(field==='pto'?0:1, val||0);
-  planAutoSave(planMembers, planDays);
-  recalcPlanTotals(planMembers, planDays);
+  var state = getPlanState();
+  state.planMembers[idx][field] = Math.max(field==='pto'?0:1, val||0);
+  planAutoSave(state.planMembers, state.planDays);
+  recalcPlanTotals(state.planMembers, state.planDays);
 }
 
 function onPlanWorkdaysChange(val) {
-  const { planMembers, planDays } = getPlanState();
-  recalcPlanTotals(planMembers, planDays);
+  var state = getPlanState();
+  recalcPlanTotals(state.planMembers, state.planDays);
 }
 
 function onPlanDayChange(idx, field, val) {
-  const { planMembers, planDays } = getPlanState();
-  planDays[idx][field] = val;
-  planAutoSave(planMembers, planDays);
-  recalcPlanTotals(planMembers, planDays);
+  var state = getPlanState();
+  state.planDays[idx][field] = val;
+  planAutoSave(state.planMembers, state.planDays);
+  recalcPlanTotals(state.planMembers, state.planDays);
 }
 
 function onPlanDayRemove(idx) {
-  const { planMembers, planDays } = getPlanState();
-  planDays.splice(idx, 1);
-  planAutoSave(planMembers, planDays);
+  var state = getPlanState();
+  state.planDays.splice(idx, 1);
+  planAutoSave(state.planMembers, state.planDays);
   renderPlanningView();
 }
 
 function onPlanDayAdd() {
-  const { SD, selSprint, planMembers, planDays } = getPlanState();
-  const s = selSprint.startDate, e = selSprint.endDate;
-  const ex = new Set(planDays.map(d=>d.date));
-  let cur = parseDate(s), end = parseDate(e), sg = '';
-  while(cur && end && cur<=end){
-    const iso=isoDate(cur);
-    if(cur.getDay()!==0&&cur.getDay()!==6&&!ex.has(iso)){sg=iso;break;}
+  var state = getPlanState();
+  var s = state.selSprint.startDate, e = state.selSprint.endDate;
+  var ex = new Set(state.planDays.map(function(d){ return d.date; }));
+  var cur = parseDate(s), end = parseDate(e), sg = '';
+  while(cur && end && cur<=end) {
+    var iso = isoDate(cur);
+    if(cur.getDay()!==0 && cur.getDay()!==6 && !ex.has(iso)){ sg=iso; break; }
     cur.setDate(cur.getDate()+1);
   }
-  planDays.push({date:sg,type:'Holiday',note:''});
-  planAutoSave(planMembers, planDays);
+  state.planDays.push({ date:sg, type:'Holiday', note:'' });
+  planAutoSave(state.planMembers, state.planDays);
   renderPlanningView();
 }
+
+// ── PLANNING BANNER ────────────────────────────────────────────────────────────
+function updatePlanningBanner(savedBy) {
+  var sd = getSD();
+  var saved = sd ? loadSavedCapacity(sd.projectKey, sd.sprintName) : null;
+  var banner = document.getElementById('planning-banner');
+  if (!banner) return;
+  var by = savedBy || (saved && saved.lastSavedBy);
+  var atRaw = saved && saved.lastSavedAt;
+  var at = atRaw ? new Date(atRaw).toLocaleString('en-US',{dateStyle:'short',timeStyle:'short',timeZone:'America/Chicago'}) : null;
+  banner.style.display = 'flex';
+  if (by && at) {
+    banner.innerHTML = '<span style="font-size:12px;color:var(--t2)">Capacity last saved by <strong style="color:var(--green)">'
+      + sanitize(by) + '</strong> &middot; ' + at + '</span>';
+  } else {
+    banner.innerHTML = '<span style="font-size:12px;color:var(--amber)">Capacity not yet set for this sprint &mdash; click <strong>Select Sprint</strong> to plan.</span>';
+  }
+}
+
+function initPlanningBanner() {
+  var sd = getSD();
+  var saved = sd ? loadSavedCapacity(sd.projectKey, sd.sprintName) : null;
+  updatePlanningBanner(saved && saved.lastSavedBy);
+}
+
 
 // ── LOAD ──────────────────────────────────────────────────────────────────────
 async function load() {
@@ -529,39 +554,6 @@ function addMemberPrompt() {
   members.push({name:n, hrs:hd(), pto:0});
   autoSave();
   renderAll();
-}
-
-// ── PLANNING BANNER ──────────────────────────────────────────────────────────────
-function updatePlanningBanner(savedBy) {
-  const saved = loadSavedCapacity(getSD()?.projectKey, getSD()?.sprintName);
-  const banner = document.getElementById('planning-banner');
-  if (!banner) return;
-
-  const by   = savedBy || saved?.lastSavedBy;
-  const atRaw = saved?.lastSavedAt;
-  const at   = atRaw ? new Date(atRaw).toLocaleString('en-US', {
-    dateStyle:'short', timeStyle:'short', timeZone:'America/Chicago'
-  }) : null;
-
-  if (by && at) {
-    banner.style.display = 'flex';
-    banner.innerHTML =
-      '<span style="font-size:12px;color:var(--t2)">📋 <strong style="color:var(--green)">Sprint planning</strong> · ' +
-      'Set your team's hrs/day and PTO for this sprint, then hit Save.</span>' +
-      '<span style="font-size:11px;color:var(--t3);margin-left:auto">Last saved by <strong style="color:var(--t2)">' +
-      sanitize(by) + '</strong> · ' + at + '</span>';
-  } else {
-    banner.style.display = 'flex';
-    banner.innerHTML =
-      '<span style="font-size:12px;color:var(--t2)">📋 <strong style="color:var(--green)">Sprint planning</strong> · ' +
-      'Set your team's hrs/day and PTO for this sprint, then hit Save.</span>' +
-      '<span style="font-size:11px;color:var(--amber);margin-left:auto">⚠ Not saved yet this sprint</span>';
-  }
-}
-
-function initPlanningBanner() {
-  const saved = loadSavedCapacity(getSD()?.projectKey, getSD()?.sprintName);
-  updatePlanningBanner(saved?.lastSavedBy);
 }
 
 // ── RENDER MEMBERS ─────────────────────────────────────────────────────────────
