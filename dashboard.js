@@ -344,7 +344,7 @@ function renderMembers() {
   const elapsedMs = start ? Math.min(today-start, totalMs) : 0;
   const sprintPct = totalMs > 0 ? elapsedMs/totalMs : 0;
 
-  tb.innerHTML = members.filter(m => asgnFor(m.name) > 0).map((m,i) => {
+  tb.innerHTML = members.map((m, i) => ({m, i})).filter(({m}) => asgnFor(m.name) > 0).map(({m, i}) => {
     const c = cap(m);
     const asgn = asgnFor(m.name);
     const logged = logFor(m.name);
@@ -663,7 +663,7 @@ function renderAll() { renderTDO(); recalc(); }
 async function refreshFromJira() {
   const btn=document.getElementById('refresh-btn');
   if(btn){btn.textContent='Ask Claude ↗';btn.disabled=false;}
-  alert('To refresh sprint data on demand, ask Claude:\n"Refresh the WBS sprint dashboard"\n\nAutomatic refresh runs every weekday at 6am CT.');
+  alert('To refresh sprint data on demand, ask Claude:\n"Refresh the WBS sprint dashboard"\n\nAutomatic refresh runs every hour.');
 }
 
 load();
