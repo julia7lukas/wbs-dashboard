@@ -436,7 +436,7 @@ function updatePlanningBanner(savedBy) {
     banner.innerHTML = '<span style="font-size:12px;color:var(--t2)">Capacity last saved by <strong style="color:var(--green)">'
       + sanitize(by) + '</strong> &middot; ' + at + '</span>';
   } else {
-    banner.innerHTML = '<span style="font-size:12px;color:var(--amber)">Capacity not yet set for this sprint &mdash; click <strong>Select Sprint</strong> to plan.</span>';
+    banner.style.display = 'none';
   }
 }
 
@@ -635,7 +635,19 @@ function addTDO() {
 // ── AVAILABILITY BARS ──────────────────────────────────────────────────────────
 function renderAvail() {
   const activeMembers = members.filter(m => asgnFor(m.name) > 0);
-  document.getElementById('avail-list').innerHTML = activeMembers.map(m=>{
+  const totalAsgn = activeMembers.reduce((a,m) => a+asgnFor(m.name), 0);
+  const totalLogged = activeMembers.reduce((a,m) => a+logFor(m.name), 0);
+  const totalRemaining = Math.max(0, totalAsgn - totalLogged);
+  const totalPct = totalAsgn > 0 ? Math.round(totalRemaining/totalAsgn*100) : 0;
+  const totalCol = totalPct===0?'var(--green)':totalPct<30?'var(--amber)':'var(--blue)';
+
+  // Sprint totals summary bar at top
+  const summaryHtml = '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;margin-bottom:10px;border-bottom:1px solid var(--bdr)">'+
+    '<span style="font-size:12px;color:var(--t2);font-weight:500">Sprint total</span>'+
+    '<span style="font-size:12px;color:'+totalCol+';font-weight:600">'+totalRemaining+'h remaining of '+totalAsgn+'h</span>'+
+    '</div>';
+
+  document.getElementById('avail-list').innerHTML = summaryHtml + activeMembers.map(m=>{
     const asgn=asgnFor(m.name), logged=logFor(m.name);
     const remaining = Math.max(0, asgn - logged);
     const p = asgn>0 ? Math.round(remaining/asgn*100) : 0;
