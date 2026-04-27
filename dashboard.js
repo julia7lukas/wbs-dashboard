@@ -531,7 +531,7 @@ async function saveAll() {
 }
 
 // ── CAPACITY HELPERS ──────────────────────────────────────────────────────────
-function wd()       { return Math.max(1, parseInt(document.getElementById('work-days').value)||9); }
+function wd()       { return Math.max(1, parseInt(document.getElementById('work-days').value)||10); }
 function hd()       { return Math.max(1, parseInt(document.getElementById('hrs-day').value)||6); }
 function tdo()      { return teamDays.length; }
 function cap(m)     { return Math.max(0, wd()-tdo()-(m.pto||0)) * (m.hrs||hd()); }
@@ -559,7 +559,9 @@ function addMemberPrompt() {
 function renderMembers() {
   const tb = document.getElementById('mtbody');
   const sd = getSD();
-  tb.innerHTML = members.map((m, i) => ({m, i})).filter(({m}) => asgnFor(m.name) > 0).map(({m, i}) => {
+  // For future sprint planning — show all members even with 0 assigned hours
+  const showAll = window._planningFutureSprint === true;
+  tb.innerHTML = members.map((m, i) => ({m, i})).filter(({m}) => showAll || asgnFor(m.name) > 0).map(({m, i}) => {
     const c = cap(m);
     const asgn = asgnFor(m.name);
     const logged = logFor(m.name);
@@ -683,10 +685,11 @@ function onSprintChipClick(idx) {
   if (!sel) return;
   const sprintName = sel.name;
   window._activePlanSprint = sprintName;
-  const isActive = sel && sel.state === 'active';
+  window._planningFutureSprint = sel.state !== 'active'; // flag for renderMembers
+  const isActive = sel.state === 'active';
 
   if (isActive) {
-    // Switch back to live data view
+    window._planningFutureSprint = false;
     members  = SD.members.map(m => ({...m}));
     teamDays = SD.teamDays ? SD.teamDays.map(d => ({...d})) : [];
     const saved = loadSavedCapacity(SD.projectKey, sprintName);
@@ -695,23 +698,24 @@ function onSprintChipClick(idx) {
       members  = SD.members.map(m => savedMap[m.name] ? {...savedMap[m.name]} : {...m});
       teamDays = saved.teamDays.map(d => ({...d}));
     }
+    document.getElementById('start-date').value = SD.startDate;
+    document.getElementById('end-date').value   = SD.endDate;
+    document.getElementById('sprint-name').value = SD.sprintName;
+    document.getElementById('hdr-sprint').textContent = SD.sprintName;
   } else {
-    // Load saved capacity for future sprint
+    // Future sprint — load saved or defaults, show all roster members for planning
     const saved = loadSavedCapacity(SD.projectKey, sprintName);
     if (saved) {
       members  = saved.members.map(m => ({...m}));
       teamDays = saved.teamDays.map(d => ({...d}));
     } else {
-      // Default capacity for unplanned sprint
       members  = SD.members.map(m => ({ name:m.name, hrs:6, pto:0 }));
       teamDays = [];
     }
-    if (sel) {
-      document.getElementById('start-date').value = sel.startDate;
-      document.getElementById('end-date').value   = sel.endDate;
-      document.getElementById('sprint-name').value = sel.name;
-      document.getElementById('hdr-sprint').textContent = sel.name;
-    }
+    document.getElementById('start-date').value = sel.startDate;
+    document.getElementById('end-date').value   = sel.endDate;
+    document.getElementById('sprint-name').value = sel.name;
+    document.getElementById('hdr-sprint').textContent = sel.name;
   }
   renderSprintChips();
   renderAll();
