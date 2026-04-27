@@ -7,7 +7,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T16:28:50.182729+00:00",
+    "syncedAt": "2026-04-27T17:55:44.904919+00:00",
     "members": [
       {
         "name": "Julia Lukas",
@@ -159,7 +159,51 @@
         "est": 52,
         "logged": 32
       }
-    }
+    },
+    "allSprints": [
+      {
+        "name": "WBS 2026 Q2S2",
+        "startDate": "2026-04-15",
+        "endDate": "2026-04-29",
+        "state": "active",
+        "id": 28962
+      },
+      {
+        "name": "WBS 2026 Q2S3",
+        "startDate": "2026-04-29",
+        "endDate": "2026-05-13",
+        "state": "future",
+        "id": 28963
+      },
+      {
+        "name": "WBS 2026 Q2S4",
+        "startDate": "2026-05-13",
+        "endDate": "2026-05-27",
+        "state": "future",
+        "id": 28964
+      },
+      {
+        "name": "WBS 2026 Q2S5",
+        "startDate": "2026-06-10",
+        "endDate": "2026-06-24",
+        "state": "future",
+        "id": 28965
+      },
+      {
+        "name": "WBS 2026 Q2S6",
+        "startDate": "2026-06-24",
+        "endDate": "2026-07-08",
+        "state": "future",
+        "id": 28967
+      },
+      {
+        "name": "WBS 2026 Q2S7",
+        "startDate": "",
+        "endDate": "",
+        "state": "future",
+        "id": 29716
+      }
+    ]
   },
   "GIN": {
     "team": "Gingersnaps",
@@ -169,7 +213,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T16:28:51.764741+00:00",
+    "syncedAt": "2026-04-27T17:55:48.620265+00:00",
     "members": [
       {
         "name": "Adam Rossman",
@@ -292,7 +336,51 @@
         "est": 45,
         "logged": 35
       }
-    }
+    },
+    "allSprints": [
+      {
+        "name": "GIN 2026 Q2S2",
+        "startDate": "2026-04-15",
+        "endDate": "2026-04-29",
+        "state": "active",
+        "id": 27940
+      },
+      {
+        "name": "GIN 2026 Q2S3",
+        "startDate": "2026-04-29",
+        "endDate": "2026-05-13",
+        "state": "future",
+        "id": 27941
+      },
+      {
+        "name": "GIN 2026 Q2S4",
+        "startDate": "2026-05-13",
+        "endDate": "2026-05-27",
+        "state": "future",
+        "id": 29502
+      },
+      {
+        "name": "GIN 2026 Q2S5",
+        "startDate": "2026-05-27",
+        "endDate": "2026-06-09",
+        "state": "future",
+        "id": 29503
+      },
+      {
+        "name": "GIN 2026 Q2S6",
+        "startDate": "2026-06-09",
+        "endDate": "2026-06-23",
+        "state": "future",
+        "id": 29578
+      },
+      {
+        "name": "GIN 2026 Q2S7",
+        "startDate": "2026-06-23",
+        "endDate": "2026-07-07",
+        "state": "future",
+        "id": 29579
+      }
+    ]
   },
   "MOJO": {
     "team": "Mojo",
@@ -302,7 +390,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T16:28:53.144468+00:00",
+    "syncedAt": "2026-04-27T17:55:51.155690+00:00",
     "members": [
       {
         "name": "Mike Jessen",
@@ -401,7 +489,51 @@
         "est": 51,
         "logged": 26
       }
-    }
+    },
+    "allSprints": [
+      {
+        "name": "Mojo Q2S2",
+        "startDate": "2026-04-15",
+        "endDate": "2026-04-28",
+        "state": "active",
+        "id": 28970
+      },
+      {
+        "name": "Mojo Q2S3",
+        "startDate": "2026-04-29",
+        "endDate": "2026-05-12",
+        "state": "future",
+        "id": 28971
+      },
+      {
+        "name": "Mojo Q2S4",
+        "startDate": "2026-05-13",
+        "endDate": "2026-05-26",
+        "state": "future",
+        "id": 29972
+      },
+      {
+        "name": "Mojo Q2S5",
+        "startDate": "2026-05-27",
+        "endDate": "2026-06-08",
+        "state": "future",
+        "id": 29973
+      },
+      {
+        "name": "Mojo Q2S6",
+        "startDate": "2026-06-09",
+        "endDate": "2026-06-22",
+        "state": "future",
+        "id": 29974
+      },
+      {
+        "name": "Mojo Q2S7",
+        "startDate": "2026-06-23",
+        "endDate": "2026-07-06",
+        "state": "future",
+        "id": 29975
+      }
+    ]
   },
   "MAV": {
     "team": "Mavericks",
@@ -411,7 +543,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T16:28:54.532247+00:00",
+    "syncedAt": "2026-04-27T17:55:53.533437+00:00",
     "members": [
       {
         "name": "Peter Lobo",
@@ -631,7 +763,51 @@
         "est": 39,
         "logged": 17
       }
-    }
+    },
+    "allSprints": [
+      {
+        "name": "MAV 2026 Q2S2",
+        "startDate": "2026-04-14",
+        "endDate": "2026-04-28",
+        "state": "active",
+        "id": 29802
+      },
+      {
+        "name": "MAV 2026 Q2S3",
+        "startDate": "2026-04-28",
+        "endDate": "2026-05-12",
+        "state": "future",
+        "id": 29803
+      },
+      {
+        "name": "MAV 2026 Q2S4",
+        "startDate": "2026-05-12",
+        "endDate": "2026-05-26",
+        "state": "future",
+        "id": 29804
+      },
+      {
+        "name": "MAV 2026 Q2S5",
+        "startDate": "2026-05-26",
+        "endDate": "2026-06-08",
+        "state": "future",
+        "id": 29805
+      },
+      {
+        "name": "MAV 2026 Q2S6",
+        "startDate": "2026-06-08",
+        "endDate": "2026-06-22",
+        "state": "future",
+        "id": 29806
+      },
+      {
+        "name": "MAV 2026 Q2S7",
+        "startDate": "2026-06-22",
+        "endDate": "2026-07-06",
+        "state": "future",
+        "id": 29807
+      }
+    ]
   },
   "AMGO": {
     "team": "Amigos",
@@ -641,7 +817,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T16:28:56.206104+00:00",
+    "syncedAt": "2026-04-27T17:55:55.984959+00:00",
     "members": [
       {
         "name": "Peter Lobo",
@@ -917,6 +1093,15 @@
         "est": 48,
         "logged": 22
       }
-    }
+    },
+    "allSprints": [
+      {
+        "name": "AMGO 2026 Q2S2",
+        "startDate": "2026-04-16",
+        "endDate": "2026-04-28",
+        "state": "active",
+        "id": 29757
+      }
+    ]
   }
 }
