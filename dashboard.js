@@ -528,6 +528,11 @@ function renderBurndown() {
   // KPI: capacity remaining from today forward
   const capLeftNow = Math.max(0, Math.round(capPerDay * daysLeft * 10) / 10);
 
+  const labels = workDays.map(d => {
+    const [,m,day] = d.split('-');
+    return parseInt(m)+'/'+parseInt(day);
+  });
+
   // ── KPI CALCULATIONS (matching Azure DevOps) ──────────────────────────────
   const completedPct  = pctDone; // % of scope logged
   // Average daily burndown = total logged / days elapsed (negative = burning down)
