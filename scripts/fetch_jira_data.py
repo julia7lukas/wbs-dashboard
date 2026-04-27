@@ -118,15 +118,54 @@ def get_sprint_issues(project_key):
            f'AND issuetype not in subTaskIssueTypes() ORDER BY created DESC')
     return fetch_all_jql(jql,
         'summary,assignee,status,issuetype,subtasks,'
-        'aggregatetimeoriginalestimate,aggregatetimespent')
+        'aggregatetimeoriginalestimate,aggregatetimespent,'
+        'timeoriginalestimate,timespent')
 
 def get_sprint_subtasks(project_key):
+    """Get all issues/subtasks in the sprint with time data."""
     jql = (f'project = {project_key} AND sprint in openSprints() '
            f'AND issuetype in subTaskIssueTypes() ORDER BY created DESC')
     return fetch_all_jql(jql,
         'assignee,timeoriginalestimate,timespent,status,parent,summary')
 
+def get_all_assigned_hours(project_key):
+    """
+    Query ALL issues in the sprint by assignee to capture hours regardless
+    of whether they are logged on subtasks or parent issues.
+    This is the most accurate way to get per-member hours.
+    """
+    jql = (f'project = {project_key} AND sprint in openSprints() '
+           f'AND assignee is not EMPTY ORDER BY assignee ASC')
+    return fetch_all_jql(jql,
+        'assignee,timeoriginalestimate,timespent,aggregatetimeoriginalestimate,'
+        'aggregatetimespent,issuetype,summary,status')
+
+def build_subtask_hrs_from_parents(parent_issues):
+    """
+    Build per-member hour totals from PARENT issue aggregate fields.
+    This is correct for Jira setups where time is logged on parent issues
+    (aggregatetimeoriginalestimate / aggregatetimespent) rather than subtasks.
+    Falls back to subtask-level fields only if parent has no aggregate data.
+    """
+    hrs = {}
+    for iss in parent_issues:
+        f    = iss['fields']
+        name = (f.get('assignee') or {}).get('displayName', 'Unassigned')
+        if name == 'Unassigned':
+            continue  # skip unassigned — won't show on dashboard anyway
+        # Prefer aggregate (rolls up subtask hours), fall back to direct fields
+        est = secs_to_hrs(f.get('aggregatetimeoriginalestimate') or f.get('timeoriginalestimate'))
+        log = secs_to_hrs(f.get('aggregatetimespent') or f.get('timespent'))
+        if est == 0 and log == 0:
+            continue
+        if name not in hrs:
+            hrs[name] = {'est': 0, 'logged': 0}
+        hrs[name]['est']    += est
+        hrs[name]['logged'] += log
+    return hrs
+
 def build_subtask_hrs(subtasks):
+    """Legacy: subtask-level time tracking. Used only if subtasks have time data."""
     hrs = {}
     for st in subtasks:
         f    = st['fields']
@@ -137,6 +176,54 @@ def build_subtask_hrs(subtasks):
             hrs[name] = {'est': 0, 'logged': 0}
         hrs[name]['est']    += est
         hrs[name]['logged'] += log
+    return hrs
+
+def build_hours_by_assignee(all_issues):
+    """
+    Build accurate per-member hour totals by querying all assigned issues.
+    For subtasks: use direct timeoriginalestimate / timespent fields.
+    For parent issues: use aggregate fields (rolls up subtask hours).
+    Deduplication: if a subtask and its parent are both returned for the same
+    assignee, the parent aggregate already includes the subtask, so we only
+    count each issue once at the appropriate level.
+    """
+    hrs = {}
+    seen_parents = set()  # track parent keys we've already counted via aggregate
+
+    # First pass: collect subtask hours (direct fields)
+    for iss in all_issues:
+        f = iss['fields']
+        is_subtask = f.get('issuetype', {}).get('subtask', False)
+        if not is_subtask:
+            continue
+        name = (f.get('assignee') or {}).get('displayName', 'Unassigned')
+        est = secs_to_hrs(f.get('timeoriginalestimate'))
+        log = secs_to_hrs(f.get('timespent'))
+        if est == 0 and log == 0:
+            continue
+        if name not in hrs:
+            hrs[name] = {'est': 0, 'logged': 0}
+        hrs[name]['est']    += est
+        hrs[name]['logged'] += log
+
+    # Second pass: add parent issue hours NOT already covered by subtask queries
+    # Only add if the parent has direct timeoriginalestimate (i.e. time is on the parent itself)
+    for iss in all_issues:
+        f = iss['fields']
+        is_subtask = f.get('issuetype', {}).get('subtask', False)
+        if is_subtask:
+            continue
+        name = (f.get('assignee') or {}).get('displayName', 'Unassigned')
+        # Use direct fields only (not aggregate) to avoid double-counting subtasks
+        est = secs_to_hrs(f.get('timeoriginalestimate'))
+        log = secs_to_hrs(f.get('timespent'))
+        if est == 0 and log == 0:
+            continue
+        if name not in hrs:
+            hrs[name] = {'est': 0, 'logged': 0}
+        hrs[name]['est']    += est
+        hrs[name]['logged'] += log
+
     return hrs
 
 def build_subtask_map(subtasks):
@@ -225,7 +312,13 @@ def process_team(key, config, existing):
     subtasks    = get_sprint_subtasks(key)
     subtask_map = build_subtask_map(subtasks)
     issues      = format_issues(raw_issues, subtask_map)
-    subtask_hrs = build_subtask_hrs(subtasks)
+    # Query all assigned issues to get accurate per-member hours
+    # This captures hours whether logged on subtasks OR parent issues
+    all_assigned = get_all_assigned_hours(project_key)
+    subtask_hrs = build_hours_by_assignee(all_assigned)
+    total_est = sum(v['est'] for v in subtask_hrs.values())
+    total_log = sum(v['logged'] for v in subtask_hrs.values())
+    print(f'  Hours by assignee: {total_est}h est, {total_log}h logged across {len(subtask_hrs)} members')
 
     print(f'  Sprint: {sprint_name} | Issues: {len(issues)} | Subtasks: {len(subtasks)}')
 
