@@ -7,7 +7,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T18:38:40.849751+00:00",
+    "syncedAt": "2026-04-27T18:39:52.338175+00:00",
     "members": [
       {
         "name": "Julia Lukas",
@@ -55,7 +55,8 @@
         "status": "In Progress",
         "est": 6,
         "logged": 5,
-        "subtasks": "WBS-75 (Julia Lukas, 2h est, 1h logged), WBS-74 (Julia Lukas, 1h est, 1h logged), WBS-73 (Suvarna Damarla, 3h est, 3h logged)"
+        "subtasks": "WBS-75 (Julia Lukas, 2h est, 1h logged), WBS-74 (Julia Lukas, 1h est, 1h logged), WBS-73 (Suvarna Damarla, 3h est, 3h logged)",
+        "points": 0
       },
       {
         "key": "WBS-66",
@@ -65,7 +66,8 @@
         "status": "Done",
         "est": 0,
         "logged": 2,
-        "subtasks": ""
+        "subtasks": "",
+        "points": 0
       },
       {
         "key": "WBS-63",
@@ -75,7 +77,8 @@
         "status": "Done",
         "est": 1,
         "logged": 0,
-        "subtasks": "WBS-65 (Joi Hepler, 1h est, 0h logged)"
+        "subtasks": "WBS-65 (Joi Hepler, 1h est, 0h logged)",
+        "points": 0
       },
       {
         "key": "WBS-52",
@@ -85,7 +88,8 @@
         "status": "In Progress",
         "est": 51,
         "logged": 53,
-        "subtasks": "WBS-77 (Yudong He, 3h est, 7h logged), WBS-69 (Julia Lukas, 4h est, 2h logged), WBS-68 (Suvarna Damarla, 12h est, 6h logged), WBS-67 (Yudong He, 16h est, 19h logged), WBS-53 (Julia Lukas, 16h est, 19h logged)"
+        "subtasks": "WBS-77 (Yudong He, 3h est, 7h logged), WBS-69 (Julia Lukas, 4h est, 2h logged), WBS-68 (Suvarna Damarla, 12h est, 6h logged), WBS-67 (Yudong He, 16h est, 19h logged), WBS-53 (Julia Lukas, 16h est, 19h logged)",
+        "points": 0
       },
       {
         "key": "WBS-50",
@@ -95,7 +99,8 @@
         "status": "Done",
         "est": 8,
         "logged": 2,
-        "subtasks": "WBS-55 (Joi Hepler, 2h est, 0h logged), WBS-54 (Yudong He, 6h est, 2h logged)"
+        "subtasks": "WBS-55 (Joi Hepler, 2h est, 0h logged), WBS-54 (Yudong He, 6h est, 2h logged)",
+        "points": 0
       },
       {
         "key": "WBS-45",
@@ -105,7 +110,8 @@
         "status": "Done",
         "est": 3,
         "logged": 0,
-        "subtasks": "WBS-59 (Joi Hepler, 3h est, 0h logged)"
+        "subtasks": "WBS-59 (Joi Hepler, 3h est, 0h logged)",
+        "points": 0
       },
       {
         "key": "WBS-39",
@@ -115,7 +121,8 @@
         "status": "In Progress",
         "est": 20,
         "logged": 7,
-        "subtasks": "WBS-61 (Suvarna Damarla, 12h est, 7h logged), WBS-60 (Jeremy Goodman, 8h est, 0h logged)"
+        "subtasks": "WBS-61 (Suvarna Damarla, 12h est, 7h logged), WBS-60 (Jeremy Goodman, 8h est, 0h logged)",
+        "points": 0
       },
       {
         "key": "WBS-24",
@@ -125,7 +132,8 @@
         "status": "In Progress",
         "est": 44,
         "logged": 6,
-        "subtasks": "WBS-27 (Joi Hepler, 6h est, 0h logged), WBS-26 (Suvarna Damarla, 2h est, 0h logged), WBS-25 (Yudong He, 20h est, 4h logged)"
+        "subtasks": "WBS-27 (Joi Hepler, 6h est, 0h logged), WBS-26 (Suvarna Damarla, 2h est, 0h logged), WBS-25 (Yudong He, 20h est, 4h logged)",
+        "points": 0
       },
       {
         "key": "WBS-14",
@@ -135,7 +143,8 @@
         "status": "In Progress",
         "est": 32,
         "logged": 6,
-        "subtasks": "WBS-62 (Suvarna Damarla, 6h est, 0h logged), WBS-51 (Yudong He, 6h est, 0h logged), WBS-30 (Suvarna Damarla, 1h est, 0h logged), WBS-28 (Yudong He, 1h est, 0h logged), WBS-17 (Julia Lukas, 6h est, 3h logged), WBS-16 (Joi Hepler, 12h est, 3h logged)"
+        "subtasks": "WBS-62 (Suvarna Damarla, 6h est, 0h logged), WBS-51 (Yudong He, 6h est, 0h logged), WBS-30 (Suvarna Damarla, 1h est, 0h logged), WBS-28 (Yudong He, 1h est, 0h logged), WBS-17 (Julia Lukas, 6h est, 3h logged), WBS-16 (Joi Hepler, 12h est, 3h logged)",
+        "points": 0
       }
     ],
     "subtaskHrs": {
@@ -213,7 +222,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T18:38:43.740497+00:00",
+    "syncedAt": "2026-04-27T18:39:54.242875+00:00",
     "members": [
       {
         "name": "Adam Rossman",
@@ -256,7 +265,8 @@
         "status": "Done",
         "est": 6,
         "logged": 6,
-        "subtasks": "GIN-85 (Michael Earley, 6h est, 6h logged)"
+        "subtasks": "GIN-85 (Michael Earley, 6h est, 6h logged)",
+        "points": 0
       },
       {
         "key": "GIN-61",
@@ -266,7 +276,8 @@
         "status": "Open",
         "est": 0,
         "logged": 0,
-        "subtasks": ""
+        "subtasks": "",
+        "points": 0
       },
       {
         "key": "GIN-40",
@@ -276,7 +287,8 @@
         "status": "Open",
         "est": 0,
         "logged": 0,
-        "subtasks": ""
+        "subtasks": "",
+        "points": 0
       },
       {
         "key": "GIN-39",
@@ -286,7 +298,8 @@
         "status": "Open",
         "est": 0,
         "logged": 0,
-        "subtasks": ""
+        "subtasks": "",
+        "points": 0
       },
       {
         "key": "GIN-38",
@@ -296,7 +309,8 @@
         "status": "In Progress",
         "est": 71,
         "logged": 61,
-        "subtasks": "GIN-86 (Deepthi Manne, 6h est, 6h logged), GIN-77 (Deepthi Manne, 10h est, 9h logged), GIN-76 (Joel Wheeler, 3h est, 0h logged), GIN-75 (Joel Wheeler, 3h est, 3h logged), GIN-74 (Joel Wheeler, 3h est, 3h logged), GIN-73 (Joel Wheeler, 6h est, 6h logged), GIN-72 (Joel Wheeler, 6h est, 6h logged), GIN-71 (Joel Wheeler, 6h est, 6h logged), GIN-70 (Deepthi Manne, 16h est, 16h logged), GIN-69 (Joel Wheeler, 6h est, 6h logged)"
+        "subtasks": "GIN-86 (Deepthi Manne, 6h est, 6h logged), GIN-77 (Deepthi Manne, 10h est, 9h logged), GIN-76 (Joel Wheeler, 3h est, 0h logged), GIN-75 (Joel Wheeler, 3h est, 3h logged), GIN-74 (Joel Wheeler, 3h est, 3h logged), GIN-73 (Joel Wheeler, 6h est, 6h logged), GIN-72 (Joel Wheeler, 6h est, 6h logged), GIN-71 (Joel Wheeler, 6h est, 6h logged), GIN-70 (Deepthi Manne, 16h est, 16h logged), GIN-69 (Joel Wheeler, 6h est, 6h logged)",
+        "points": 0
       },
       {
         "key": "GIN-37",
@@ -306,7 +320,8 @@
         "status": "Open",
         "est": 66,
         "logged": 29,
-        "subtasks": "GIN-83 (John Coniff, 8h est, 0h logged), GIN-82 (John Coniff, 6h est, 3h logged), GIN-81 (John Coniff, 16h est, 0h logged), GIN-80 (Michael Earley, 10h est, 0h logged), GIN-79 (Michael Earley, 10h est, 10h logged), GIN-78 (Michael Earley, 16h est, 16h logged)"
+        "subtasks": "GIN-83 (John Coniff, 8h est, 0h logged), GIN-82 (John Coniff, 6h est, 3h logged), GIN-81 (John Coniff, 16h est, 0h logged), GIN-80 (Michael Earley, 10h est, 0h logged), GIN-79 (Michael Earley, 10h est, 10h logged), GIN-78 (Michael Earley, 16h est, 16h logged)",
+        "points": 0
       },
       {
         "key": "GIN-36",
@@ -316,7 +331,8 @@
         "status": "Done",
         "est": 5,
         "logged": 5,
-        "subtasks": "GIN-67 (Michael Earley, 3h est, 3h logged), GIN-66 (Deepthi Manne, 1h est, 1h logged), GIN-65 (Deepthi Manne, 1h est, 1h logged)"
+        "subtasks": "GIN-67 (Michael Earley, 3h est, 3h logged), GIN-66 (Deepthi Manne, 1h est, 1h logged), GIN-65 (Deepthi Manne, 1h est, 1h logged)",
+        "points": 0
       }
     ],
     "subtaskHrs": {
@@ -390,7 +406,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T18:38:46.297796+00:00",
+    "syncedAt": "2026-04-27T18:39:56.323037+00:00",
     "members": [
       {
         "name": "Mike Jessen",
@@ -423,7 +439,8 @@
         "status": "Open",
         "est": 31,
         "logged": 5,
-        "subtasks": "MOJO-71 (Serguei Pozdniakov, 9h est, 0h logged), MOJO-70 (Serguei Pozdniakov, 6h est, 0h logged), MOJO-69 (Mike Jessen, 1h est, 0h logged), MOJO-68 (Ilya Dyakov, 15h est, 5h logged)"
+        "subtasks": "MOJO-71 (Serguei Pozdniakov, 9h est, 0h logged), MOJO-70 (Serguei Pozdniakov, 6h est, 0h logged), MOJO-69 (Mike Jessen, 1h est, 0h logged), MOJO-68 (Ilya Dyakov, 15h est, 5h logged)",
+        "points": 0
       },
       {
         "key": "MOJO-54",
@@ -433,7 +450,8 @@
         "status": "In Progress",
         "est": 37,
         "logged": 37,
-        "subtasks": "MOJO-67 (Serguei Pozdniakov, 9h est, 2h logged), MOJO-66 (Serguei Pozdniakov, 9h est, 6h logged), MOJO-65 (Mike Jessen, 1h est, 0h logged), MOJO-64 (Ilya Dyakov, 18h est, 29h logged)"
+        "subtasks": "MOJO-67 (Serguei Pozdniakov, 9h est, 2h logged), MOJO-66 (Serguei Pozdniakov, 9h est, 6h logged), MOJO-65 (Mike Jessen, 1h est, 0h logged), MOJO-64 (Ilya Dyakov, 18h est, 29h logged)",
+        "points": 0
       },
       {
         "key": "MOJO-51",
@@ -443,7 +461,8 @@
         "status": "In Progress",
         "est": 3,
         "logged": 6,
-        "subtasks": "MOJO-61 (Mike Jessen, 3h est, 6h logged)"
+        "subtasks": "MOJO-61 (Mike Jessen, 3h est, 6h logged)",
+        "points": 0
       },
       {
         "key": "MOJO-45",
@@ -453,7 +472,8 @@
         "status": "In Progress",
         "est": 6,
         "logged": 3,
-        "subtasks": "MOJO-60 (Ilya Dyakov, 6h est, 3h logged)"
+        "subtasks": "MOJO-60 (Ilya Dyakov, 6h est, 3h logged)",
+        "points": 0
       },
       {
         "key": "MOJO-21",
@@ -463,7 +483,8 @@
         "status": "Open",
         "est": 12,
         "logged": 7,
-        "subtasks": "MOJO-35 (Mike Jessen, 12h est, 7h logged)"
+        "subtasks": "MOJO-35 (Mike Jessen, 12h est, 7h logged)",
+        "points": 0
       },
       {
         "key": "MOJO-18",
@@ -473,7 +494,8 @@
         "status": "In Progress",
         "est": 43,
         "logged": 42,
-        "subtasks": "MOJO-26 (Ilya Dyakov, 1h est, 1h logged), MOJO-25 (Serguei Pozdniakov, 9h est, 9h logged), MOJO-24 (Serguei Pozdniakov, 9h est, 9h logged), MOJO-23 (Mike Jessen, 24h est, 23h logged)"
+        "subtasks": "MOJO-26 (Ilya Dyakov, 1h est, 1h logged), MOJO-25 (Serguei Pozdniakov, 9h est, 9h logged), MOJO-24 (Serguei Pozdniakov, 9h est, 9h logged), MOJO-23 (Mike Jessen, 24h est, 23h logged)",
+        "points": 0
       }
     ],
     "subtaskHrs": {
@@ -543,7 +565,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T18:38:48.885135+00:00",
+    "syncedAt": "2026-04-27T18:39:58.650958+00:00",
     "members": [
       {
         "name": "Peter Lobo",
@@ -621,7 +643,8 @@
         "status": "In Progress",
         "est": 0,
         "logged": 6,
-        "subtasks": ""
+        "subtasks": "",
+        "points": 0
       },
       {
         "key": "MAV-90",
@@ -631,7 +654,8 @@
         "status": "Done",
         "est": 0,
         "logged": 0,
-        "subtasks": ""
+        "subtasks": "",
+        "points": 0
       },
       {
         "key": "MAV-87",
@@ -641,7 +665,8 @@
         "status": "Done",
         "est": 18,
         "logged": 18,
-        "subtasks": ""
+        "subtasks": "",
+        "points": 0
       },
       {
         "key": "MAV-70",
@@ -651,7 +676,8 @@
         "status": "Done",
         "est": 3,
         "logged": 4,
-        "subtasks": ""
+        "subtasks": "",
+        "points": 0
       },
       {
         "key": "MAV-56",
@@ -661,7 +687,8 @@
         "status": "Open",
         "est": 0,
         "logged": 0,
-        "subtasks": ""
+        "subtasks": "",
+        "points": 0
       },
       {
         "key": "MAV-51",
@@ -671,7 +698,8 @@
         "status": "Open",
         "est": 0,
         "logged": 0,
-        "subtasks": ""
+        "subtasks": "",
+        "points": 0
       },
       {
         "key": "MAV-40",
@@ -681,7 +709,8 @@
         "status": "In Progress",
         "est": 13,
         "logged": 29,
-        "subtasks": "MAV-77 (Kumaraswamy Krishnan, 2h est, 0h logged), MAV-76 (Kumaraswamy Krishnan, 6h est, 6h logged), MAV-75 (Kumaraswamy Krishnan, 2h est, 2h logged), MAV-73 (Vikshani Chitlur, 3h est, 3h logged)"
+        "subtasks": "MAV-77 (Kumaraswamy Krishnan, 2h est, 0h logged), MAV-76 (Kumaraswamy Krishnan, 6h est, 6h logged), MAV-75 (Kumaraswamy Krishnan, 2h est, 2h logged), MAV-73 (Vikshani Chitlur, 3h est, 3h logged)",
+        "points": 0
       },
       {
         "key": "MAV-38",
@@ -691,7 +720,8 @@
         "status": "Open",
         "est": 14,
         "logged": 0,
-        "subtasks": "MAV-78 (Kumaraswamy Krishnan, 12h est, 0h logged), MAV-72 (Chethan Rangaswamy, 2h est, 0h logged)"
+        "subtasks": "MAV-78 (Kumaraswamy Krishnan, 12h est, 0h logged), MAV-72 (Chethan Rangaswamy, 2h est, 0h logged)",
+        "points": 0
       },
       {
         "key": "MAV-33",
@@ -701,7 +731,8 @@
         "status": "In Progress",
         "est": 42,
         "logged": 31,
-        "subtasks": "MAV-92 (Rohan Kiran, 0h est, 1h logged), MAV-89 (Rohan Kiran, 0h est, 12h logged), MAV-81 (Sougata Das, 24h est, 12h logged), MAV-80 (Kumaraswamy Krishnan, 12h est, 0h logged), MAV-79 (Rohan Kiran, 6h est, 6h logged)"
+        "subtasks": "MAV-92 (Rohan Kiran, 0h est, 1h logged), MAV-89 (Rohan Kiran, 0h est, 12h logged), MAV-81 (Sougata Das, 24h est, 12h logged), MAV-80 (Kumaraswamy Krishnan, 12h est, 0h logged), MAV-79 (Rohan Kiran, 6h est, 6h logged)",
+        "points": 0
       },
       {
         "key": "MAV-27",
@@ -711,7 +742,8 @@
         "status": "Done",
         "est": 18,
         "logged": 22,
-        "subtasks": "MAV-82 (Muthu Kumaran, 16h est, 20h logged), MAV-71 (Chethan Rangaswamy, 2h est, 2h logged)"
+        "subtasks": "MAV-82 (Muthu Kumaran, 16h est, 20h logged), MAV-71 (Chethan Rangaswamy, 2h est, 2h logged)",
+        "points": 0
       },
       {
         "key": "MAV-25",
@@ -721,7 +753,8 @@
         "status": "Open",
         "est": 9,
         "logged": 0,
-        "subtasks": "MAV-74 (Sougata Das, 9h est, 0h logged)"
+        "subtasks": "MAV-74 (Sougata Das, 9h est, 0h logged)",
+        "points": 0
       },
       {
         "key": "MAV-24",
@@ -731,7 +764,8 @@
         "status": "In Progress",
         "est": 60,
         "logged": 46,
-        "subtasks": "MAV-69 (Kumar Kuppusamy, 24h est, 32h logged), MAV-68 (Vikshani Chitlur, 32h est, 12h logged), MAV-67 (Vikshani Chitlur, 4h est, 2h logged)"
+        "subtasks": "MAV-69 (Kumar Kuppusamy, 24h est, 32h logged), MAV-68 (Vikshani Chitlur, 32h est, 12h logged), MAV-67 (Vikshani Chitlur, 4h est, 2h logged)",
+        "points": 0
       }
     ],
     "subtaskHrs": {
@@ -817,7 +851,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T18:38:51.548941+00:00",
+    "syncedAt": "2026-04-27T18:40:00.942371+00:00",
     "members": [
       {
         "name": "Peter Lobo",
@@ -875,7 +909,8 @@
         "status": "Open",
         "est": 0,
         "logged": 0,
-        "subtasks": ""
+        "subtasks": "",
+        "points": 0
       },
       {
         "key": "AMGO-105",
@@ -885,7 +920,8 @@
         "status": "Open",
         "est": 12,
         "logged": 0,
-        "subtasks": "AMGO-107 (Unassigned, 8h est, 0h logged), AMGO-106 (Unassigned, 4h est, 0h logged)"
+        "subtasks": "AMGO-107 (Unassigned, 8h est, 0h logged), AMGO-106 (Unassigned, 4h est, 0h logged)",
+        "points": 0
       },
       {
         "key": "AMGO-100",
@@ -895,7 +931,8 @@
         "status": "Open",
         "est": 28,
         "logged": 0,
-        "subtasks": "AMGO-103 (Akshay Kompelli, 4h est, 0h logged), AMGO-102 (Yashodhara Kulal, 10h est, 0h logged), AMGO-101 (Akshay Kompelli, 6h est, 0h logged)"
+        "subtasks": "AMGO-103 (Akshay Kompelli, 4h est, 0h logged), AMGO-102 (Yashodhara Kulal, 10h est, 0h logged), AMGO-101 (Akshay Kompelli, 6h est, 0h logged)",
+        "points": 0
       },
       {
         "key": "AMGO-74",
@@ -905,7 +942,8 @@
         "status": "Open",
         "est": 2,
         "logged": 0,
-        "subtasks": "AMGO-96 (Harsh Jain, 1h est, 0h logged), AMGO-93 (Harsh Jain, 1h est, 0h logged)"
+        "subtasks": "AMGO-96 (Harsh Jain, 1h est, 0h logged), AMGO-93 (Harsh Jain, 1h est, 0h logged)",
+        "points": 0
       },
       {
         "key": "AMGO-73",
@@ -915,7 +953,8 @@
         "status": "In Progress",
         "est": 8,
         "logged": 0,
-        "subtasks": "AMGO-95 (Harsh Jain, 2h est, 0h logged), AMGO-92 (Harsh Jain, 6h est, 0h logged)"
+        "subtasks": "AMGO-95 (Harsh Jain, 2h est, 0h logged), AMGO-92 (Harsh Jain, 6h est, 0h logged)",
+        "points": 0
       },
       {
         "key": "AMGO-72",
@@ -925,7 +964,8 @@
         "status": "Done",
         "est": 6,
         "logged": 3,
-        "subtasks": "AMGO-88 (Yashodhara Kulal, 6h est, 3h logged)"
+        "subtasks": "AMGO-88 (Yashodhara Kulal, 6h est, 3h logged)",
+        "points": 0
       },
       {
         "key": "AMGO-71",
@@ -935,7 +975,8 @@
         "status": "Done",
         "est": 2,
         "logged": 2,
-        "subtasks": "AMGO-91 (Yashodhara Kulal, 2h est, 2h logged)"
+        "subtasks": "AMGO-91 (Yashodhara Kulal, 2h est, 2h logged)",
+        "points": 0
       },
       {
         "key": "AMGO-70",
@@ -945,7 +986,8 @@
         "status": "In Progress",
         "est": 12,
         "logged": 0,
-        "subtasks": "AMGO-83 (Kashish Thakur, 6h est, 0h logged), AMGO-79 (Akshay Kompelli, 6h est, 0h logged)"
+        "subtasks": "AMGO-83 (Kashish Thakur, 6h est, 0h logged), AMGO-79 (Akshay Kompelli, 6h est, 0h logged)",
+        "points": 0
       },
       {
         "key": "AMGO-69",
@@ -955,7 +997,8 @@
         "status": "Done",
         "est": 4,
         "logged": 4,
-        "subtasks": "AMGO-90 (Yashodhara Kulal, 4h est, 4h logged)"
+        "subtasks": "AMGO-90 (Yashodhara Kulal, 4h est, 4h logged)",
+        "points": 0
       },
       {
         "key": "AMGO-68",
@@ -965,7 +1008,8 @@
         "status": "Done",
         "est": 8,
         "logged": 35,
-        "subtasks": "AMGO-94 (Yashodhara Kulal, 8h est, 13h logged), AMGO-75 (Kapil Darji, 0h est, 22h logged)"
+        "subtasks": "AMGO-94 (Yashodhara Kulal, 8h est, 13h logged), AMGO-75 (Kapil Darji, 0h est, 22h logged)",
+        "points": 0
       },
       {
         "key": "AMGO-67",
@@ -975,7 +1019,8 @@
         "status": "Open",
         "est": 16,
         "logged": 16,
-        "subtasks": "AMGO-84 (Kashish Thakur, 8h est, 12h logged), AMGO-80 (Akshay Kompelli, 8h est, 4h logged)"
+        "subtasks": "AMGO-84 (Kashish Thakur, 8h est, 12h logged), AMGO-80 (Akshay Kompelli, 8h est, 4h logged)",
+        "points": 0
       },
       {
         "key": "AMGO-66",
@@ -985,7 +1030,8 @@
         "status": "Done",
         "est": 6,
         "logged": 0,
-        "subtasks": "AMGO-87 (Akshay Kompelli, 6h est, 0h logged)"
+        "subtasks": "AMGO-87 (Akshay Kompelli, 6h est, 0h logged)",
+        "points": 0
       },
       {
         "key": "AMGO-61",
@@ -995,7 +1041,8 @@
         "status": "Open",
         "est": 0,
         "logged": 0,
-        "subtasks": ""
+        "subtasks": "",
+        "points": 0
       },
       {
         "key": "AMGO-57",
@@ -1005,7 +1052,8 @@
         "status": "Open",
         "est": 0,
         "logged": 0,
-        "subtasks": ""
+        "subtasks": "",
+        "points": 0
       },
       {
         "key": "AMGO-39",
@@ -1015,7 +1063,8 @@
         "status": "Open",
         "est": 22,
         "logged": 10,
-        "subtasks": "AMGO-98 (Seetharamkumar Thummala, 10h est, 10h logged), AMGO-86 (Kashish Thakur, 12h est, 0h logged)"
+        "subtasks": "AMGO-98 (Seetharamkumar Thummala, 10h est, 10h logged), AMGO-86 (Kashish Thakur, 12h est, 0h logged)",
+        "points": 0
       },
       {
         "key": "AMGO-34",
@@ -1025,7 +1074,8 @@
         "status": "Open",
         "est": 36,
         "logged": 6,
-        "subtasks": "AMGO-85 (Yashodhara Kulal, 12h est, 0h logged), AMGO-82 (Seetharamkumar Thummala, 12h est, 6h logged)"
+        "subtasks": "AMGO-85 (Yashodhara Kulal, 12h est, 0h logged), AMGO-82 (Seetharamkumar Thummala, 12h est, 6h logged)",
+        "points": 0
       },
       {
         "key": "AMGO-33",
@@ -1035,7 +1085,8 @@
         "status": "Done",
         "est": 10,
         "logged": 0,
-        "subtasks": "AMGO-97 (Seetharamkumar Thummala, 10h est, 0h logged)"
+        "subtasks": "AMGO-97 (Seetharamkumar Thummala, 10h est, 0h logged)",
+        "points": 0
       },
       {
         "key": "AMGO-26",
@@ -1045,7 +1096,8 @@
         "status": "In Progress",
         "est": 24,
         "logged": 8,
-        "subtasks": "AMGO-78 (Kapil Darji, 4h est, 4h logged), AMGO-77 (Kapil Darji, 8h est, 0h logged), AMGO-76 (Kapil Darji, 12h est, 4h logged)"
+        "subtasks": "AMGO-78 (Kapil Darji, 4h est, 4h logged), AMGO-77 (Kapil Darji, 8h est, 0h logged), AMGO-76 (Kapil Darji, 12h est, 4h logged)",
+        "points": 0
       },
       {
         "key": "AMGO-11",
@@ -1055,7 +1107,8 @@
         "status": "In Progress",
         "est": 6,
         "logged": 0,
-        "subtasks": "AMGO-89 (Kashish Thakur, 6h est, 0h logged)"
+        "subtasks": "AMGO-89 (Kashish Thakur, 6h est, 0h logged)",
+        "points": 0
       },
       {
         "key": "AMGO-7",
@@ -1065,7 +1118,8 @@
         "status": "In Progress",
         "est": 20,
         "logged": 0,
-        "subtasks": "AMGO-81 (Seetharamkumar Thummala, 8h est, 0h logged), AMGO-18 (Seetharamkumar Thummala, 6h est, 0h logged), AMGO-15 (Yashodhara Kulal, 6h est, 0h logged)"
+        "subtasks": "AMGO-81 (Seetharamkumar Thummala, 8h est, 0h logged), AMGO-18 (Seetharamkumar Thummala, 6h est, 0h logged), AMGO-15 (Yashodhara Kulal, 6h est, 0h logged)",
+        "points": 0
       }
     ],
     "subtaskHrs": {
