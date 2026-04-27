@@ -180,21 +180,15 @@ def build_subtask_hrs(subtasks):
 
 def build_hours_by_assignee(all_issues):
     """
-    Build accurate per-member hour totals by querying all assigned issues.
-    For subtasks: use direct timeoriginalestimate / timespent fields.
-    For parent issues: use aggregate fields (rolls up subtask hours).
-    Deduplication: if a subtask and its parent are both returned for the same
-    assignee, the parent aggregate already includes the subtask, so we only
-    count each issue once at the appropriate level.
+    Build per-member hour totals from subtasks only.
+    Subtasks are the single source of truth — parent issues roll up from subtasks
+    so including both would double-count. Hours are on the subtask direct fields.
     """
     hrs = {}
-    seen_parents = set()  # track parent keys we've already counted via aggregate
-
-    # First pass: collect subtask hours (direct fields)
     for iss in all_issues:
         f = iss['fields']
-        is_subtask = f.get('issuetype', {}).get('subtask', False)
-        if not is_subtask:
+        # Subtasks only — skip parent issues entirely
+        if not f.get('issuetype', {}).get('subtask', False):
             continue
         name = (f.get('assignee') or {}).get('displayName', 'Unassigned')
         est = secs_to_hrs(f.get('timeoriginalestimate'))
@@ -205,25 +199,6 @@ def build_hours_by_assignee(all_issues):
             hrs[name] = {'est': 0, 'logged': 0}
         hrs[name]['est']    += est
         hrs[name]['logged'] += log
-
-    # Second pass: add parent issue hours NOT already covered by subtask queries
-    # Only add if the parent has direct timeoriginalestimate (i.e. time is on the parent itself)
-    for iss in all_issues:
-        f = iss['fields']
-        is_subtask = f.get('issuetype', {}).get('subtask', False)
-        if is_subtask:
-            continue
-        name = (f.get('assignee') or {}).get('displayName', 'Unassigned')
-        # Use direct fields only (not aggregate) to avoid double-counting subtasks
-        est = secs_to_hrs(f.get('timeoriginalestimate'))
-        log = secs_to_hrs(f.get('timespent'))
-        if est == 0 and log == 0:
-            continue
-        if name not in hrs:
-            hrs[name] = {'est': 0, 'logged': 0}
-        hrs[name]['est']    += est
-        hrs[name]['logged'] += log
-
     return hrs
 
 def build_subtask_map(subtasks):
