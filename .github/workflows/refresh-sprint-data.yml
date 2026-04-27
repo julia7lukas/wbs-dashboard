@@ -1,9 +1,9 @@
-name: Daily Sprint Data Refresh
+name: Sprint Data Refresh
 
 on:
   schedule:
-    - cron: '0 11 * * 1-5'   # 6am CT (11am UTC)
-  workflow_dispatch:
+    - cron: '0 * * * *'   # Every hour, every day — catches sprint starts/ends within the hour
+  workflow_dispatch:        # Manual trigger still available
 
 jobs:
   refresh:
@@ -41,7 +41,7 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: actions/configure-pages@v4
 
-      - name: Upload Pages artifact (with env.js injected, never committed)
+      - name: Upload Pages artifact
         env:
           WRITE_TOKEN: ${{ secrets.DASHBOARD_WRITE_TOKEN }}
         run: |
@@ -49,7 +49,6 @@ jobs:
           cp index.html _site/
           cp dashboard.js _site/
           cp data.json _site/
-          # Write env.js with the token — goes to Pages but never to the repo
           echo "window.__ENV__ = { WRITE_TOKEN: '${WRITE_TOKEN}' };" > _site/env.js
 
       - name: Upload artifact
