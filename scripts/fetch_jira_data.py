@@ -314,7 +314,7 @@ def process_team(key, config, existing):
     issues      = format_issues(raw_issues, subtask_map)
     # Query all assigned issues to get accurate per-member hours
     # This captures hours whether logged on subtasks OR parent issues
-    all_assigned = get_all_assigned_hours(project_key)
+    all_assigned = get_all_assigned_hours(key)
     subtask_hrs = build_hours_by_assignee(all_assigned)
     total_est = sum(v['est'] for v in subtask_hrs.values())
     total_log = sum(v['logged'] for v in subtask_hrs.values())
