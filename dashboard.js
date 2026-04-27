@@ -353,8 +353,7 @@ function planAutoSave(planMembers, planDays) {
   var SD = TEAMS[_planningTeam];
   var allSprints = SD.allSprints || [];
   var selSprint = allSprints.find(function(s){ return s.name === _planningSprint; }) || { name: SD.sprintName };
-  var savedBy = (document.getElementById('user-name-input') && document.getElementById('user-name-input').value.trim())
-              || window.__currentUser || 'Team member';
+  var savedBy = (TEAMS[_planningTeam] && TEAMS[_planningTeam].team) || 'Team member';
   saveCapacity(SD.projectKey, selSprint.name, planMembers, planDays, savedBy);
 }
 
@@ -635,19 +634,7 @@ function addTDO() {
 // ── AVAILABILITY BARS ──────────────────────────────────────────────────────────
 function renderAvail() {
   const activeMembers = members.filter(m => asgnFor(m.name) > 0);
-  const totalAsgn = activeMembers.reduce((a,m) => a+asgnFor(m.name), 0);
-  const totalLogged = activeMembers.reduce((a,m) => a+logFor(m.name), 0);
-  const totalRemaining = Math.max(0, totalAsgn - totalLogged);
-  const totalPct = totalAsgn > 0 ? Math.round(totalRemaining/totalAsgn*100) : 0;
-  const totalCol = totalPct===0?'var(--green)':totalPct<30?'var(--amber)':'var(--blue)';
-
-  // Sprint totals summary bar at top
-  const summaryHtml = '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;margin-bottom:10px;border-bottom:1px solid var(--bdr)">'+
-    '<span style="font-size:12px;color:var(--t2);font-weight:500">Sprint total</span>'+
-    '<span style="font-size:12px;color:'+totalCol+';font-weight:600">'+totalRemaining+'h remaining of '+totalAsgn+'h</span>'+
-    '</div>';
-
-  document.getElementById('avail-list').innerHTML = summaryHtml + activeMembers.map(m=>{
+  document.getElementById('avail-list').innerHTML = activeMembers.map(m=>{
     const asgn=asgnFor(m.name), logged=logFor(m.name);
     const remaining = Math.max(0, asgn - logged);
     const p = asgn>0 ? Math.round(remaining/asgn*100) : 0;
@@ -657,6 +644,117 @@ function renderAvail() {
       '<span style="color:var(--t3);font-size:11px">'+remaining+'h remaining / '+asgn+'h assigned ('+p+'% left)</span></div>'+
       '<div class="ar-bg"><div class="ar-fill" style="width:'+p+'%;background:'+col+'"></div></div></div>';
   }).join('');
+}
+
+// ── SPRINT SELECTOR CHIPS ─────────────────────────────────────────────────────
+function renderSprintChips() {
+  const container = document.getElementById('sprint-chips');
+  if (!container || !currentTeam) return;
+  const SD = TEAMS[currentTeam];
+  if (!SD) return;
+  const allSprints = SD.allSprints || [{ name: SD.sprintName, startDate: SD.startDate, endDate: SD.endDate, state: 'active' }];
+  const activePlanSprint = window._activePlanSprint || SD.sprintName;
+  container.innerHTML = allSprints.map((s, chipIdx) => {
+    const isSelected = s.name === activePlanSprint;
+    const isActive   = s.state === 'active';
+    const saved = loadSavedCapacity(SD.projectKey, s.name);
+    const hasSaved = saved && saved.lastSavedBy;
+    return '<button onclick="onSprintChipClick(' + chipIdx + ')" style="'
+      + 'padding:4px 10px;font-size:11px;font-weight:600;border-radius:6px;cursor:pointer;border:1px solid;'
+      + 'font-family:var(--font);'
+      + (isSelected
+          ? 'background:var(--green);color:#000;border-color:var(--green);'
+          : isActive
+            ? 'background:var(--bg3);color:var(--t1);border-color:var(--bdr2);'
+            : 'background:transparent;color:var(--t3);border-color:var(--bdr);opacity:.7;')
+      + '">'
+      + sanitize(s.name)
+      + (isActive ? ' · Active' : '')
+      + (hasSaved && !isActive ? ' ✓' : '')
+      + '</button>';
+  }).join('');
+}
+
+function onSprintChipClick(idx) {
+  const SD = TEAMS[currentTeam];
+  if (!SD) return;
+  const allSprints = SD.allSprints || [{ name: SD.sprintName, startDate: SD.startDate, endDate: SD.endDate, state: 'active' }];
+  const sel = allSprints[idx];
+  if (!sel) return;
+  const sprintName = sel.name;
+  window._activePlanSprint = sprintName;
+  const isActive = sel && sel.state === 'active';
+
+  if (isActive) {
+    // Switch back to live data view
+    members  = SD.members.map(m => ({...m}));
+    teamDays = SD.teamDays ? SD.teamDays.map(d => ({...d})) : [];
+    const saved = loadSavedCapacity(SD.projectKey, sprintName);
+    if (saved) {
+      const savedMap = Object.fromEntries(saved.members.map(m => [m.name, m]));
+      members  = SD.members.map(m => savedMap[m.name] ? {...savedMap[m.name]} : {...m});
+      teamDays = saved.teamDays.map(d => ({...d}));
+    }
+  } else {
+    // Load saved capacity for future sprint
+    const saved = loadSavedCapacity(SD.projectKey, sprintName);
+    if (saved) {
+      members  = saved.members.map(m => ({...m}));
+      teamDays = saved.teamDays.map(d => ({...d}));
+    } else {
+      // Default capacity for unplanned sprint
+      members  = SD.members.map(m => ({ name:m.name, hrs:6, pto:0 }));
+      teamDays = [];
+    }
+    if (sel) {
+      document.getElementById('start-date').value = sel.startDate;
+      document.getElementById('end-date').value   = sel.endDate;
+      document.getElementById('sprint-name').value = sel.name;
+      document.getElementById('hdr-sprint').textContent = sel.name;
+    }
+  }
+  renderSprintChips();
+  renderAll();
+}
+
+// ── EFFORT SECTION ─────────────────────────────────────────────────────────────
+function renderEffort() {
+  const container = document.getElementById('effort-list');
+  if (!container) return;
+  const sd = getSD();
+  if (!sd || !sd.issues || !sd.issues.length) {
+    container.innerHTML = '<div style="color:var(--t3);font-size:12px;padding:8px 0">No story data available</div>';
+    return;
+  }
+
+  // Only stories/epics (not subtasks), with story points > 0
+  const stories = sd.issues.filter(i => i.type !== 'Subtask' && i.points > 0);
+  const totalPts = stories.reduce((a,i) => a + (i.points||0), 0);
+
+  if (!stories.length) {
+    container.innerHTML = '<div style="color:var(--t3);font-size:12px;padding:8px 0">No story point estimates found in Jira</div>';
+    return;
+  }
+
+  container.innerHTML = stories.map(s => {
+    const statusCol = s.status === 'Done' ? 'var(--green)' : s.status === 'In Progress' ? 'var(--blue)' : 'var(--t3)';
+    const pts = s.points || 0;
+    const barW = totalPts > 0 ? Math.round(pts/totalPts*100) : 0;
+    return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+      + '<div style="font-family:var(--mono);font-size:11px;color:var(--t3);width:60px;flex-shrink:0">' + sanitize(s.key) + '</div>'
+      + '<div style="flex:1;min-width:0">'
+      +   '<div style="font-size:12px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + sanitize(s.summary) + '</div>'
+      +   '<div style="background:var(--bg3);border-radius:3px;height:3px;margin-top:3px;overflow:hidden">'
+      +     '<div style="width:'+barW+'%;height:100%;background:'+statusCol+'"></div>'
+      +   '</div>'
+      + '</div>'
+      + '<div style="font-size:12px;font-weight:600;color:var(--t1);width:32px;text-align:right;flex-shrink:0">' + pts + 'pt</div>'
+      + '</div>';
+  }).join('')
+  + '<div style="display:flex;justify-content:space-between;padding-top:10px;margin-top:4px;border-top:1px solid var(--bdr)">'
+  +   '<span style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">Total committed</span>'
+  +   '<span style="font-size:16px;font-weight:600;color:var(--green)">' + totalPts + ' pts</span>'
+  + '</div>';
 }
 
 // ── CALENDAR ───────────────────────────────────────────────────────────────────
@@ -781,7 +879,6 @@ function renderBurndown() {
   kpi.innerHTML =
     chip('Completed', completedPct+'%', completedPct > 80 ? 'var(--green)' : 'var(--t1)') +
     chip('Avg Burndown', (avgBurndown > 0 ? '-' : '')+avgBurndown+'h/day', 'var(--t1)', 'per working day') +
-    chip('Items not estimated', notEstimated, notEstimated > 0 ? 'var(--amber)' : 'var(--t1)') +
     chip('Total Scope Increase', (scopeIncrease > 0 ? '+' : '')+scopeIncrease+'h', scopeIncrease > 0 ? 'var(--amber)' : 'var(--t1)') +
     chip('Remaining Work', remainingNow+'h', remainingNow > capLeftNow ? 'var(--red)' : 'var(--t1)', remainingNow > capLeftNow ? '⚠ exceeds capacity' : 'of '+originalScope+'h scope');
 
@@ -884,7 +981,7 @@ function recalc() {
   document.getElementById('k-rem-sub').textContent=tl+'h logged of '+ta+'h assigned';
   document.getElementById('k-util').textContent=tc>0?Math.round(tl/tc*100)+'%':'0%';
   document.getElementById('k-pto').textContent=tp;
-  renderMembers(); renderAvail(); renderCal(); renderBurndown();
+  renderMembers(); renderAvail(); renderCal(); renderBurndown(); renderEffort(); renderSprintChips();
 }
 
 function renderAll() { renderTDO(); recalc(); }
