@@ -7,7 +7,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T21:57:40.676208+00:00",
+    "syncedAt": "2026-04-28T07:39:40.393882+00:00",
     "members": [
       {
         "name": "Julia Lukas",
@@ -222,7 +222,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T21:57:43.128201+00:00",
+    "syncedAt": "2026-04-28T07:39:42.413096+00:00",
     "members": [
       {
         "name": "Adam Rossman",
@@ -406,7 +406,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T21:57:45.634301+00:00",
+    "syncedAt": "2026-04-28T07:39:44.350151+00:00",
     "members": [
       {
         "name": "Mike Jessen",
@@ -565,7 +565,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T21:57:47.864919+00:00",
+    "syncedAt": "2026-04-28T07:39:46.187088+00:00",
     "members": [
       {
         "name": "Peter Lobo",
@@ -640,7 +640,7 @@
         "type": "Task",
         "summary": "Automation analysis, run and fix",
         "assignee": "Chethan Rangaswamy",
-        "status": "In Progress",
+        "status": "Done",
         "est": 0,
         "logged": 6,
         "subtasks": "",
@@ -704,12 +704,12 @@
       {
         "key": "MAV-40",
         "type": "Story",
-        "summary": "Display payer extension ids on payer list information Id column based on configuration and wiki update",
+        "summary": "Display payer extension ids on payer list information Id column based on configuration",
         "assignee": "Kumaraswamy Krishnan",
-        "status": "In Progress",
+        "status": "Done",
         "est": 13,
-        "logged": 29,
-        "subtasks": "MAV-77 (Kumaraswamy Krishnan, 2h est, 0h logged), MAV-76 (Kumaraswamy Krishnan, 6h est, 6h logged), MAV-75 (Kumaraswamy Krishnan, 2h est, 2h logged), MAV-73 (Vikshani Chitlur, 3h est, 3h logged)",
+        "logged": 31,
+        "subtasks": "MAV-77 (Kumaraswamy Krishnan, 2h est, 2h logged), MAV-76 (Kumaraswamy Krishnan, 6h est, 6h logged), MAV-75 (Kumaraswamy Krishnan, 2h est, 2h logged), MAV-73 (Vikshani Chitlur, 3h est, 3h logged)",
         "points": 0
       },
       {
@@ -717,10 +717,10 @@
         "type": "Story",
         "summary": "Create Stedi Payer Extension and Map Stedi PayerIds to Payer list.",
         "assignee": "Kumaraswamy Krishnan",
-        "status": "Open",
+        "status": "In Progress",
         "est": 14,
-        "logged": 0,
-        "subtasks": "MAV-78 (Kumaraswamy Krishnan, 12h est, 0h logged), MAV-72 (Chethan Rangaswamy, 2h est, 0h logged)",
+        "logged": 6,
+        "subtasks": "MAV-78 (Kumaraswamy Krishnan, 12h est, 6h logged), MAV-72 (Chethan Rangaswamy, 2h est, 0h logged)",
         "points": 0
       },
       {
@@ -730,8 +730,8 @@
         "assignee": "Rohan Kiran",
         "status": "In Progress",
         "est": 42,
-        "logged": 31,
-        "subtasks": "MAV-92 (Rohan Kiran, 0h est, 1h logged), MAV-89 (Rohan Kiran, 0h est, 12h logged), MAV-81 (Sougata Das, 24h est, 12h logged), MAV-80 (Kumaraswamy Krishnan, 12h est, 0h logged), MAV-79 (Rohan Kiran, 6h est, 6h logged)",
+        "logged": 38,
+        "subtasks": "MAV-108 (Rohan Kiran, 0h est, 1h logged), MAV-106 (Rohan Kiran, 0h est, 1h logged), MAV-96 (Rohan Kiran, 0h est, 1h logged), MAV-95 (Rohan Kiran, 0h est, 1h logged), MAV-93 (Rohan Kiran, 0h est, 1h logged), MAV-92 (Rohan Kiran, 0h est, 1h logged), MAV-89 (Rohan Kiran, 0h est, 12h logged), MAV-81 (Sougata Das, 24h est, 18h logged), MAV-80 (Kumaraswamy Krishnan, 12h est, 0h logged), MAV-79 (Rohan Kiran, 6h est, 6h logged)",
         "points": 0
       },
       {
@@ -744,28 +744,6 @@
         "logged": 22,
         "subtasks": "MAV-82 (Muthu Kumaran, 16h est, 20h logged), MAV-71 (Chethan Rangaswamy, 2h est, 2h logged)",
         "points": 0
-      },
-      {
-        "key": "MAV-25",
-        "type": "Story",
-        "summary": "SQL script for Adding new CustGroup and Payer extension value",
-        "assignee": "Sougata Das",
-        "status": "Open",
-        "est": 9,
-        "logged": 0,
-        "subtasks": "MAV-74 (Sougata Das, 9h est, 0h logged)",
-        "points": 0
-      },
-      {
-        "key": "MAV-24",
-        "type": "Story",
-        "summary": "RTE : Migrate from NetFramework to NetCore",
-        "assignee": "Kumar Kuppusamy",
-        "status": "In Progress",
-        "est": 60,
-        "logged": 46,
-        "subtasks": "MAV-69 (Kumar Kuppusamy, 24h est, 32h logged), MAV-68 (Vikshani Chitlur, 32h est, 12h logged), MAV-67 (Vikshani Chitlur, 4h est, 2h logged)",
-        "points": 0
       }
     ],
     "subtaskHrs": {
@@ -775,11 +753,7 @@
       },
       "Kumaraswamy Krishnan": {
         "est": 34,
-        "logged": 8
-      },
-      "Kumar Kuppusamy": {
-        "est": 24,
-        "logged": 32
+        "logged": 16
       },
       "Muthu Kumaran": {
         "est": 16,
@@ -787,15 +761,15 @@
       },
       "Rohan Kiran": {
         "est": 6,
-        "logged": 19
+        "logged": 24
       },
       "Sougata Das": {
-        "est": 33,
-        "logged": 12
+        "est": 24,
+        "logged": 18
       },
       "Vikshani Chitlur": {
-        "est": 39,
-        "logged": 17
+        "est": 3,
+        "logged": 3
       }
     },
     "allSprints": [
@@ -851,7 +825,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-27T21:57:50.141445+00:00",
+    "syncedAt": "2026-04-28T07:39:48.072747+00:00",
     "members": [
       {
         "name": "Peter Lobo",
@@ -905,7 +879,7 @@
         "key": "AMGO-108",
         "type": "Bug",
         "summary": "Bug 8867882: Automation Bug: UI (E2E) : ClaimForm and ClaimList_Test failing",
-        "assignee": "Unassigned",
+        "assignee": "Harsh Jain",
         "status": "Open",
         "est": 0,
         "logged": 0,
@@ -920,7 +894,7 @@
         "status": "Open",
         "est": 12,
         "logged": 0,
-        "subtasks": "AMGO-107 (Unassigned, 8h est, 0h logged), AMGO-106 (Unassigned, 4h est, 0h logged)",
+        "subtasks": "AMGO-107 (Kapil Darji, 8h est, 0h logged), AMGO-106 (Kapil Darji, 4h est, 0h logged)",
         "points": 0
       },
       {
@@ -929,9 +903,9 @@
         "summary": "Meta Task",
         "assignee": "Yashodhara Kulal",
         "status": "Open",
-        "est": 28,
-        "logged": 0,
-        "subtasks": "AMGO-103 (Akshay Kompelli, 4h est, 0h logged), AMGO-102 (Yashodhara Kulal, 10h est, 0h logged), AMGO-101 (Akshay Kompelli, 6h est, 0h logged)",
+        "est": 32,
+        "logged": 9,
+        "subtasks": "AMGO-109 (Akshay Kompelli, 4h est, 3h logged), AMGO-103 (Akshay Kompelli, 4h est, 0h logged), AMGO-102 (Yashodhara Kulal, 10h est, 6h logged), AMGO-101 (Akshay Kompelli, 6h est, 0h logged)",
         "points": 0
       },
       {
@@ -963,8 +937,8 @@
         "assignee": "Yashodhara Kulal",
         "status": "Done",
         "est": 6,
-        "logged": 3,
-        "subtasks": "AMGO-88 (Yashodhara Kulal, 6h est, 3h logged)",
+        "logged": 9,
+        "subtasks": "AMGO-88 (Yashodhara Kulal, 6h est, 9h logged)",
         "points": 0
       },
       {
@@ -1073,8 +1047,8 @@
         "assignee": "Yashodhara Kulal",
         "status": "Open",
         "est": 36,
-        "logged": 6,
-        "subtasks": "AMGO-85 (Yashodhara Kulal, 12h est, 0h logged), AMGO-82 (Seetharamkumar Thummala, 12h est, 6h logged)",
+        "logged": 19,
+        "subtasks": "AMGO-85 (Yashodhara Kulal, 12h est, 4h logged), AMGO-82 (Seetharamkumar Thummala, 12h est, 15h logged)",
         "points": 0
       },
       {
@@ -1095,8 +1069,8 @@
         "assignee": "Kapil Darji",
         "status": "In Progress",
         "est": 24,
-        "logged": 8,
-        "subtasks": "AMGO-78 (Kapil Darji, 4h est, 4h logged), AMGO-77 (Kapil Darji, 8h est, 0h logged), AMGO-76 (Kapil Darji, 12h est, 4h logged)",
+        "logged": 16,
+        "subtasks": "AMGO-78 (Kapil Darji, 4h est, 4h logged), AMGO-77 (Kapil Darji, 8h est, 2h logged), AMGO-76 (Kapil Darji, 12h est, 10h logged)",
         "points": 0
       },
       {
@@ -1117,23 +1091,23 @@
         "assignee": "Seetharamkumar Thummala",
         "status": "In Progress",
         "est": 20,
-        "logged": 0,
-        "subtasks": "AMGO-81 (Seetharamkumar Thummala, 8h est, 0h logged), AMGO-18 (Seetharamkumar Thummala, 6h est, 0h logged), AMGO-15 (Yashodhara Kulal, 6h est, 0h logged)",
+        "logged": 6,
+        "subtasks": "AMGO-81 (Seetharamkumar Thummala, 8h est, 0h logged), AMGO-18 (Seetharamkumar Thummala, 6h est, 0h logged), AMGO-15 (Yashodhara Kulal, 6h est, 6h logged)",
         "points": 0
       }
     ],
     "subtaskHrs": {
       "Akshay Kompelli": {
-        "est": 30,
-        "logged": 4
+        "est": 34,
+        "logged": 7
       },
       "Harsh Jain": {
         "est": 10,
         "logged": 0
       },
       "Kapil Darji": {
-        "est": 24,
-        "logged": 30
+        "est": 36,
+        "logged": 38
       },
       "Kashish Thakur": {
         "est": 32,
@@ -1141,11 +1115,11 @@
       },
       "Seetharamkumar Thummala": {
         "est": 46,
-        "logged": 16
+        "logged": 25
       },
       "Yashodhara Kulal": {
         "est": 48,
-        "logged": 22
+        "logged": 44
       }
     },
     "allSprints": [
