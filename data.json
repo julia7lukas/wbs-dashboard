@@ -7,7 +7,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T11:59:02.589400+00:00",
+    "syncedAt": "2026-04-28T13:23:38.137378+00:00",
     "members": [
       {
         "name": "Julia Lukas",
@@ -86,9 +86,9 @@
         "summary": "Meta Tasks",
         "assignee": "Unassigned",
         "status": "In Progress",
-        "est": 51,
-        "logged": 53,
-        "subtasks": "WBS-77 (Yudong He, 3h est, 7h logged), WBS-69 (Julia Lukas, 4h est, 2h logged), WBS-68 (Suvarna Damarla, 12h est, 6h logged), WBS-67 (Yudong He, 16h est, 19h logged), WBS-53 (Julia Lukas, 16h est, 19h logged)",
+        "est": 60,
+        "logged": 57,
+        "subtasks": "WBS-77 (Yudong He, 12h est, 11h logged), WBS-69 (Julia Lukas, 4h est, 2h logged), WBS-68 (Suvarna Damarla, 12h est, 6h logged), WBS-67 (Yudong He, 16h est, 19h logged), WBS-53 (Julia Lukas, 16h est, 19h logged)",
         "points": 0
       },
       {
@@ -165,8 +165,8 @@
         "logged": 16
       },
       "Yudong He": {
-        "est": 52,
-        "logged": 32
+        "est": 61,
+        "logged": 36
       }
     },
     "allSprints": [
@@ -222,7 +222,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T11:59:05.425065+00:00",
+    "syncedAt": "2026-04-28T13:23:40.197305+00:00",
     "members": [
       {
         "name": "Adam Rossman",
@@ -406,7 +406,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T11:59:07.650087+00:00",
+    "syncedAt": "2026-04-28T13:23:42.250194+00:00",
     "members": [
       {
         "name": "Mike Jessen",
@@ -436,7 +436,7 @@
         "type": "Story",
         "summary": "Team Reserve: Invalid Characters (T72T7)",
         "assignee": "Unassigned",
-        "status": "Open",
+        "status": "In Progress",
         "est": 31,
         "logged": 5,
         "subtasks": "MOJO-71 (Serguei Pozdniakov, 9h est, 0h logged), MOJO-70 (Serguei Pozdniakov, 6h est, 0h logged), MOJO-69 (Mike Jessen, 1h est, 0h logged), MOJO-68 (Ilya Dyakov, 15h est, 5h logged)",
@@ -480,7 +480,7 @@
         "type": "Story",
         "summary": "VIP: spike - iTools Utilization layout options",
         "assignee": "Unassigned",
-        "status": "Open",
+        "status": "In Progress",
         "est": 12,
         "logged": 7,
         "subtasks": "MOJO-35 (Mike Jessen, 12h est, 7h logged)",
@@ -490,7 +490,7 @@
         "key": "MOJO-18",
         "type": "Story",
         "summary": "VIP: A4HSNames report updates",
-        "assignee": "Unassigned",
+        "assignee": "Tanya Templer",
         "status": "In Progress",
         "est": 43,
         "logged": 42,
@@ -565,7 +565,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T11:59:09.950759+00:00",
+    "syncedAt": "2026-04-28T13:23:44.672744+00:00",
     "members": [
       {
         "name": "Peter Lobo",
@@ -729,9 +729,9 @@
         "summary": "Angular and Kendo upgrade using Claude",
         "assignee": "Rohan Kiran",
         "status": "In Progress",
-        "est": 42,
-        "logged": 38,
-        "subtasks": "MAV-108 (Rohan Kiran, 0h est, 1h logged), MAV-106 (Rohan Kiran, 0h est, 1h logged), MAV-96 (Rohan Kiran, 0h est, 1h logged), MAV-95 (Rohan Kiran, 0h est, 1h logged), MAV-93 (Rohan Kiran, 0h est, 1h logged), MAV-92 (Rohan Kiran, 0h est, 1h logged), MAV-89 (Rohan Kiran, 0h est, 12h logged), MAV-81 (Sougata Das, 24h est, 18h logged), MAV-80 (Kumaraswamy Krishnan, 12h est, 0h logged), MAV-79 (Rohan Kiran, 6h est, 6h logged)",
+        "est": 46,
+        "logged": 42,
+        "subtasks": "MAV-110 (Vikshani Chitlur, 4h est, 4h logged), MAV-108 (Rohan Kiran, 0h est, 1h logged), MAV-106 (Rohan Kiran, 0h est, 1h logged), MAV-96 (Rohan Kiran, 0h est, 1h logged), MAV-95 (Rohan Kiran, 0h est, 1h logged), MAV-93 (Rohan Kiran, 0h est, 1h logged), MAV-92 (Rohan Kiran, 0h est, 1h logged), MAV-89 (Rohan Kiran, 0h est, 12h logged), MAV-81 (Sougata Das, 24h est, 18h logged), MAV-80 (Kumaraswamy Krishnan, 12h est, 0h logged), MAV-79 (Rohan Kiran, 6h est, 6h logged)",
         "points": 0
       },
       {
@@ -768,8 +768,8 @@
         "logged": 18
       },
       "Vikshani Chitlur": {
-        "est": 3,
-        "logged": 3
+        "est": 7,
+        "logged": 7
       }
     },
     "allSprints": [
@@ -825,7 +825,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T11:59:12.623763+00:00",
+    "syncedAt": "2026-04-28T13:23:46.921373+00:00",
     "members": [
       {
         "name": "Peter Lobo",
