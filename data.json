@@ -7,7 +7,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T17:29:49.631086+00:00",
+    "syncedAt": "2026-04-28T19:12:10.275363+00:00",
     "members": [
       {
         "name": "Julia Lukas",
@@ -87,8 +87,8 @@
         "assignee": "Unassigned",
         "status": "In Progress",
         "est": 60,
-        "logged": 60,
-        "subtasks": "WBS-77 (Yudong He, 12h est, 11h logged), WBS-69 (Julia Lukas, 4h est, 2h logged), WBS-68 (Suvarna Damarla, 12h est, 6h logged), WBS-67 (Yudong He, 16h est, 19h logged), WBS-53 (Julia Lukas, 16h est, 22h logged)",
+        "logged": 72,
+        "subtasks": "WBS-77 (Yudong He, 12h est, 11h logged), WBS-69 (Julia Lukas, 4h est, 2h logged), WBS-68 (Suvarna Damarla, 12h est, 18h logged), WBS-67 (Yudong He, 16h est, 19h logged), WBS-53 (Julia Lukas, 16h est, 22h logged)",
         "points": 0
       },
       {
@@ -162,7 +162,7 @@
       },
       "Suvarna Damarla": {
         "est": 36,
-        "logged": 16
+        "logged": 28
       },
       "Yudong He": {
         "est": 61,
@@ -222,7 +222,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T17:29:52.323796+00:00",
+    "syncedAt": "2026-04-28T19:12:13.138861+00:00",
     "members": [
       {
         "name": "Adam Rossman",
@@ -406,7 +406,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T17:29:54.841960+00:00",
+    "syncedAt": "2026-04-28T19:12:15.942776+00:00",
     "members": [
       {
         "name": "Mike Jessen",
@@ -565,7 +565,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T17:29:56.835026+00:00",
+    "syncedAt": "2026-04-28T19:12:18.335440+00:00",
     "members": [
       {
         "name": "Peter Lobo",
@@ -825,7 +825,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T17:29:59.114327+00:00",
+    "syncedAt": "2026-04-28T19:12:20.896000+00:00",
     "members": [
       {
         "name": "Peter Lobo",
