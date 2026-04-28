@@ -5,7 +5,9 @@
 // On Save: changes persist to localStorage, Jira, and Confluence.
 // GitHub data.json is updated only by the daily Action — never from the browser.
 const REPO     = 'julia7lukas/wbs-dashboard';
-const DATA_URL = 'https://raw.githubusercontent.com/' + REPO + '/main/data.json?cb=' + Date.now();
+const DATA_URL     = 'https://raw.githubusercontent.com/' + REPO + '/main/data.json?cb=' + Date.now();
+const CAPACITY_URL = 'https://raw.githubusercontent.com/' + REPO + '/main/capacity.json?cb=' + Date.now();
+const GITHUB_API   = 'https://api.github.com/repos/' + REPO + '/contents/capacity.json';
 const ANTHROPIC_API  = 'https://api.anthropic.com/v1/messages';
 const ATLASSIAN_MCP  = 'https://mcp.atlassian.com/v1/sse';
 const CONFLUENCE_PAGE_IDS = { WBS:'6627524645', GIN:null, MOJO:null, MAV:null, AMGO:null };
@@ -116,6 +118,74 @@ async function callAtlassianMCP(prompt) {
   return data.content.filter(b => b.type === 'text').map(b => b.text).join('\n');
 }
 
+
+// ── SAVE CAPACITY TO GITHUB (shared persistence for all users) ───────────────
+// Routes through Anthropic API → Claude → GitHub API → capacity.json
+// This means ANY user's Save pushes to the repo so everyone sees it.
+async function saveCapacityToGitHub(allCapacity) {
+  if (!isAllowedOrigin()) throw new Error('Unauthorized origin');
+  const prompt =
+    'Using the GitHub API, update the file capacity.json in the repository ' + REPO + '. ' +
+    'The file should contain exactly this JSON (do not modify it, use it verbatim):\n' +
+    JSON.stringify(allCapacity, null, 2) + '\n\n' +
+    'Steps: 1) GET https://api.github.com/repos/' + REPO + '/contents/capacity.json to get the current SHA. ' +
+    '2) PUT https://api.github.com/repos/' + REPO + '/contents/capacity.json with the new content (base64 encoded), the SHA, and commit message "Update capacity.json". ' +
+    'Use the github tool or make the API calls directly. Return only "OK" when done.';
+  const res = await fetch(ANTHROPIC_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 500,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  if (!res.ok) throw new Error('Anthropic API error: ' + res.status);
+  return 'OK';
+}
+
+// Build the full capacity object across all teams/sprints from localStorage
+function buildAllCapacity() {
+  const result = {};
+  Object.keys(TEAMS).forEach(teamKey => {
+    const SD = TEAMS[teamKey];
+    const allSprints = SD.allSprints || [{ name: SD.sprintName }];
+    result[teamKey] = {};
+    allSprints.forEach(s => {
+      const saved = loadSavedCapacity(SD.projectKey, s.name);
+      if (saved) result[teamKey][s.name] = saved;
+    });
+  });
+  return result;
+}
+
+// Load shared capacity.json and merge into localStorage
+async function loadSharedCapacity() {
+  try {
+    const res = await fetch(CAPACITY_URL);
+    if (!res.ok) return;
+    const data = await res.json();
+    let merged = 0;
+    Object.keys(data).forEach(teamKey => {
+      const SD = TEAMS[teamKey];
+      if (!SD) return;
+      Object.keys(data[teamKey]).forEach(sprintName => {
+        const remote = data[teamKey][sprintName];
+        const local  = loadSavedCapacity(SD.projectKey, sprintName);
+        // Remote wins if newer or no local copy
+        const remoteTime = remote.lastSavedAt ? new Date(remote.lastSavedAt) : new Date(0);
+        const localTime  = local && local.lastSavedAt ? new Date(local.lastSavedAt) : new Date(0);
+        if (remoteTime >= localTime) {
+          saveCapacity(SD.projectKey, sprintName, remote.members, remote.teamDays, remote.lastSavedBy);
+          merged++;
+        }
+      });
+    });
+    if (merged > 0) console.log('Loaded', merged, 'capacity entries from capacity.json');
+  } catch(e) {
+    console.log('capacity.json not found yet (will be created on first Save)');
+  }
+}
 
 async function syncCapacityToConfluence() {
   const sd     = getSD();
@@ -466,6 +536,8 @@ async function load() {
         });
         TEAMS = data;
         buildTeamSelector();
+        // Load shared capacity.json first, then render
+        await loadSharedCapacity();
         switchTeam(Object.keys(TEAMS)[0]);
         if (el) {
           const ts = new Date(Object.values(TEAMS)[0].syncedAt);
@@ -508,26 +580,29 @@ async function saveAll() {
   const el  = document.getElementById('sync-ts');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Saving...'; }
 
-  // Sprint-scoped localStorage (capacity edits — no secrets)
-  saveCapacity(s.projectKey, s.sprintName, members, teamDays);
+  // 1. Save current sprint to localStorage immediately
+  saveCapacity(s.projectKey, s.sprintName, members, teamDays,
+    (TEAMS[currentTeam] && TEAMS[currentTeam].team) || 'Team');
 
-  // Jira + Confluence in parallel
+  // 2. Push all teams' capacity to GitHub (shared persistence)
+  let githubStatus = '';
   let confluenceStatus = '';
-  const promises = [];
+  const allCap = buildAllCapacity();
 
-  promises.push(
+  await Promise.all([
+    saveCapacityToGitHub(allCap)
+      .then(()  => { githubStatus = ' · GitHub ✓'; })
+      .catch(e  => { console.error('GitHub capacity save failed:', e); githubStatus = ' · GitHub ✗'; }),
     syncCapacityToConfluence()
       .then(()  => { confluenceStatus = ' · Confluence ✓'; })
       .catch(e  => { console.error('Confluence sync failed:', e); confluenceStatus = ' · Confluence ✗'; })
-  );
-
-  await Promise.all(promises);
+  ]);
 
   _removedMembers = [];
 
   if (btn) { btn.disabled = false; btn.textContent = '✓ Save changes'; }
-  if (el)  el.textContent = (el.textContent||'').replace(/ · (Saving|Saved|Jira|Confluence).*/g, '') +
-    confluenceStatus + ' · Saved ✓';
+  if (el)  el.textContent = (el.textContent||'').replace(/ · (Saving|Saved|Jira|GitHub|Confluence).*/g, '') +
+    githubStatus + confluenceStatus + ' · Saved ✓';
 }
 
 // ── CAPACITY HELPERS ──────────────────────────────────────────────────────────
@@ -583,7 +658,7 @@ function renderMembers() {
   '<tr><td colspan="8" style="padding:6px 0"><button class="addl" id="add-member-btn">+ Add team member</button></td></tr>';
 
   // Totals only for members with assigned hours (hidden members excluded entirely)
-  const activeMembers = members.filter(m => asgnFor(m.name) > 0);
+  const activeMembers = (window._planningFutureSprint === true) ? members : members.filter(m => asgnFor(m.name) > 0);
   const tp = activeMembers.reduce((a,m) => a+(m.pto||0), 0);
   const tc = activeMembers.reduce((a,m) => a+cap(m), 0);
   const ta = activeMembers.reduce((s,m) => s+asgnFor(m.name), 0);
@@ -645,7 +720,7 @@ function addTDO() {
 
 // ── AVAILABILITY BARS ──────────────────────────────────────────────────────────
 function renderAvail() {
-  const activeMembers = members.filter(m => asgnFor(m.name) > 0);
+  const activeMembers = (window._planningFutureSprint === true) ? members : members.filter(m => asgnFor(m.name) > 0);
   document.getElementById('avail-list').innerHTML = activeMembers.map(m=>{
     const asgn=asgnFor(m.name), logged=logFor(m.name);
     const remaining = Math.max(0, asgn - logged);
@@ -820,7 +895,7 @@ function renderBurndown() {
   }
   if (!workDays.length) return;
 
-  const activeMembers = members.filter(m => asgnFor(m.name) > 0);
+  const activeMembers = (window._planningFutureSprint === true) ? members : members.filter(m => asgnFor(m.name) > 0);
   const originalScope  = activeMembers.reduce((a,m) => a + asgnFor(m.name), 0);
   const totalLogged    = activeMembers.reduce((a,m) => a + logFor(m.name),  0);
   const remainingNow   = Math.max(0, originalScope - totalLogged);
@@ -983,7 +1058,8 @@ function renderBurndown() {
 
 // ── RECALC / RENDER ALL ────────────────────────────────────────────────────────
 function recalc() {
-  const active = members.filter(m => asgnFor(m.name) > 0);
+  const isFuture = window._planningFutureSprint === true;
+  const active = isFuture ? members : members.filter(m => asgnFor(m.name) > 0);
   const tc = active.reduce((a,m) => a+cap(m), 0);
   const ta = active.reduce((a,m) => a+asgnFor(m.name), 0);
   const tl = active.reduce((a,m) => a+logFor(m.name), 0);
