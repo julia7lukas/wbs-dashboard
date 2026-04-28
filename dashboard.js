@@ -535,8 +535,8 @@ function wd()       { const v = parseInt(document.getElementById('work-days').va
 function hd()       { const v = parseInt(document.getElementById('hrs-day').value);  return Math.max(1, isNaN(v) ? 6  : v); }
 function tdo()      { return teamDays.length; }
 function cap(m)     { const domWd = parseInt(document.getElementById('work-days').value); const sd = getSD(); const days = (!isNaN(domWd) && domWd > 0) ? domWd : (sd && sd.workDays ? sd.workDays : 10); return Math.max(0, days-tdo()-(m.pto||0)) * (m.hrs||hd()); }
-function asgnFor(n) { const sd=getSD(); return sd&&sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).est||0    : 0; }
-function logFor(n)  { const sd=getSD(); return sd&&sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).logged||0 : 0; }
+function asgnFor(n) { if (window._planningFutureSprint) return 0; const sd=getSD(); return sd&&sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).est||0    : 0; }
+function logFor(n)  { if (window._planningFutureSprint) return 0; const sd=getSD(); return sd&&sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).logged||0 : 0; }
 
 
 function removeMember(i) {
@@ -578,9 +578,9 @@ function renderMembers() {
       '<td class="c" style="color:var(--blue)">'+asgn+'h</td>'+
       '<td class="c" style="color:var(--t2)">'+logged+'h</td>'+
       '<td class="c"><div style="font-size:12px;font-weight:600;color:'+remCol+'">'+remaining+'h</div></td>'+
-      '<td><button class="rb" onclick="removeMember('+i+')">×</button></td></tr>';
+      '<td><button class="rb" data-remove-idx="'+i+'">×</button></td></tr>';
   }).join('')+
-  '<tr><td colspan="8" style="padding:6px 0"><button class="addl" onclick="addMemberPrompt()">+ Add team member</button></td></tr>';
+  '<tr><td colspan="8" style="padding:6px 0"><button class="addl" id="add-member-btn">+ Add team member</button></td></tr>';
 
   // Totals only for members with assigned hours (hidden members excluded entirely)
   const activeMembers = members.filter(m => asgnFor(m.name) > 0);
@@ -589,6 +589,13 @@ function renderMembers() {
   const ta = activeMembers.reduce((s,m) => s+asgnFor(m.name), 0);
   const tl = activeMembers.reduce((s,m) => s+logFor(m.name), 0);
   const tr2 = Math.max(0, ta-tl);
+  // Attach event listeners (CSP blocks inline onclick)
+  tb.querySelectorAll('[data-remove-idx]').forEach(btn => {
+    btn.addEventListener('click', () => removeMember(+btn.dataset.removeIdx));
+  });
+  const addBtn = document.getElementById('add-member-btn');
+  if (addBtn) addBtn.addEventListener('click', addMemberPrompt);
+
   document.getElementById('t-pto').textContent = tp;
   document.getElementById('t-cap').textContent = tc+'h';
   const ea=document.getElementById('t-asgn'); if(ea) ea.textContent=ta+'h';
@@ -620,9 +627,12 @@ function renderTDO() {
       '<option '+(d.type==='Recharge'?'selected':'')+'>Recharge</option>'+
       '<option '+(d.type==='Company' ?'selected':'')+'>Company</option>'+
     '</select>'+
-    '<button class="rb" onclick="teamDays.splice('+i+',1);autoSave();renderTDO();recalc()">×</button></div>'
+    '<button class="rb" data-tdo-idx="'+i+'">×</button></div>'
   ).join('');
   document.getElementById('tdo-chip').textContent=teamDays.length+' day'+(teamDays.length!==1?'s':'');
+  document.getElementById('tdo-list').querySelectorAll('[data-tdo-idx]').forEach(btn => {
+    btn.addEventListener('click', () => { teamDays.splice(+btn.dataset.tdoIdx,1); autoSave(); renderTDO(); recalc(); });
+  });
 }
 function addTDO() {
   const s=document.getElementById('start-date').value||getSD().startDate;
