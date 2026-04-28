@@ -656,25 +656,25 @@ function renderSprintChips() {
   if (!SD) return;
   const allSprints = SD.allSprints || [{ name: SD.sprintName, startDate: SD.startDate, endDate: SD.endDate, state: 'active' }];
   const activePlanSprint = window._activePlanSprint || SD.sprintName;
-  container.innerHTML = allSprints.map((s, chipIdx) => {
+  const buttons = allSprints.map((s, chipIdx) => {
     const isSelected = s.name === activePlanSprint;
     const isActive   = s.state === 'active';
     const saved = loadSavedCapacity(SD.projectKey, s.name);
     const hasSaved = saved && saved.lastSavedBy;
-    return '<button onclick="onSprintChipClick(' + chipIdx + ')" style="'
-      + 'padding:4px 10px;font-size:11px;font-weight:600;border-radius:6px;cursor:pointer;border:1px solid;'
-      + 'font-family:var(--font);'
+    const btn = document.createElement('button');
+    btn.dataset.chipIdx = chipIdx;
+    btn.style.cssText = 'padding:4px 10px;font-size:11px;font-weight:600;border-radius:6px;cursor:pointer;border:1px solid;font-family:var(--font);'
       + (isSelected
           ? 'background:var(--green);color:#000;border-color:var(--green);'
           : isActive
             ? 'background:var(--bg3);color:var(--t1);border-color:var(--bdr2);'
-            : 'background:transparent;color:var(--t3);border-color:var(--bdr);opacity:.7;')
-      + '">'
-      + sanitize(s.name)
-      + (isActive ? ' · Active' : '')
-      + (hasSaved && !isActive ? ' ✓' : '')
-      + '</button>';
-  }).join('');
+            : 'background:transparent;color:var(--t3);border-color:var(--bdr);opacity:.7;');
+    btn.textContent = s.name + (isActive ? ' · Active' : '') + (hasSaved && !isActive ? ' ✓' : '');
+    btn.addEventListener('click', function() { onSprintChipClick(chipIdx); });
+    return btn;
+  });
+  container.innerHTML = '';
+  buttons.forEach(b => container.appendChild(b));
 }
 
 function onSprintChipClick(idx) {
