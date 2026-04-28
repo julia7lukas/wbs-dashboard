@@ -7,7 +7,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T13:28:10.601793+00:00",
+    "syncedAt": "2026-04-28T17:29:49.631086+00:00",
     "members": [
       {
         "name": "Julia Lukas",
@@ -87,8 +87,8 @@
         "assignee": "Unassigned",
         "status": "In Progress",
         "est": 60,
-        "logged": 57,
-        "subtasks": "WBS-77 (Yudong He, 12h est, 11h logged), WBS-69 (Julia Lukas, 4h est, 2h logged), WBS-68 (Suvarna Damarla, 12h est, 6h logged), WBS-67 (Yudong He, 16h est, 19h logged), WBS-53 (Julia Lukas, 16h est, 19h logged)",
+        "logged": 60,
+        "subtasks": "WBS-77 (Yudong He, 12h est, 11h logged), WBS-69 (Julia Lukas, 4h est, 2h logged), WBS-68 (Suvarna Damarla, 12h est, 6h logged), WBS-67 (Yudong He, 16h est, 19h logged), WBS-53 (Julia Lukas, 16h est, 22h logged)",
         "points": 0
       },
       {
@@ -117,8 +117,8 @@
         "key": "WBS-39",
         "type": "Story",
         "summary": "PractPerf Single EOB - Spike - Research to gain an understanding of the requirements",
-        "assignee": "Unassigned",
-        "status": "In Progress",
+        "assignee": "Julia Lukas",
+        "status": "Done",
         "est": 20,
         "logged": 7,
         "subtasks": "WBS-61 (Suvarna Damarla, 12h est, 7h logged), WBS-60 (Jeremy Goodman, 8h est, 0h logged)",
@@ -158,7 +158,7 @@
       },
       "Julia Lukas": {
         "est": 29,
-        "logged": 26
+        "logged": 29
       },
       "Suvarna Damarla": {
         "est": 36,
@@ -222,7 +222,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T13:28:13.150797+00:00",
+    "syncedAt": "2026-04-28T17:29:52.323796+00:00",
     "members": [
       {
         "name": "Adam Rossman",
@@ -318,9 +318,9 @@
         "summary": "CCL - Automate the Rest",
         "assignee": "Michael Earley",
         "status": "Open",
-        "est": 66,
+        "est": 62,
         "logged": 29,
-        "subtasks": "GIN-83 (John Coniff, 8h est, 0h logged), GIN-82 (John Coniff, 6h est, 3h logged), GIN-81 (John Coniff, 16h est, 0h logged), GIN-80 (Michael Earley, 10h est, 0h logged), GIN-79 (Michael Earley, 10h est, 10h logged), GIN-78 (Michael Earley, 16h est, 16h logged)",
+        "subtasks": "GIN-83 (Joel Wheeler, 8h est, 0h logged), GIN-82 (John Coniff, 6h est, 3h logged), GIN-81 (John Coniff, 16h est, 0h logged), GIN-80 (Michael Earley, 6h est, 0h logged), GIN-79 (Michael Earley, 10h est, 10h logged), GIN-78 (Michael Earley, 16h est, 16h logged)",
         "points": 0
       },
       {
@@ -341,15 +341,15 @@
         "logged": 33
       },
       "Joel Wheeler": {
-        "est": 33,
+        "est": 41,
         "logged": 30
       },
       "John Coniff": {
-        "est": 30,
+        "est": 22,
         "logged": 3
       },
       "Michael Earley": {
-        "est": 45,
+        "est": 41,
         "logged": 35
       }
     },
@@ -406,7 +406,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T13:28:15.592237+00:00",
+    "syncedAt": "2026-04-28T17:29:54.841960+00:00",
     "members": [
       {
         "name": "Mike Jessen",
@@ -438,8 +438,8 @@
         "assignee": "Unassigned",
         "status": "In Progress",
         "est": 31,
-        "logged": 5,
-        "subtasks": "MOJO-71 (Serguei Pozdniakov, 9h est, 0h logged), MOJO-70 (Serguei Pozdniakov, 6h est, 0h logged), MOJO-69 (Mike Jessen, 1h est, 0h logged), MOJO-68 (Ilya Dyakov, 15h est, 5h logged)",
+        "logged": 6,
+        "subtasks": "MOJO-71 (Serguei Pozdniakov, 9h est, 0h logged), MOJO-70 (Serguei Pozdniakov, 6h est, 0h logged), MOJO-69 (Mike Jessen, 1h est, 1h logged), MOJO-68 (Ilya Dyakov, 15h est, 5h logged)",
         "points": 0
       },
       {
@@ -449,8 +449,8 @@
         "assignee": "Unassigned",
         "status": "In Progress",
         "est": 37,
-        "logged": 37,
-        "subtasks": "MOJO-67 (Serguei Pozdniakov, 9h est, 2h logged), MOJO-66 (Serguei Pozdniakov, 9h est, 6h logged), MOJO-65 (Mike Jessen, 1h est, 0h logged), MOJO-64 (Ilya Dyakov, 18h est, 29h logged)",
+        "logged": 47,
+        "subtasks": "MOJO-67 (Serguei Pozdniakov, 9h est, 8h logged), MOJO-66 (Serguei Pozdniakov, 9h est, 9h logged), MOJO-65 (Mike Jessen, 1h est, 1h logged), MOJO-64 (Ilya Dyakov, 18h est, 29h logged)",
         "points": 0
       },
       {
@@ -471,8 +471,8 @@
         "assignee": "Unassigned",
         "status": "In Progress",
         "est": 6,
-        "logged": 3,
-        "subtasks": "MOJO-60 (Ilya Dyakov, 6h est, 3h logged)",
+        "logged": 4,
+        "subtasks": "MOJO-60 (Ilya Dyakov, 6h est, 4h logged)",
         "points": 0
       },
       {
@@ -482,8 +482,8 @@
         "assignee": "Unassigned",
         "status": "In Progress",
         "est": 12,
-        "logged": 7,
-        "subtasks": "MOJO-35 (Mike Jessen, 12h est, 7h logged)",
+        "logged": 12,
+        "subtasks": "MOJO-35 (Mike Jessen, 12h est, 12h logged)",
         "points": 0
       },
       {
@@ -501,15 +501,15 @@
     "subtaskHrs": {
       "Ilya Dyakov": {
         "est": 40,
-        "logged": 38
+        "logged": 39
       },
       "Mike Jessen": {
         "est": 41,
-        "logged": 36
+        "logged": 43
       },
       "Serguei Pozdniakov": {
         "est": 51,
-        "logged": 26
+        "logged": 35
       }
     },
     "allSprints": [
@@ -565,7 +565,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T13:28:17.928506+00:00",
+    "syncedAt": "2026-04-28T17:29:56.835026+00:00",
     "members": [
       {
         "name": "Peter Lobo",
@@ -719,8 +719,8 @@
         "assignee": "Kumaraswamy Krishnan",
         "status": "In Progress",
         "est": 14,
-        "logged": 6,
-        "subtasks": "MAV-78 (Kumaraswamy Krishnan, 12h est, 6h logged), MAV-72 (Chethan Rangaswamy, 2h est, 0h logged)",
+        "logged": 12,
+        "subtasks": "MAV-78 (Kumaraswamy Krishnan, 12h est, 12h logged), MAV-72 (Chethan Rangaswamy, 2h est, 0h logged)",
         "points": 0
       },
       {
@@ -753,7 +753,7 @@
       },
       "Kumaraswamy Krishnan": {
         "est": 34,
-        "logged": 16
+        "logged": 22
       },
       "Muthu Kumaran": {
         "est": 16,
@@ -825,7 +825,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T13:28:20.371794+00:00",
+    "syncedAt": "2026-04-28T17:29:59.114327+00:00",
     "members": [
       {
         "name": "Peter Lobo",
