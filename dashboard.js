@@ -658,7 +658,7 @@ function renderMembers() {
     // Util = logged vs capacity (actual progress)
     // Remaining is amber when hours left, green when done
     const remCol = remaining > 0 ? 'var(--amber)' : 'var(--green)';
-    return '<tr class="dr">'+
+    return '<tr class="dr" data-member-idx="'+i+'">'+
       '<td><div class="mc"><div class="av" style="background:'+AVB[i%8]+';color:'+AVC[i%8]+'">'+ini(m.name)+'</div>'+
       '<input style="background:transparent;border:none;color:var(--t1);font-family:var(--font);font-size:13px;width:130px" value="'+sanitize(m.name)+'" data-name-idx="'+i+'"></div></td>'+
       '<td class="c"><input class="ni" type="number" min="1" max="12" value="'+(m.hrs||hd())+'" data-hrs-idx="'+i+'"></td>'+
