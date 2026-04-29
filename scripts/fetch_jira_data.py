@@ -11,7 +11,7 @@ Sprint boundary behavior:
 """
 
 import os, json, math, requests
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from requests.auth import HTTPBasicAuth
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
@@ -142,6 +142,22 @@ def get_sprints(project_key):
     except Exception as e:
         print(f'  Error fetching sprints for {project_key}: {e}')
         return None, []
+
+def _parse_sprint_end(end_raw):
+    """
+    Jira stores sprint end as midnight UTC of the *next* day, e.g. a sprint
+    ending May 13 is stored as 2026-05-14T04:00:00.000Z.
+    If the time component is before noon UTC we subtract one day.
+    """
+    if not end_raw:
+        return ''
+    try:
+        dt = datetime.fromisoformat(end_raw.replace('Z', '+00:00'))
+        if dt.hour < 12:
+            dt -= timedelta(days=1)
+        return dt.strftime('%Y-%m-%d')
+    except Exception:
+        return end_raw[:10]
 
 def get_sprint_issues(project_key):
     jql = (f'project = {project_key} AND sprint in openSprints() '
@@ -290,13 +306,13 @@ def process_team(key, config, existing, capacity={}):
 
     sprint_name = sprint.get('name', f'{key} Active Sprint')
     start_date  = sprint.get('startDate', '')[:10]
-    end_date    = sprint.get('endDate',   '')[:10]
+    end_date    = _parse_sprint_end(sprint.get('endDate', ''))
 
     all_sprints_data = [
         {
             'name':      s.get('name', ''),
             'startDate': s.get('startDate', '')[:10],
-            'endDate':   s.get('endDate', '')[:10],
+            'endDate':   _parse_sprint_end(s.get('endDate', '')),
             'state':     s.get('state', 'future'),
             'id':        s.get('id')
         }
