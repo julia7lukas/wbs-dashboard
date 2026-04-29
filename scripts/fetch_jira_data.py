@@ -120,14 +120,12 @@ def get_sprints(project_key):
             return None, []
         board_id = boards['values'][0]['id']
 
-        # Fetch active sprints
         active = requests.get(
             f'{JIRA_BASE}/rest/agile/1.0/board/{board_id}/sprint',
             auth=AUTH, headers=HEADERS,
             params={'state': 'active'}
         ).json().get('values', [])
 
-        # Fetch future sprints
         future = requests.get(
             f'{JIRA_BASE}/rest/agile/1.0/board/{board_id}/sprint',
             auth=AUTH, headers=HEADERS,
@@ -145,11 +143,6 @@ def get_sprints(project_key):
         print(f'  Error fetching sprints for {project_key}: {e}')
         return None, []
 
-def get_active_sprint(project_key):
-    """Legacy wrapper — returns active sprint only."""
-    sprint, _ = get_sprints(project_key)
-    return sprint
-
 def get_sprint_issues(project_key):
     jql = (f'project = {project_key} AND sprint in openSprints() '
            f'AND issuetype not in subTaskIssueTypes() ORDER BY created DESC')
@@ -159,17 +152,19 @@ def get_sprint_issues(project_key):
         'timeoriginalestimate,timespent,customfield_10016')
 
 def get_sprint_subtasks(project_key):
-    """Get all issues/subtasks in the sprint with time data."""
+    """Get all subtasks in the sprint with time data."""
     jql = (f'project = {project_key} AND sprint in openSprints() '
            f'AND issuetype in subTaskIssueTypes() ORDER BY created DESC')
+    # FIX: include aggregate fields — Jira stores hours on aggregatetimeoriginalestimate
     return fetch_all_jql(jql,
-        'assignee,timeoriginalestimate,timespent,status,parent,summary')
+        'assignee,timeoriginalestimate,timespent,'
+        'aggregatetimeoriginalestimate,aggregatetimespent,'
+        'status,parent,summary')
 
 def get_all_assigned_hours(project_key):
     """
     Query ALL issues in the sprint by assignee to capture hours regardless
     of whether they are logged on subtasks or parent issues.
-    This is the most accurate way to get per-member hours.
     """
     jql = (f'project = {project_key} AND sprint in openSprints() '
            f'AND assignee is not EMPTY ORDER BY assignee ASC')
@@ -178,19 +173,13 @@ def get_all_assigned_hours(project_key):
         'aggregatetimespent,issuetype,summary,status')
 
 def build_subtask_hrs_from_parents(parent_issues):
-    """
-    Build per-member hour totals from PARENT issue aggregate fields.
-    This is correct for Jira setups where time is logged on parent issues
-    (aggregatetimeoriginalestimate / aggregatetimespent) rather than subtasks.
-    Falls back to subtask-level fields only if parent has no aggregate data.
-    """
+    """Build per-member hour totals from PARENT issue aggregate fields."""
     hrs = {}
     for iss in parent_issues:
         f    = iss['fields']
         name = (f.get('assignee') or {}).get('displayName', 'Unassigned')
         if name == 'Unassigned':
-            continue  # skip unassigned — won't show on dashboard anyway
-        # Prefer aggregate (rolls up subtask hours), fall back to direct fields
+            continue
         est = secs_to_hrs(f.get('aggregatetimeoriginalestimate') or f.get('timeoriginalestimate'))
         log = secs_to_hrs(f.get('aggregatetimespent') or f.get('timespent'))
         if est == 0 and log == 0:
@@ -201,25 +190,12 @@ def build_subtask_hrs_from_parents(parent_issues):
         hrs[name]['logged'] += log
     return hrs
 
-def build_subtask_hrs(subtasks):
-    """Legacy: subtask-level time tracking. Used only if subtasks have time data."""
-    hrs = {}
-    for st in subtasks:
-        f    = st['fields']
-        name = (f.get('assignee') or {}).get('displayName', 'Unassigned')
-        est  = secs_to_hrs(f.get('timeoriginalestimate'))
-        log  = secs_to_hrs(f.get('timespent'))
-        if name not in hrs:
-            hrs[name] = {'est': 0, 'logged': 0}
-        hrs[name]['est']    += est
-        hrs[name]['logged'] += log
-    return hrs
-
 def build_hours_by_assignee(all_issues):
     """
     Build per-member hour totals from subtasks only.
     Subtasks are the single source of truth — parent issues roll up from subtasks
-    so including both would double-count. Hours are on the subtask direct fields.
+    so including both would double-count.
+    FIX: use aggregatetimeoriginalestimate which is what Jira actually returns.
     """
     hrs = {}
     for iss in all_issues:
@@ -228,8 +204,9 @@ def build_hours_by_assignee(all_issues):
         if not f.get('issuetype', {}).get('subtask', False):
             continue
         name = (f.get('assignee') or {}).get('displayName', 'Unassigned')
-        est = secs_to_hrs(f.get('timeoriginalestimate'))
-        log = secs_to_hrs(f.get('timespent'))
+        # FIX: prefer aggregate fields, fall back to direct fields
+        est = secs_to_hrs(f.get('aggregatetimeoriginalestimate') or f.get('timeoriginalestimate'))
+        log = secs_to_hrs(f.get('aggregatetimespent') or f.get('timespent'))
         if est == 0 and log == 0:
             continue
         if name not in hrs:
@@ -242,8 +219,9 @@ def build_subtask_map(subtasks):
     parent_map = {}
     for st in subtasks:
         f          = st['fields']
-        est        = secs_to_hrs(f.get('timeoriginalestimate'))
-        log        = secs_to_hrs(f.get('timespent'))
+        # FIX: use aggregate fields for hour display in subtask map too
+        est        = secs_to_hrs(f.get('aggregatetimeoriginalestimate') or f.get('timeoriginalestimate'))
+        log        = secs_to_hrs(f.get('aggregatetimespent') or f.get('timespent'))
         parent_key = (f.get('parent') or {}).get('key', '')
         if not parent_key or (est == 0 and log == 0): continue
         assignee   = (f.get('assignee') or {}).get('displayName', 'Unassigned')
@@ -278,7 +256,6 @@ def merge(fresh, saved_team, new_sprint_name, planned_capacity={}):
     New sprint   → load from capacity.json if Scrum Master planned it; else defaults
     No saved     → use fresh defaults
     """
-    # Check capacity.json for pre-planned capacity for this sprint
     planned = planned_capacity.get(new_sprint_name)
     if planned:
         print(f'  Found pre-planned capacity for {new_sprint_name} in capacity.json')
@@ -293,13 +270,11 @@ def merge(fresh, saved_team, new_sprint_name, planned_capacity={}):
     saved_sprint = saved_team.get('sprintName', '')
 
     if saved_sprint == new_sprint_name:
-        # Same sprint — preserve everything the team edited
         print(f'  Same sprint ({new_sprint_name}) — preserving saved edits')
         fresh['members']  = saved_team.get('members',  fresh['members'])
         fresh['teamDays'] = saved_team.get('teamDays', fresh['teamDays'])
         return fresh
 
-    # New sprint with no planned capacity — use defaults
     print(f'  New sprint detected: {saved_sprint} → {new_sprint_name} (no planned capacity found)')
     fresh['members']  = fresh['members']  # default 6h/day, 0 PTO
     fresh['teamDays'] = []
@@ -317,7 +292,6 @@ def process_team(key, config, existing, capacity={}):
     start_date  = sprint.get('startDate', '')[:10]
     end_date    = sprint.get('endDate',   '')[:10]
 
-    # Build sprint list for planning dropdown
     all_sprints_data = [
         {
             'name':      s.get('name', ''),
@@ -333,14 +307,13 @@ def process_team(key, config, existing, capacity={}):
     subtasks    = get_sprint_subtasks(key)
     subtask_map = build_subtask_map(subtasks)
     issues      = format_issues(raw_issues, subtask_map)
-    # Query all assigned issues to get accurate per-member hours
-    # This captures hours whether logged on subtasks OR parent issues
+
     all_assigned = get_all_assigned_hours(key)
-    subtask_hrs = build_hours_by_assignee(all_assigned)
+    subtask_hrs  = build_hours_by_assignee(all_assigned)
+
     total_est = sum(v['est'] for v in subtask_hrs.values())
     total_log = sum(v['logged'] for v in subtask_hrs.values())
     print(f'  Hours by assignee: {total_est}h est, {total_log}h logged across {len(subtask_hrs)} members')
-
     print(f'  Sprint: {sprint_name} | Issues: {len(issues)} | Subtasks: {len(subtasks)}')
 
     default_members = [
@@ -391,7 +364,6 @@ def main():
         if result:
             output[key] = result
         else:
-            # No active sprint — keep previous data so dashboard doesn't go blank
             if key in existing:
                 print(f'  Keeping previous data for {key} (no active sprint)')
                 output[key] = existing[key]
@@ -399,7 +371,6 @@ def main():
     with open('data.json', 'w') as f:
         json.dump(output, f, indent=2)
 
-    # Write env.js with scoped GitHub token for capacity.json saves from browser
     gh_token = os.environ.get('GH_CAPACITY_TOKEN', '')
     with open('env.js', 'w') as f:
         f.write(f'window.__ENV__ = {{ GH_TOKEN: "{gh_token}" }};\n')
