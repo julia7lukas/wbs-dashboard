@@ -5,7 +5,7 @@
 // On Save: changes persist to localStorage, Jira, and Confluence.
 // GitHub data.json is updated only by the daily Action — never from the browser.
 const REPO     = 'julia7lukas/wbs-dashboard';
-const DATA_URL     = 'https://raw.githubusercontent.com/' + REPO + '/main/data.json?cb=' + Date.now();
+const DATA_URL = 'https://julia7lukas.github.io/wbs-dashboard/data.json?cb=' + Date.now();
 const CAPACITY_URL = 'https://raw.githubusercontent.com/' + REPO + '/main/capacity.json?cb=' + Date.now();
 const GITHUB_API   = 'https://api.github.com/repos/' + REPO + '/contents/capacity.json';
 const ANTHROPIC_API  = 'https://api.anthropic.com/v1/messages';
@@ -294,7 +294,7 @@ async function load() {
   const el = document.getElementById('sync-ts');
   if (el) el.textContent = 'Loading sprint data...';
   try {
-    const res = await fetch(DATA_URL);
+    const res = await fetch(DATA_URL, { cache: 'no-store' });
     if (res.ok) {
       const data = await res.json();
       if (data && Object.keys(data).length > 0) {
