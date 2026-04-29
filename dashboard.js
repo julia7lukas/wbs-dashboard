@@ -124,23 +124,28 @@ async function callAtlassianMCP(prompt) {
 // This means ANY user's Save pushes to the repo so everyone sees it.
 async function saveCapacityToGitHub(allCapacity) {
   if (!isAllowedOrigin()) throw new Error('Unauthorized origin');
-  const prompt =
-    'Using the GitHub API, update the file capacity.json in the repository ' + REPO + '. ' +
-    'The file should contain exactly this JSON (do not modify it, use it verbatim):\n' +
-    JSON.stringify(allCapacity, null, 2) + '\n\n' +
-    'Steps: 1) GET https://api.github.com/repos/' + REPO + '/contents/capacity.json to get the current SHA. ' +
-    '2) PUT https://api.github.com/repos/' + REPO + '/contents/capacity.json with the new content (base64 encoded), the SHA, and commit message "Update capacity.json". ' +
-    'Use the github tool or make the API calls directly. Return only "OK" when done.';
-  const res = await fetch(ANTHROPIC_API, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 500,
-      messages: [{ role: 'user', content: prompt }]
-    })
+  // Get token from env.js (written by GitHub Action, read-only scoped to this repo)
+  const token = (window.__ENV__ && window.__ENV__.GH_TOKEN) || '';
+  if (!token) {
+    console.warn('No GH_TOKEN in env.js — capacity.json not saved to GitHub');
+    throw new Error('No GitHub token available');
+  }
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(allCapacity, null, 2))));
+  // Get current SHA first
+  const getRes = await fetch('https://api.github.com/repos/' + REPO + '/contents/capacity.json', {
+    headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
   });
-  if (!res.ok) throw new Error('Anthropic API error: ' + res.status);
+  const sha = getRes.ok ? (await getRes.json()).sha : undefined;
+  // Write new content
+  const putRes = await fetch('https://api.github.com/repos/' + REPO + '/contents/capacity.json', {
+    method: 'PUT',
+    headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: 'Update capacity.json', content, ...(sha ? { sha } : {}) })
+  });
+  if (!putRes.ok) {
+    const err = await putRes.json();
+    throw new Error('GitHub API error: ' + (err.message || putRes.status));
+  }
   return 'OK';
 }
 
@@ -215,7 +220,7 @@ function switchTeam(key) {
   if (!TEAMS[key]) return;
   currentTeam = key;
   const SD = TEAMS[key];
-  purgeStaleCaches(SD.projectKey, SD.sprintName);
+  // Don't purge — keep all sprint caches so future sprint edits persist
   const saved = loadSavedCapacity(SD.projectKey, SD.sprintName);
   if (saved) {
     const savedMap = Object.fromEntries(saved.members.map(m => [m.name, m]));
@@ -349,8 +354,9 @@ async function saveAll() {
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Saving...'; }
 
   // 1. Save current sprint to localStorage immediately
-  saveCapacity(s.projectKey, s.sprintName, members, teamDays,
-    (TEAMS[currentTeam] && TEAMS[currentTeam].team) || 'Team');
+  const displayedSprint = (document.getElementById('sprint-name') && document.getElementById('sprint-name').value) || s.sprintName;
+  const savedBy = (TEAMS[currentTeam] && TEAMS[currentTeam].team) || 'Team';
+  saveCapacity(s.projectKey, displayedSprint, members, teamDays, savedBy);
 
   // 2. Push all teams' capacity to GitHub (shared persistence)
   let githubStatus = '';
@@ -497,7 +503,10 @@ function renderMembers() {
 function autoSave(savedBy) {
   const s = getSD();
   if (!s) return;
-  saveCapacity(s.projectKey, s.sprintName, members, teamDays, savedBy);
+  // Use displayed sprint name (may be a future sprint) not active sprint
+  const displayedSprint = (document.getElementById('sprint-name') && document.getElementById('sprint-name').value) || s.sprintName;
+  const by = savedBy || (TEAMS[currentTeam] && TEAMS[currentTeam].team) || 'Team';
+  saveCapacity(s.projectKey, displayedSprint, members, teamDays, by);
 }
 
 // ── RENDER TEAM DAYS OFF ───────────────────────────────────────────────────────

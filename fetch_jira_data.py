@@ -399,6 +399,12 @@ def main():
     with open('data.json', 'w') as f:
         json.dump(output, f, indent=2)
 
+    # Write env.js with scoped GitHub token for capacity.json saves from browser
+    gh_token = os.environ.get('GH_CAPACITY_TOKEN', '')
+    with open('env.js', 'w') as f:
+        f.write(f'window.__ENV__ = {{ GH_TOKEN: "{gh_token}" }};\n')
+    print(f'env.js written (token: {"set" if gh_token else "not set"})')
+
     print(f'\n✅ data.json written — {len(output)} team(s): {", ".join(output.keys())}')
 
 
