@@ -20,7 +20,25 @@ AUTH      = HTTPBasicAuth(os.environ['JIRA_EMAIL'], os.environ['JIRA_API_TOKEN']
 HEADERS   = {'Accept': 'application/json'}
 
 HRS_PER_DAY  = 6
-WORKING_DAYS = 10
+WORKING_DAYS = 10  # fallback only
+
+def calc_working_days(start_str, end_str):
+    """Count working days (Mon-Fri) between two date strings inclusive."""
+    from datetime import date, timedelta
+    if not start_str or not end_str:
+        return WORKING_DAYS
+    try:
+        s = date.fromisoformat(start_str[:10])
+        e = date.fromisoformat(end_str[:10])
+        count = 0
+        cur = s
+        while cur <= e:
+            if cur.weekday() < 5:
+                count += 1
+            cur += timedelta(days=1)
+        return count if count > 0 else WORKING_DAYS
+    except Exception:
+        return WORKING_DAYS
 
 # Default rosters — used only on first ever run per team (no existing data.json)
 DEFAULT_ROSTERS = {
@@ -254,12 +272,20 @@ def format_issues(raw_issues, subtask_map):
     return out
 
 # ── SPRINT BOUNDARY MERGE ─────────────────────────────────────────────────────
-def merge(fresh, saved_team, new_sprint_name):
+def merge(fresh, saved_team, new_sprint_name, planned_capacity={}):
     """
     Same sprint  → preserve all saved capacity edits (members, hrs/day, PTO, teamDays)
-    New sprint   → carry over member list + hrs/day only; fresh PTO + teamDays
+    New sprint   → load from capacity.json if Scrum Master planned it; else defaults
     No saved     → use fresh defaults
     """
+    # Check capacity.json for pre-planned capacity for this sprint
+    planned = planned_capacity.get(new_sprint_name)
+    if planned:
+        print(f'  Found pre-planned capacity for {new_sprint_name} in capacity.json')
+        fresh['members']  = planned.get('members',  fresh['members'])
+        fresh['teamDays'] = planned.get('teamDays', [])
+        return fresh
+
     if not saved_team:
         print(f'  No previous data — using defaults')
         return fresh
@@ -273,20 +299,15 @@ def merge(fresh, saved_team, new_sprint_name):
         fresh['teamDays'] = saved_team.get('teamDays', fresh['teamDays'])
         return fresh
 
-    # New sprint — carry over member list + hrs/day, reset PTO + teamDays
-    print(f'  New sprint detected: {saved_sprint} → {new_sprint_name}')
-    print(f'  Carrying over member list + hrs/day, resetting PTO + team days off')
-
-    # New sprint = fresh start for capacity planning.
-    # Capacity is set during sprint planning, not carried over.
-    # Default roster from Jira assignees, 6h/day, 0 PTO — team fills in during planning.
-    fresh['members']  = fresh['members']  # use default roster (6h/day, 0 PTO)
+    # New sprint with no planned capacity — use defaults
+    print(f'  New sprint detected: {saved_sprint} → {new_sprint_name} (no planned capacity found)')
+    fresh['members']  = fresh['members']  # default 6h/day, 0 PTO
     fresh['teamDays'] = []
     return fresh
 
 
 # ── MAIN ─────────────────────────────────────────────────────────────────────
-def process_team(key, config, existing):
+def process_team(key, config, existing, capacity={}):
     print(f'\nProcessing {key} ({config["team"]})...')
     sprint, all_sprints = get_sprints(key)
     if not sprint:
@@ -333,7 +354,7 @@ def process_team(key, config, existing):
         'sprintName': sprint_name,
         'startDate':  start_date,
         'endDate':    end_date,
-        'workDays':   WORKING_DAYS,
+        'workDays':   calc_working_days(start_date, end_date),
         'hrsPerDay':  HRS_PER_DAY,
         'syncedAt':   datetime.now(timezone.utc).isoformat(),
         'members':    default_members,
@@ -343,16 +364,30 @@ def process_team(key, config, existing):
         'allSprints':  all_sprints_data,
     }
 
-    return merge(fresh, existing.get(key), sprint_name)
+    return merge(fresh, existing.get(key), sprint_name, capacity.get(key, {}))
+
+
+def load_capacity_json():
+    """Load shared capacity.json — contains planned capacity per team per sprint."""
+    try:
+        if os.path.exists('capacity.json'):
+            with open('capacity.json') as f:
+                data = json.load(f)
+            print(f'Loaded capacity.json for teams: {list(data.keys())}')
+            return data
+    except Exception as e:
+        print(f'Could not load capacity.json: {e}')
+    return {}
 
 
 def main():
     existing = load_existing()
     print(f'Loaded existing data for teams: {list(existing.keys()) or "none"}')
+    capacity = load_capacity_json()
 
     output = {}
     for key, config in DEFAULT_ROSTERS.items():
-        result = process_team(key, config, existing)
+        result = process_team(key, config, existing, capacity)
         if result:
             output[key] = result
         else:
@@ -363,6 +398,12 @@ def main():
 
     with open('data.json', 'w') as f:
         json.dump(output, f, indent=2)
+
+    # Write env.js with scoped GitHub token for capacity.json saves from browser
+    gh_token = os.environ.get('GH_CAPACITY_TOKEN', '')
+    with open('env.js', 'w') as f:
+        f.write(f'window.__ENV__ = {{ GH_TOKEN: "{gh_token}" }};\n')
+    print(f'env.js written (token: {"set" if gh_token else "not set"})')
 
     print(f'\n✅ data.json written — {len(output)} team(s): {", ".join(output.keys())}')
 
