@@ -235,11 +235,7 @@ function switchTeam(key) {
   document.getElementById('end-date').value          = SD.endDate;
   document.getElementById('work-days').value         = SD.workDays;
   document.getElementById('hrs-day').value           = SD.hrsPerDay;
-  // Active sprint — lock dates to Jira values, no manual editing
-  ['start-date','end-date','sprint-name','work-days'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) { el.readOnly = true; el.style.opacity = '.6'; el.style.cursor = 'default'; }
-  });
+
   const ts = new Date(SD.syncedAt);
   document.getElementById('sync-ts').textContent = 'Jira sync: ' +
     ts.toLocaleDateString('en-US', {timeZone:'America/Chicago'}) + ' ' +
@@ -853,11 +849,7 @@ function onSprintChipClick(idx) {
     document.getElementById('end-date').value   = SD.endDate;
     document.getElementById('sprint-name').value = SD.sprintName;
     document.getElementById('hdr-sprint').textContent = SD.sprintName;
-    // Lock dates for active sprint
-    ['start-date','end-date','sprint-name','work-days'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) { el.readOnly = true; el.style.opacity = '.6'; el.style.cursor = 'default'; }
-    });
+
   } else {
     // Future sprint — load saved or defaults, show all roster members for planning
     const saved = loadSavedCapacity(SD.projectKey, sprintName);
@@ -872,11 +864,7 @@ function onSprintChipClick(idx) {
     document.getElementById('end-date').value   = sel.endDate;
     document.getElementById('sprint-name').value = sel.name;
     document.getElementById('hdr-sprint').textContent = sel.name;
-    // Unlock dates for future sprint planning
-    ['start-date','end-date','sprint-name','work-days'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) { el.readOnly = false; el.style.opacity = '1'; el.style.cursor = ''; }
-    });
+
   }
   renderSprintChips();
   renderAll();
@@ -1150,7 +1138,17 @@ function recalc() {
   renderMembers(); renderAvail(); renderCal(); renderBurndown(); renderEffort(); renderSprintChips();
 }
 
-function renderAll() { renderTDO(); recalc(); }
+function lockActiveSprint() {
+  const isActive = !window._planningFutureSprint;
+  ['start-date','end-date','sprint-name','work-days'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.readOnly = isActive;
+    el.style.opacity = isActive ? '.6' : '1';
+    el.style.cursor  = isActive ? 'default' : '';
+  });
+}
+function renderAll() { renderTDO(); recalc(); lockActiveSprint(); }
 
 async function refreshFromJira() {
   const btn=document.getElementById('refresh-btn');
