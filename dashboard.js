@@ -235,6 +235,11 @@ function switchTeam(key) {
   document.getElementById('end-date').value          = SD.endDate;
   document.getElementById('work-days').value         = SD.workDays;
   document.getElementById('hrs-day').value           = SD.hrsPerDay;
+  // Active sprint — lock dates to Jira values, no manual editing
+  ['start-date','end-date','sprint-name','work-days'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.readOnly = true; el.style.opacity = '.6'; el.style.cursor = 'default'; }
+  });
   const ts = new Date(SD.syncedAt);
   document.getElementById('sync-ts').textContent = 'Jira sync: ' +
     ts.toLocaleDateString('en-US', {timeZone:'America/Chicago'}) + ' ' +
@@ -776,7 +781,12 @@ function addTDO() {
 
 // ── AVAILABILITY BARS ──────────────────────────────────────────────────────────
 function renderAvail() {
-  const activeMembers = (window._planningFutureSprint === true) ? members : members.filter(m => asgnFor(m.name) > 0);
+  const avail = document.getElementById('avail-list');
+  if (window._planningFutureSprint === true) {
+    avail.innerHTML = '<div style="color:var(--t3);font-size:12px;padding:20px 0;text-align:center">No tasks assigned yet — sprint hasn\'t started</div>';
+    return;
+  }
+  const activeMembers = members.filter(m => asgnFor(m.name) > 0);
   document.getElementById('avail-list').innerHTML = activeMembers.map(m=>{
     const asgn=asgnFor(m.name), logged=logFor(m.name);
     const remaining = Math.max(0, asgn - logged);
@@ -843,6 +853,11 @@ function onSprintChipClick(idx) {
     document.getElementById('end-date').value   = SD.endDate;
     document.getElementById('sprint-name').value = SD.sprintName;
     document.getElementById('hdr-sprint').textContent = SD.sprintName;
+    // Lock dates for active sprint
+    ['start-date','end-date','sprint-name','work-days'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.readOnly = true; el.style.opacity = '.6'; el.style.cursor = 'default'; }
+    });
   } else {
     // Future sprint — load saved or defaults, show all roster members for planning
     const saved = loadSavedCapacity(SD.projectKey, sprintName);
@@ -857,6 +872,11 @@ function onSprintChipClick(idx) {
     document.getElementById('end-date').value   = sel.endDate;
     document.getElementById('sprint-name').value = sel.name;
     document.getElementById('hdr-sprint').textContent = sel.name;
+    // Unlock dates for future sprint planning
+    ['start-date','end-date','sprint-name','work-days'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.readOnly = false; el.style.opacity = '1'; el.style.cursor = ''; }
+    });
   }
   renderSprintChips();
   renderAll();
