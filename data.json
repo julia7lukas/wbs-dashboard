@@ -7,7 +7,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T23:12:38.628411+00:00",
+    "syncedAt": "2026-04-29T07:51:02.279699+00:00",
     "members": [
       {
         "name": "Julia Lukas",
@@ -51,8 +51,8 @@
         "key": "WBS-71",
         "type": "Bug",
         "summary": "PractPerf R26.1.1 Manage Reports - delete checkbox missing",
-        "assignee": "Suvarna Damarla",
-        "status": "In Progress",
+        "assignee": "Julia Lukas",
+        "status": "Done",
         "est": 6,
         "logged": 5,
         "subtasks": "WBS-75 (Julia Lukas, 2h est, 1h logged), WBS-74 (Julia Lukas, 1h est, 1h logged), WBS-73 (Suvarna Damarla, 3h est, 3h logged)",
@@ -222,7 +222,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T23:12:40.898117+00:00",
+    "syncedAt": "2026-04-29T07:51:05.060385+00:00",
     "members": [
       {
         "name": "Adam Rossman",
@@ -406,7 +406,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T23:12:43.056504+00:00",
+    "syncedAt": "2026-04-29T07:51:07.975620+00:00",
     "members": [
       {
         "name": "Mike Jessen",
@@ -560,12 +560,12 @@
   "MAV": {
     "team": "Mavericks",
     "projectKey": "MAV",
-    "sprintName": "MAV 2026 Q2S2",
-    "startDate": "2026-04-14",
-    "endDate": "2026-04-28",
+    "sprintName": "MAV 2026 Q2S3",
+    "startDate": "2026-04-29",
+    "endDate": "2026-05-12",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T23:12:45.348368+00:00",
+    "syncedAt": "2026-04-29T07:51:10.547775+00:00",
     "members": [
       {
         "name": "Peter Lobo",
@@ -636,53 +636,9 @@
     "teamDays": [],
     "issues": [
       {
-        "key": "MAV-91",
-        "type": "Task",
-        "summary": "Automation analysis, run and fix",
-        "assignee": "Chethan Rangaswamy",
-        "status": "Done",
-        "est": 0,
-        "logged": 6,
-        "subtasks": "",
-        "points": 0
-      },
-      {
-        "key": "MAV-90",
-        "type": "Task",
-        "summary": "Automation Analysis - Rohan ",
-        "assignee": "Rohan Kiran",
-        "status": "Done",
-        "est": 0,
-        "logged": 0,
-        "subtasks": "",
-        "points": 0
-      },
-      {
-        "key": "MAV-87",
-        "type": "Task",
-        "summary": "Automation Analysis",
-        "assignee": "Kumaraswamy Krishnan",
-        "status": "Done",
-        "est": 18,
-        "logged": 18,
-        "subtasks": "",
-        "points": 0
-      },
-      {
-        "key": "MAV-70",
-        "type": "Task",
-        "summary": "SQL query to check Customer Accessed practice performance with 835 and AR",
-        "assignee": "Kumar Kuppusamy",
-        "status": "Done",
-        "est": 3,
-        "logged": 4,
-        "subtasks": "",
-        "points": 0
-      },
-      {
-        "key": "MAV-56",
+        "key": "MAV-52",
         "type": "Story",
-        "summary": "Mavericks Bug Backlog Q2S2",
+        "summary": "Mavericks Team Reserve Q2S3",
         "assignee": "Unassigned",
         "status": "Open",
         "est": 0,
@@ -691,10 +647,10 @@
         "points": 0
       },
       {
-        "key": "MAV-51",
+        "key": "MAV-50",
         "type": "Story",
-        "summary": "Mavericks Team Reserve Q2S2",
-        "assignee": "Rohan Kiran",
+        "summary": "Mavericks 26.2 Integration Testing-Part 2",
+        "assignee": "Unassigned",
         "status": "Open",
         "est": 0,
         "logged": 0,
@@ -702,89 +658,136 @@
         "points": 0
       },
       {
-        "key": "MAV-40",
+        "key": "MAV-39",
         "type": "Story",
-        "summary": "Display payer extension ids on payer list information Id column based on configuration",
+        "summary": "UI Automation and wiki update",
         "assignee": "Kumaraswamy Krishnan",
-        "status": "Done",
-        "est": 13,
-        "logged": 31,
-        "subtasks": "MAV-77 (Kumaraswamy Krishnan, 2h est, 2h logged), MAV-76 (Kumaraswamy Krishnan, 6h est, 6h logged), MAV-75 (Kumaraswamy Krishnan, 2h est, 2h logged), MAV-73 (Vikshani Chitlur, 3h est, 3h logged)",
+        "status": "Open",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
         "points": 0
       },
       {
-        "key": "MAV-38",
+        "key": "MAV-35",
         "type": "Story",
-        "summary": "Create Stedi Payer Extension and Map Stedi PayerIds to Payer list.",
-        "assignee": "Kumaraswamy Krishnan",
-        "status": "In Progress",
-        "est": 14,
-        "logged": 12,
-        "subtasks": "MAV-78 (Kumaraswamy Krishnan, 12h est, 12h logged), MAV-72 (Chethan Rangaswamy, 2h est, 0h logged)",
-        "points": 0
-      },
-      {
-        "key": "MAV-33",
-        "type": "Story",
-        "summary": "Angular and Kendo upgrade using Claude",
-        "assignee": "Rohan Kiran",
-        "status": "In Progress",
-        "est": 46,
-        "logged": 42,
-        "subtasks": "MAV-110 (Vikshani Chitlur, 4h est, 4h logged), MAV-108 (Rohan Kiran, 0h est, 1h logged), MAV-106 (Rohan Kiran, 0h est, 1h logged), MAV-96 (Rohan Kiran, 0h est, 1h logged), MAV-95 (Rohan Kiran, 0h est, 1h logged), MAV-93 (Rohan Kiran, 0h est, 1h logged), MAV-92 (Rohan Kiran, 0h est, 1h logged), MAV-89 (Rohan Kiran, 0h est, 12h logged), MAV-81 (Sougata Das, 24h est, 18h logged), MAV-80 (Kumaraswamy Krishnan, 12h est, 0h logged), MAV-79 (Rohan Kiran, 6h est, 6h logged)",
-        "points": 0
-      },
-      {
-        "key": "MAV-27",
-        "type": "Story",
-        "summary": "Provisioning  for Insurance Discovery Zoll",
+        "summary": "UI Automation run and Dev support",
         "assignee": "Chethan Rangaswamy",
-        "status": "Done",
+        "status": "Open",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
+        "points": 0
+      },
+      {
+        "key": "MAV-34",
+        "type": "Story",
+        "summary": "Angular upgrade and validation",
+        "assignee": "Rohan Kiran",
+        "status": "Open",
         "est": 18,
-        "logged": 22,
-        "subtasks": "MAV-82 (Muthu Kumaran, 16h est, 20h logged), MAV-71 (Chethan Rangaswamy, 2h est, 2h logged)",
+        "logged": 0,
+        "subtasks": "MAV-111 (Sougata Das, 6h est, 0h logged), MAV-102 (Sougata Das, 6h est, 0h logged), MAV-101 (Sougata Das, 6h est, 0h logged)",
+        "points": 0
+      },
+      {
+        "key": "MAV-32",
+        "type": "Story",
+        "summary": "Insurance Discovery-Wiki update",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
+        "points": 0
+      },
+      {
+        "key": "MAV-31",
+        "type": "Story",
+        "summary": "Alert for Unmatched Payer from Zoll",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
+        "points": 0
+      },
+      {
+        "key": "MAV-30",
+        "type": "Story",
+        "summary": "Zoll Payer ID to Payerpath TSPId Mapping",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
+        "points": 0
+      },
+      {
+        "key": "MAV-29",
+        "type": "Story",
+        "summary": "Integration Zoll with Call Partner service",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
+        "points": 0
+      },
+      {
+        "key": "MAV-28",
+        "type": "Story",
+        "summary": "Testdouble for Zoll Api",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
+        "points": 0
+      },
+      {
+        "key": "MAV-24",
+        "type": "Story",
+        "summary": "RTE : Migrate from NetFramework to NetCore",
+        "assignee": "Kumar Kuppusamy",
+        "status": "In Progress",
+        "est": 60,
+        "logged": 54,
+        "subtasks": "MAV-69 (Kumar Kuppusamy, 24h est, 32h logged), MAV-68 (Vikshani Chitlur, 32h est, 20h logged), MAV-67 (Vikshani Chitlur, 4h est, 2h logged)",
+        "points": 0
+      },
+      {
+        "key": "MAV-11",
+        "type": "Story",
+        "summary": "Mavericks 26.2 Integration Testing-Part 1",
+        "assignee": "Chethan Rangaswamy",
+        "status": "Open",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
         "points": 0
       }
     ],
     "subtaskHrs": {
-      "Chethan Rangaswamy": {
-        "est": 4,
-        "logged": 2
-      },
-      "Kumaraswamy Krishnan": {
-        "est": 34,
-        "logged": 22
-      },
-      "Muthu Kumaran": {
-        "est": 16,
-        "logged": 20
-      },
-      "Rohan Kiran": {
-        "est": 6,
-        "logged": 24
+      "Kumar Kuppusamy": {
+        "est": 24,
+        "logged": 32
       },
       "Sougata Das": {
-        "est": 24,
-        "logged": 18
+        "est": 18,
+        "logged": 0
       },
       "Vikshani Chitlur": {
-        "est": 7,
-        "logged": 7
+        "est": 36,
+        "logged": 22
       }
     },
     "allSprints": [
       {
-        "name": "MAV 2026 Q2S2",
-        "startDate": "2026-04-14",
-        "endDate": "2026-04-28",
-        "state": "active",
-        "id": 29802
-      },
-      {
         "name": "MAV 2026 Q2S3",
-        "startDate": "2026-04-28",
+        "startDate": "2026-04-29",
         "endDate": "2026-05-12",
-        "state": "future",
+        "state": "active",
         "id": 29803
       },
       {
@@ -825,7 +828,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-28T23:12:47.576959+00:00",
+    "syncedAt": "2026-04-29T07:51:13.253727+00:00",
     "members": [
       {
         "name": "Peter Lobo",
@@ -880,7 +883,7 @@
         "type": "Bug",
         "summary": "Bug 8867882: Automation Bug: UI (E2E) : ClaimForm and ClaimList_Test failing",
         "assignee": "Harsh Jain",
-        "status": "Open",
+        "status": "In Progress",
         "est": 0,
         "logged": 0,
         "subtasks": "",
@@ -891,10 +894,10 @@
         "type": "Bug",
         "summary": "Automation Bug: Backend: (HFAutoSuite) Eligibility related test cases were failed",
         "assignee": "Kapil Darji",
-        "status": "Open",
+        "status": "Done",
         "est": 12,
-        "logged": 0,
-        "subtasks": "AMGO-107 (Kapil Darji, 8h est, 0h logged), AMGO-106 (Kapil Darji, 4h est, 0h logged)",
+        "logged": 8,
+        "subtasks": "AMGO-107 (Kapil Darji, 8h est, 4h logged), AMGO-106 (Kapil Darji, 4h est, 4h logged)",
         "points": 0
       },
       {
@@ -902,7 +905,7 @@
         "type": "Story",
         "summary": "Meta Task",
         "assignee": "Yashodhara Kulal",
-        "status": "Open",
+        "status": "Done",
         "est": 32,
         "logged": 9,
         "subtasks": "AMGO-109 (Akshay Kompelli, 4h est, 3h logged), AMGO-103 (Akshay Kompelli, 4h est, 0h logged), AMGO-102 (Yashodhara Kulal, 10h est, 6h logged), AMGO-101 (Akshay Kompelli, 6h est, 0h logged)",
@@ -913,10 +916,10 @@
         "type": "Bug",
         "summary": "Automation Bug: UI (E2E) : ClaimForm and ClaimList_Test failing",
         "assignee": "Harsh Jain",
-        "status": "Open",
+        "status": "In Progress",
         "est": 2,
-        "logged": 0,
-        "subtasks": "AMGO-96 (Harsh Jain, 1h est, 0h logged), AMGO-93 (Harsh Jain, 1h est, 0h logged)",
+        "logged": 1,
+        "subtasks": "AMGO-96 (Harsh Jain, 1h est, 1h logged), AMGO-93 (Harsh Jain, 1h est, 0h logged)",
         "points": 0
       },
       {
@@ -926,8 +929,8 @@
         "assignee": "Harsh Jain",
         "status": "In Progress",
         "est": 8,
-        "logged": 0,
-        "subtasks": "AMGO-95 (Harsh Jain, 2h est, 0h logged), AMGO-92 (Harsh Jain, 6h est, 0h logged)",
+        "logged": 2,
+        "subtasks": "AMGO-95 (Harsh Jain, 2h est, 2h logged), AMGO-92 (Harsh Jain, 6h est, 0h logged)",
         "points": 0
       },
       {
@@ -990,10 +993,10 @@
         "type": "Bug",
         "summary": "8867520: 837Translator: Faulty DUPCHECK (NULL) logic fails files that are NOT duplicate",
         "assignee": "Kashish Thakur",
-        "status": "Open",
+        "status": "In Progress",
         "est": 16,
-        "logged": 16,
-        "subtasks": "AMGO-84 (Kashish Thakur, 8h est, 12h logged), AMGO-80 (Akshay Kompelli, 8h est, 4h logged)",
+        "logged": 33,
+        "subtasks": "AMGO-84 (Kashish Thakur, 8h est, 28h logged), AMGO-80 (Akshay Kompelli, 8h est, 5h logged)",
         "points": 0
       },
       {
@@ -1030,25 +1033,14 @@
         "points": 0
       },
       {
-        "key": "AMGO-39",
+        "key": "AMGO-37",
         "type": "Story",
-        "summary": "Discuss with Atlas team to review the approach and progress",
-        "assignee": "Kashish Thakur",
-        "status": "Open",
-        "est": 22,
-        "logged": 10,
-        "subtasks": "AMGO-98 (Seetharamkumar Thummala, 10h est, 10h logged), AMGO-86 (Kashish Thakur, 12h est, 0h logged)",
-        "points": 0
-      },
-      {
-        "key": "AMGO-34",
-        "type": "Story",
-        "summary": "Rules update to accommodate Modifier,CPT and ICD edit codes suppress logic",
-        "assignee": "Yashodhara Kulal",
-        "status": "Open",
-        "est": 36,
-        "logged": 19,
-        "subtasks": "AMGO-85 (Yashodhara Kulal, 12h est, 4h logged), AMGO-82 (Seetharamkumar Thummala, 12h est, 15h logged)",
+        "summary": "IntegratedEdits: SQL script to update spcidref entry and take backup",
+        "assignee": "Seetharamkumar Thummala",
+        "status": "Done",
+        "est": 0,
+        "logged": 2,
+        "subtasks": "AMGO-111 (Seetharamkumar Thummala, 0h est, 2h logged)",
         "points": 0
       },
       {
@@ -1065,12 +1057,12 @@
       {
         "key": "AMGO-26",
         "type": "Story",
-        "summary": "Enabler: Analyze 835 service line data in snowflake",
+        "summary": "Pract Perf: Enabler - Analyze code structure and 835 service line data in snowflake",
         "assignee": "Kapil Darji",
-        "status": "In Progress",
+        "status": "Done",
         "est": 24,
-        "logged": 16,
-        "subtasks": "AMGO-78 (Kapil Darji, 4h est, 4h logged), AMGO-77 (Kapil Darji, 8h est, 2h logged), AMGO-76 (Kapil Darji, 12h est, 10h logged)",
+        "logged": 20,
+        "subtasks": "AMGO-78 (Kapil Darji, 4h est, 4h logged), AMGO-77 (Kapil Darji, 8h est, 4h logged), AMGO-76 (Kapil Darji, 12h est, 12h logged)",
         "points": 0
       },
       {
@@ -1083,43 +1075,32 @@
         "logged": 0,
         "subtasks": "AMGO-89 (Kashish Thakur, 6h est, 0h logged)",
         "points": 0
-      },
-      {
-        "key": "AMGO-7",
-        "type": "Story",
-        "summary": "Prac Perf Widget - Integrate getdata pract perf API and display the data for nation, state and customer graph",
-        "assignee": "Seetharamkumar Thummala",
-        "status": "In Progress",
-        "est": 20,
-        "logged": 6,
-        "subtasks": "AMGO-81 (Seetharamkumar Thummala, 8h est, 0h logged), AMGO-18 (Seetharamkumar Thummala, 6h est, 0h logged), AMGO-15 (Yashodhara Kulal, 6h est, 6h logged)",
-        "points": 0
       }
     ],
     "subtaskHrs": {
       "Akshay Kompelli": {
         "est": 34,
-        "logged": 7
+        "logged": 8
       },
       "Harsh Jain": {
         "est": 10,
-        "logged": 0
+        "logged": 3
       },
       "Kapil Darji": {
         "est": 36,
-        "logged": 38
+        "logged": 50
       },
       "Kashish Thakur": {
-        "est": 32,
-        "logged": 12
+        "est": 20,
+        "logged": 28
       },
       "Seetharamkumar Thummala": {
-        "est": 46,
-        "logged": 25
+        "est": 10,
+        "logged": 2
       },
       "Yashodhara Kulal": {
-        "est": 48,
-        "logged": 44
+        "est": 30,
+        "logged": 34
       }
     },
     "allSprints": [
@@ -1129,6 +1110,13 @@
         "endDate": "2026-04-28",
         "state": "active",
         "id": 29757
+      },
+      {
+        "name": "AMGO 2026 Q2S3",
+        "startDate": "2026-04-29",
+        "endDate": "2026-05-12",
+        "state": "future",
+        "id": 29758
       }
     ]
   }
