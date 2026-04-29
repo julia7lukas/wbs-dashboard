@@ -7,7 +7,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-29T10:06:19.774007+00:00",
+    "syncedAt": "2026-04-29T10:28:01.017709+00:00",
     "members": [
       {
         "name": "Julia Lukas",
@@ -222,7 +222,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-29T10:06:22.496136+00:00",
+    "syncedAt": "2026-04-29T10:28:03.934833+00:00",
     "members": [
       {
         "name": "Adam Rossman",
@@ -406,7 +406,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-29T10:06:25.291540+00:00",
+    "syncedAt": "2026-04-29T10:28:06.272240+00:00",
     "members": [
       {
         "name": "Mike Jessen",
@@ -565,7 +565,7 @@
     "endDate": "2026-05-12",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-29T10:06:27.682223+00:00",
+    "syncedAt": "2026-04-29T10:28:08.632035+00:00",
     "members": [
       {
         "name": "Peter Lobo",
@@ -650,11 +650,11 @@
         "key": "MAV-50",
         "type": "Story",
         "summary": "Mavericks 26.2 Integration Testing-Part 2",
-        "assignee": "Unassigned",
+        "assignee": "Chethan Rangaswamy",
         "status": "Open",
-        "est": 0,
+        "est": 8,
         "logged": 0,
-        "subtasks": "",
+        "subtasks": "MAV-116 (Vikshani Chitlur, 4h est, 0h logged), MAV-115 (Chethan Rangaswamy, 4h est, 0h logged)",
         "points": 0
       },
       {
@@ -674,9 +674,9 @@
         "summary": "UI Automation run and Dev support",
         "assignee": "Chethan Rangaswamy",
         "status": "Open",
-        "est": 0,
+        "est": 18,
         "logged": 0,
-        "subtasks": "",
+        "subtasks": "MAV-113 (Chethan Rangaswamy, 18h est, 0h logged)",
         "points": 0
       },
       {
@@ -685,9 +685,9 @@
         "summary": "Angular upgrade and validation",
         "assignee": "Rohan Kiran",
         "status": "Open",
-        "est": 18,
+        "est": 30,
         "logged": 0,
-        "subtasks": "MAV-111 (Sougata Das, 6h est, 0h logged), MAV-102 (Sougata Das, 6h est, 0h logged), MAV-101 (Sougata Das, 6h est, 0h logged)",
+        "subtasks": "MAV-112 (Chethan Rangaswamy, 12h est, 0h logged), MAV-111 (Sougata Das, 6h est, 0h logged), MAV-102 (Sougata Das, 6h est, 0h logged), MAV-101 (Sougata Das, 6h est, 0h logged)",
         "points": 0
       },
       {
@@ -762,13 +762,17 @@
         "summary": "Mavericks 26.2 Integration Testing-Part 1",
         "assignee": "Chethan Rangaswamy",
         "status": "Open",
-        "est": 0,
+        "est": 10,
         "logged": 0,
-        "subtasks": "",
+        "subtasks": "MAV-114 (Chethan Rangaswamy, 10h est, 0h logged)",
         "points": 0
       }
     ],
     "subtaskHrs": {
+      "Chethan Rangaswamy": {
+        "est": 44,
+        "logged": 0
+      },
       "Kumar Kuppusamy": {
         "est": 24,
         "logged": 32
@@ -778,7 +782,7 @@
         "logged": 0
       },
       "Vikshani Chitlur": {
-        "est": 36,
+        "est": 40,
         "logged": 22
       }
     },
