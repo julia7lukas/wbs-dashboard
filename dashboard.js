@@ -610,8 +610,21 @@ function wd()       { const v = parseInt(document.getElementById('work-days').va
 function hd()       { const v = parseInt(document.getElementById('hrs-day').value);  return Math.max(1, isNaN(v) ? 6  : v); }
 function tdo()      { return teamDays.length; }
 function cap(m)     { const domWd = parseInt(document.getElementById('work-days').value); const sd = getSD(); const days = (!isNaN(domWd) && domWd > 0) ? domWd : (sd && sd.workDays ? sd.workDays : 10); return Math.max(0, days-tdo()-(m.pto||0)) * (m.hrs||hd()); }
-function asgnFor(n) { if (window._planningFutureSprint) return 0; const sd=getSD(); return sd&&sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).est||0    : 0; }
-function logFor(n)  { if (window._planningFutureSprint) return 0; const sd=getSD(); return sd&&sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).logged||0 : 0; }
+function asgnFor(n) {
+  if (window._planningFutureSprint) return 0;
+  const sd=getSD();
+  // Only show hours if the displayed sprint matches the active sprint in data.json
+  const displayedSprint = document.getElementById('sprint-name') && document.getElementById('sprint-name').value;
+  if (sd && displayedSprint && displayedSprint !== sd.sprintName) return 0;
+  return sd&&sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).est||0 : 0;
+}
+function logFor(n)  {
+  if (window._planningFutureSprint) return 0;
+  const sd=getSD();
+  const displayedSprint = document.getElementById('sprint-name') && document.getElementById('sprint-name').value;
+  if (sd && displayedSprint && displayedSprint !== sd.sprintName) return 0;
+  return sd&&sd.subtaskHrs ? (sd.subtaskHrs[n]||{}).logged||0 : 0;
+}
 
 
 function removeMember(i) {
@@ -729,10 +742,11 @@ function sprintDateAttrs() {
 }
 function renderTDO() {
   const a=sprintDateAttrs();
-  document.getElementById('tdo-list').innerHTML = teamDays.map((d,i)=>
+  const list = document.getElementById('tdo-list');
+  list.innerHTML = teamDays.map((d,i)=>
     '<div class="dor">'+
-    '<input type="date" class="si2" style="font-size:11px;padding:3px 5px" value="'+d.date+'" '+a+' oninput="teamDays['+i+'].date=this.value;autoSave();renderTDO();recalc()">'+
-    '<select class="si2" style="font-size:11px;padding:3px 5px" oninput="teamDays['+i+'].type=this.value;autoSave()">'+
+    '<input type="date" class="si2" style="font-size:11px;padding:3px 5px" value="'+d.date+'" '+a+' data-tdo-date-idx="'+i+'">'+
+    '<select class="si2" style="font-size:11px;padding:3px 5px" data-tdo-type-idx="'+i+'">'+
       '<option '+(d.type==='Holiday' ?'selected':'')+'>Holiday</option>'+
       '<option '+(d.type==='Recharge'?'selected':'')+'>Recharge</option>'+
       '<option '+(d.type==='Company' ?'selected':'')+'>Company</option>'+
@@ -740,8 +754,15 @@ function renderTDO() {
     '<button class="rb" data-tdo-idx="'+i+'">×</button></div>'
   ).join('');
   document.getElementById('tdo-chip').textContent=teamDays.length+' day'+(teamDays.length!==1?'s':'');
-  document.getElementById('tdo-list').querySelectorAll('[data-tdo-idx]').forEach(btn => {
+  // Attach listeners each render (tdo-list is small and only updated when days change)
+  list.querySelectorAll('[data-tdo-idx]').forEach(btn => {
     btn.addEventListener('click', () => { teamDays.splice(+btn.dataset.tdoIdx,1); autoSave(); renderTDO(); recalc(); });
+  });
+  list.querySelectorAll('[data-tdo-date-idx]').forEach(inp => {
+    inp.addEventListener('input', () => { teamDays[+inp.dataset.tdoDateIdx].date=inp.value; autoSave(); renderTDO(); recalc(); });
+  });
+  list.querySelectorAll('[data-tdo-type-idx]').forEach(sel => {
+    sel.addEventListener('change', () => { teamDays[+sel.dataset.tdoTypeIdx].type=sel.value; autoSave(); });
   });
 }
 function addTDO() {
@@ -1125,6 +1146,10 @@ document.addEventListener('DOMContentLoaded', function() {}, false);
 setTimeout(function setupDelegation() {
   const tb = document.getElementById('mtbody');
   if (!tb) { setTimeout(setupDelegation, 200); return; }
+
+  // Add day button for team days off
+  const addTdoBtn = document.getElementById('add-tdo-btn');
+  if (addTdoBtn) addTdoBtn.addEventListener('click', addTDO);
 
   tb.addEventListener('input', function(e) {
     const hrsIdx = e.target.dataset && e.target.dataset.hrsIdx;
