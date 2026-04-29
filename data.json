@@ -7,7 +7,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-29T10:28:01.017709+00:00",
+    "syncedAt": "2026-04-29T10:45:04.379644+00:00",
     "members": [
       {
         "name": "Julia Lukas",
@@ -84,8 +84,8 @@
         "key": "WBS-52",
         "type": "Story",
         "summary": "Meta Tasks",
-        "assignee": "Unassigned",
-        "status": "In Progress",
+        "assignee": "Julia Lukas",
+        "status": "Done",
         "est": 60,
         "logged": 72,
         "subtasks": "WBS-77 (Yudong He, 12h est, 11h logged), WBS-69 (Julia Lukas, 4h est, 2h logged), WBS-68 (Suvarna Damarla, 12h est, 18h logged), WBS-67 (Yudong He, 16h est, 19h logged), WBS-53 (Julia Lukas, 16h est, 22h logged)",
@@ -222,7 +222,7 @@
     "endDate": "2026-04-29",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-29T10:28:03.934833+00:00",
+    "syncedAt": "2026-04-29T10:45:06.581079+00:00",
     "members": [
       {
         "name": "Adam Rossman",
@@ -406,7 +406,7 @@
     "endDate": "2026-04-28",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-29T10:28:06.272240+00:00",
+    "syncedAt": "2026-04-29T10:45:08.991442+00:00",
     "members": [
       {
         "name": "Mike Jessen",
@@ -565,7 +565,7 @@
     "endDate": "2026-05-12",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-29T10:28:08.632035+00:00",
+    "syncedAt": "2026-04-29T10:45:10.949036+00:00",
     "members": [
       {
         "name": "Peter Lobo",
