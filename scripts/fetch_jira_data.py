@@ -153,7 +153,7 @@ def _parse_sprint_end(end_raw):
         return ''
     try:
         dt = datetime.fromisoformat(end_raw.replace('Z', '+00:00'))
-        if dt.hour < 12:
+        if dt.hour < 6:
             dt -= timedelta(days=1)
         return dt.strftime('%Y-%m-%d')
     except Exception:
