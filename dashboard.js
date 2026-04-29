@@ -672,10 +672,15 @@ function renderMembers() {
     inp.addEventListener('input', () => {
       const i = +inp.dataset.hrsIdx;
       members[i].hrs = Math.max(1, +inp.value || hd());
-      // Update capacity cell immediately
       const capCell = tb.querySelector('[data-cap-idx="'+i+'"]');
       if (capCell) capCell.textContent = cap(members[i]) + 'h';
-      autoSave(); recalc();
+      // Update KPI totals without full re-render
+      const activeM = (window._planningFutureSprint === true) ? members : members.filter(m => asgnFor(m.name) > 0);
+      const tc = activeM.reduce((a,m) => a+cap(m), 0);
+      document.getElementById('k-cap').textContent = tc;
+      document.getElementById('k-util').textContent = tc>0 ? Math.round(activeM.reduce((a,m)=>a+asgnFor(m.name),0)/tc*100)+'%' : '0%';
+      document.getElementById('t-cap').textContent = tc+'h';
+      autoSave();
     });
   });
   tb.querySelectorAll('[data-pto-idx]').forEach(inp => {
@@ -684,7 +689,12 @@ function renderMembers() {
       members[i].pto = Math.max(0, +inp.value || 0);
       const capCell = tb.querySelector('[data-cap-idx="'+i+'"]');
       if (capCell) capCell.textContent = cap(members[i]) + 'h';
-      autoSave(); recalc();
+      const activeM = (window._planningFutureSprint === true) ? members : members.filter(m => asgnFor(m.name) > 0);
+      const tc = activeM.reduce((a,m) => a+cap(m), 0);
+      document.getElementById('k-cap').textContent = tc;
+      document.getElementById('k-util').textContent = tc>0 ? Math.round(activeM.reduce((a,m)=>a+asgnFor(m.name),0)/tc*100)+'%' : '0%';
+      document.getElementById('t-cap').textContent = tc+'h';
+      autoSave();
     });
   });
   tb.querySelectorAll('[data-name-idx]').forEach(inp => {
@@ -1108,3 +1118,55 @@ async function refreshFromJira() {
 }
 
 load();
+
+// ── EVENT DELEGATION — survives re-renders (attaches once to stable containers) ──
+document.addEventListener('DOMContentLoaded', function() {}, false);
+// Use setTimeout to ensure DOM is ready after load()
+setTimeout(function setupDelegation() {
+  const tb = document.getElementById('mtbody');
+  if (!tb) { setTimeout(setupDelegation, 200); return; }
+
+  tb.addEventListener('input', function(e) {
+    const hrsIdx = e.target.dataset && e.target.dataset.hrsIdx;
+    const ptoIdx = e.target.dataset && e.target.dataset.ptoIdx;
+    if (hrsIdx !== undefined) {
+      const i = +hrsIdx;
+      members[i].hrs = Math.max(1, +e.target.value || hd());
+      const capCell = tb.querySelector('[data-cap-idx="'+i+'"]');
+      if (capCell) capCell.textContent = cap(members[i]) + 'h';
+      const activeM = (window._planningFutureSprint === true) ? members : members.filter(m => asgnFor(m.name) > 0);
+      const tc = activeM.reduce((a,m) => a+cap(m), 0);
+      const ta = activeM.reduce((a,m) => a+asgnFor(m.name), 0);
+      document.getElementById('k-cap').textContent = tc;
+      document.getElementById('k-util').textContent = tc>0 ? Math.round(ta/tc*100)+'%' : '0%';
+      document.getElementById('t-cap').textContent = tc+'h';
+      autoSave();
+    }
+    if (ptoIdx !== undefined) {
+      const i = +ptoIdx;
+      members[i].pto = Math.max(0, +e.target.value || 0);
+      const capCell = tb.querySelector('[data-cap-idx="'+i+'"]');
+      if (capCell) capCell.textContent = cap(members[i]) + 'h';
+      const activeM = (window._planningFutureSprint === true) ? members : members.filter(m => asgnFor(m.name) > 0);
+      const tc = activeM.reduce((a,m) => a+cap(m), 0);
+      const ta = activeM.reduce((a,m) => a+asgnFor(m.name), 0);
+      document.getElementById('k-cap').textContent = tc;
+      document.getElementById('k-util').textContent = tc>0 ? Math.round(ta/tc*100)+'%' : '0%';
+      document.getElementById('t-cap').textContent = tc+'h';
+      autoSave();
+    }
+  });
+
+  tb.addEventListener('change', function(e) {
+    const nameIdx = e.target.dataset && e.target.dataset.nameIdx;
+    if (nameIdx !== undefined) {
+      members[+nameIdx].name = e.target.value.trim();
+      autoSave(); renderAll();
+    }
+  });
+
+  tb.addEventListener('click', function(e) {
+    const removeIdx = e.target.dataset && e.target.dataset.removeIdx;
+    if (removeIdx !== undefined) removeMember(+removeIdx);
+  });
+}, 1500);
