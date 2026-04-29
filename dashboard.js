@@ -646,10 +646,10 @@ function renderMembers() {
     const remCol = remaining > 0 ? 'var(--amber)' : 'var(--green)';
     return '<tr class="dr">'+
       '<td><div class="mc"><div class="av" style="background:'+AVB[i%8]+';color:'+AVC[i%8]+'">'+ini(m.name)+'</div>'+
-      '<input style="background:transparent;border:none;color:var(--t1);font-family:var(--font);font-size:13px;width:130px" value="'+sanitize(m.name)+'" onchange="members['+i+'].name=this.value.trim();autoSave();renderAll()"></div></td>'+
-      '<td class="c"><input class="ni" type="number" min="1" max="12" value="'+(m.hrs||hd())+'" oninput="members['+i+'].hrs=Math.max(1,+this.value||'+hd()+');autoSave();recalc()"></td>'+
-      '<td class="c"><input class="ni" type="number" min="0" value="'+(m.pto||0)+'" oninput="members['+i+'].pto=Math.max(0,+this.value||0);autoSave();recalc()"></td>'+
-      '<td class="c netc">'+c+'h</td>'+
+      '<input style="background:transparent;border:none;color:var(--t1);font-family:var(--font);font-size:13px;width:130px" value="'+sanitize(m.name)+'" data-name-idx="'+i+'"></div></td>'+
+      '<td class="c"><input class="ni" type="number" min="1" max="12" value="'+(m.hrs||hd())+'" data-hrs-idx="'+i+'"></td>'+
+      '<td class="c"><input class="ni" type="number" min="0" value="'+(m.pto||0)+'" data-pto-idx="'+i+'"></td>'+
+      '<td class="c netc" data-cap-idx="'+i+'">'+c+'h</td>'+
       '<td class="c" style="color:var(--blue)">'+asgn+'h</td>'+
       '<td class="c" style="color:var(--t2)">'+logged+'h</td>'+
       '<td class="c"><div style="font-size:12px;font-weight:600;color:'+remCol+'">'+remaining+'h</div></td>'+
@@ -664,9 +664,34 @@ function renderMembers() {
   const ta = activeMembers.reduce((s,m) => s+asgnFor(m.name), 0);
   const tl = activeMembers.reduce((s,m) => s+logFor(m.name), 0);
   const tr2 = Math.max(0, ta-tl);
-  // Attach event listeners (CSP blocks inline onclick)
+  // Attach event listeners (CSP blocks inline onclick/oninput)
   tb.querySelectorAll('[data-remove-idx]').forEach(btn => {
     btn.addEventListener('click', () => removeMember(+btn.dataset.removeIdx));
+  });
+  tb.querySelectorAll('[data-hrs-idx]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const i = +inp.dataset.hrsIdx;
+      members[i].hrs = Math.max(1, +inp.value || hd());
+      // Update capacity cell immediately
+      const capCell = tb.querySelector('[data-cap-idx="'+i+'"]');
+      if (capCell) capCell.textContent = cap(members[i]) + 'h';
+      autoSave(); recalc();
+    });
+  });
+  tb.querySelectorAll('[data-pto-idx]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const i = +inp.dataset.ptoIdx;
+      members[i].pto = Math.max(0, +inp.value || 0);
+      const capCell = tb.querySelector('[data-cap-idx="'+i+'"]');
+      if (capCell) capCell.textContent = cap(members[i]) + 'h';
+      autoSave(); recalc();
+    });
+  });
+  tb.querySelectorAll('[data-name-idx]').forEach(inp => {
+    inp.addEventListener('change', () => {
+      members[+inp.dataset.nameIdx].name = inp.value.trim();
+      autoSave(); renderAll();
+    });
   });
   const addBtn = document.getElementById('add-member-btn');
   if (addBtn) addBtn.addEventListener('click', addMemberPrompt);
