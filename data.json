@@ -2,12 +2,12 @@
   "WBS": {
     "team": "Webslingers",
     "projectKey": "WBS",
-    "sprintName": "WBS 2026 Q2S2",
-    "startDate": "2026-04-15",
-    "endDate": "2026-04-29",
+    "sprintName": "WBS 2026 Q2S4",
+    "startDate": "2026-05-13",
+    "endDate": "2026-05-27",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-29T12:03:41.854295+00:00",
+    "syncedAt": "2026-05-13T14:00:00.000000+00:00",
     "members": [
       {
         "name": "Julia Lukas",
@@ -48,147 +48,111 @@
     "teamDays": [],
     "issues": [
       {
-        "key": "WBS-71",
+        "key": "WBS-116",
         "type": "Bug",
-        "summary": "PractPerf R26.1.1 Manage Reports - delete checkbox missing",
-        "assignee": "Julia Lukas",
-        "status": "Done",
-        "est": 6,
-        "logged": 5,
-        "subtasks": "WBS-75 (Julia Lukas, 2h est, 1h logged), WBS-74 (Julia Lukas, 1h est, 1h logged), WBS-73 (Suvarna Damarla, 3h est, 3h logged)",
-        "points": 0
-      },
-      {
-        "key": "WBS-66",
-        "type": "Task",
-        "summary": "Migrate Daily Scrum Report Claude Skill from Azure DevOps to Jira",
-        "assignee": "Yudong He",
-        "status": "Done",
-        "est": 0,
-        "logged": 2,
-        "subtasks": "",
-        "points": 0
-      },
-      {
-        "key": "WBS-63",
-        "type": "Bug",
-        "summary": "Bug 8867850: Practice Performance - Filter Search - Case Sensitive",
-        "assignee": "Joi Hepler",
-        "status": "Done",
-        "est": 1,
+        "summary": "Practice Performance - Ar Measures - Lookback Frequency Set to Day - 500 Internal Server Error",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 16,
         "logged": 0,
-        "subtasks": "WBS-65 (Joi Hepler, 1h est, 0h logged)",
+        "subtasks": "WBS-124 (Joi Hepler, 1h est, 0h logged), WBS-123 (Julia Lukas, 1h est, 0h logged), WBS-122 (Joi Hepler, 1h est, 0h logged), WBS-121 (Joi Hepler, 2h est, 0h logged), WBS-120 (Julia Lukas, 3h est, 0h logged), WBS-119 (Joi Hepler, 2h est, 0h logged), WBS-118 (Suvarna Damarla, 6h est, 0h logged)",
         "points": 0
       },
       {
-        "key": "WBS-52",
-        "type": "Story",
-        "summary": "Meta Tasks",
-        "assignee": "Julia Lukas",
-        "status": "Done",
-        "est": 60,
-        "logged": 72,
-        "subtasks": "WBS-77 (Yudong He, 12h est, 11h logged), WBS-69 (Julia Lukas, 4h est, 2h logged), WBS-68 (Suvarna Damarla, 12h est, 18h logged), WBS-67 (Yudong He, 16h est, 19h logged), WBS-53 (Julia Lukas, 16h est, 22h logged)",
-        "points": 0
-      },
-      {
-        "key": "WBS-50",
+        "key": "WBS-109",
         "type": "Bug",
-        "summary": "Bug 8867869: Practice Performance - AR Measures - 500 Internal Server Error",
-        "assignee": "Joi Hepler",
-        "status": "Done",
-        "est": 8,
-        "logged": 2,
-        "subtasks": "WBS-55 (Joi Hepler, 2h est, 0h logged), WBS-54 (Yudong He, 6h est, 2h logged)",
-        "points": 0
-      },
-      {
-        "key": "WBS-45",
-        "type": "Story",
-        "summary": "Pract Perf: AR measures lookback - pass lookback parameter from UI",
-        "assignee": "Joi Hepler",
-        "status": "Done",
-        "est": 3,
+        "summary": "Practice Performance - Save Custom Report - GroupBy set to None",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 18,
         "logged": 0,
-        "subtasks": "WBS-59 (Joi Hepler, 3h est, 0h logged)",
+        "subtasks": "WBS-143 (Joi Hepler, 1h est, 0h logged), WBS-134 (Joi Hepler, 1h est, 0h logged), WBS-133 (Joi Hepler, 2h est, 0h logged), WBS-128 (Joi Hepler, 2h est, 0h logged), WBS-127 (Jeremy Goodman, 12h est, 0h logged)",
         "points": 0
       },
       {
-        "key": "WBS-39",
-        "type": "Story",
-        "summary": "PractPerf Single EOB - Spike - Research to gain an understanding of the requirements",
-        "assignee": "Julia Lukas",
-        "status": "Done",
-        "est": 20,
-        "logged": 7,
-        "subtasks": "WBS-61 (Suvarna Damarla, 12h est, 7h logged), WBS-60 (Jeremy Goodman, 8h est, 0h logged)",
+        "key": "WBS-108",
+        "type": "Bug",
+        "summary": "PractPerfUI: Filter Panel \u2013 Visibility Issue",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 19,
+        "logged": 0,
+        "subtasks": "WBS-144 (Julia Lukas, 1h est, 0h logged), WBS-132 (Julia Lukas, 1h est, 0h logged), WBS-131 (Julia Lukas, 1h est, 0h logged), WBS-130 (Julia Lukas, 1h est, 0h logged), WBS-129 (Julia Lukas, 3h est, 0h logged), WBS-126 (Julia Lukas, 1h est, 0h logged), WBS-125 (Jeremy Goodman, 12h est, 0h logged)",
         "points": 0
       },
       {
-        "key": "WBS-24",
+        "key": "WBS-44",
         "type": "Story",
-        "summary": "AR Measures Performance Tuning",
-        "assignee": "Yudong He",
+        "summary": "PractPerf Remit Based Provider Specialty - BackEnd work",
+        "assignee": "Unassigned",
         "status": "In Progress",
-        "est": 44,
-        "logged": 6,
-        "subtasks": "WBS-27 (Joi Hepler, 6h est, 0h logged), WBS-26 (Suvarna Damarla, 2h est, 0h logged), WBS-25 (Yudong He, 20h est, 4h logged)",
+        "est": 36,
+        "logged": 0,
+        "subtasks": "WBS-142 (Yudong He, 9h est, 0h logged), WBS-90 (Yudong He, 1h est, 0h logged), WBS-89 (Joi Hepler, 1h est, 0h logged), WBS-88 (Joi Hepler, 3h est, 0h logged), WBS-87 (Joi Hepler, 3h est, 0h logged), WBS-86 (Jeremy Goodman, 3h est, 0h logged), WBS-85 (Yudong He, 16h est, 0h logged)",
         "points": 0
       },
       {
-        "key": "WBS-14",
+        "key": "WBS-38",
         "type": "Story",
-        "summary": "  26.1.1 Pract Perf Testing/ Deployment DEV02",
-        "assignee": "Julia Lukas",
-        "status": "Done",
-        "est": 32,
-        "logged": 6,
-        "subtasks": "WBS-62 (Suvarna Damarla, 6h est, 0h logged), WBS-51 (Yudong He, 6h est, 0h logged), WBS-30 (Suvarna Damarla, 1h est, 0h logged), WBS-28 (Yudong He, 1h est, 0h logged), WBS-17 (Julia Lukas, 6h est, 3h logged), WBS-16 (Joi Hepler, 12h est, 3h logged)",
+        "summary": "Stretch - Pract Perf Remit Procedure Category Report - Code changes to create new view - backEnd",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 35,
+        "logged": 0,
+        "subtasks": "WBS-141 (Yudong He, 1h est, 0h logged), WBS-140 (Joi Hepler, 1h est, 0h logged), WBS-139 (Joi Hepler, 3h est, 0h logged), WBS-138 (Joi Hepler, 3h est, 0h logged), WBS-137 (Suvarna Damarla, 3h est, 0h logged), WBS-136 (Yudong He, 16h est, 0h logged), WBS-135 (Yudong He, 8h est, 0h logged)",
+        "points": 0
+      },
+      {
+        "key": "WBS-36",
+        "type": "Story",
+        "summary": "PractPerf Patient Responsibility Analysis Report - Code changes to create new report view - UI",
+        "assignee": "Unassigned",
+        "status": "In Progress",
+        "est": 23,
+        "logged": 14,
+        "subtasks": "WBS-96 (Suvarna Damarla, 1h est, 0h logged), WBS-95 (Joi Hepler, 1h est, 0h logged), WBS-94 (Joi Hepler, 2h est, 0h logged), WBS-93 (Joi Hepler, 3h est, 2h logged), WBS-92 (Yudong He, 1h est, 0h logged), WBS-91 (Suvarna Damarla, 15h est, 12h logged)",
+        "points": 0
+      },
+      {
+        "key": "WBS-35",
+        "type": "Story",
+        "summary": "PractPerf Patient Responsibility Analysis Report - Code changes to create new report view - backend",
+        "assignee": "Unassigned",
+        "status": "In Progress",
+        "est": 41,
+        "logged": 17,
+        "subtasks": "WBS-114 (Yudong He, 6h est, 2h logged), WBS-84 (Yudong He, 1h est, 0h logged), WBS-83 (Julia Lukas, 1h est, 0h logged), WBS-82 (Julia Lukas, 8h est, 0h logged), WBS-81 (Julia Lukas, 3h est, 0h logged), WBS-80 (Jeremy Goodman, 3h est, 0h logged), WBS-79 (Yudong He, 19h est, 15h logged)",
         "points": 0
       }
     ],
     "subtaskHrs": {
-      "Jeremy Goodman": {
-        "est": 8,
+      "Julia Lukas": {
+        "est": 24,
         "logged": 0
       },
       "Joi Hepler": {
-        "est": 24,
-        "logged": 3
-      },
-      "Julia Lukas": {
-        "est": 29,
-        "logged": 29
-      },
-      "Suvarna Damarla": {
-        "est": 36,
-        "logged": 28
+        "est": 32,
+        "logged": 2
       },
       "Yudong He": {
-        "est": 61,
-        "logged": 36
+        "est": 78,
+        "logged": 17
+      },
+      "Suvarna Damarla": {
+        "est": 25,
+        "logged": 12
+      },
+      "Jeremy Goodman": {
+        "est": 30,
+        "logged": 0
       }
     },
     "allSprints": [
       {
-        "name": "WBS 2026 Q2S2",
-        "startDate": "2026-04-15",
-        "endDate": "2026-04-29",
-        "state": "active",
-        "id": 28962
-      },
-      {
-        "name": "WBS 2026 Q2S3",
-        "startDate": "2026-04-29",
-        "endDate": "2026-05-13",
-        "state": "future",
-        "id": 28963
-      },
-      {
         "name": "WBS 2026 Q2S4",
         "startDate": "2026-05-13",
         "endDate": "2026-05-27",
-        "state": "future",
+        "state": "active",
         "id": 28964
       },
       {
@@ -217,12 +181,12 @@
   "GIN": {
     "team": "Gingersnaps",
     "projectKey": "GIN",
-    "sprintName": "GIN 2026 Q2S2",
-    "startDate": "2026-04-15",
-    "endDate": "2026-04-29",
+    "sprintName": "GIN 2026 Q2S4",
+    "startDate": "2026-05-13",
+    "endDate": "2026-05-27",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-29T12:03:44.029673+00:00",
+    "syncedAt": "2026-05-13T14:00:00.000000+00:00",
     "members": [
       {
         "name": "Adam Rossman",
@@ -258,121 +222,96 @@
     "teamDays": [],
     "issues": [
       {
-        "key": "GIN-84",
-        "type": "Bug",
-        "summary": "R26.2 Automation - Bug 8867872: Automation Bug: Backend: 61 CodeCheckEditsTests failures",
+        "key": "GIN-88",
+        "type": "Story",
+        "summary": "Update Directory where Zuora claim billing files are placed",
         "assignee": "Unassigned",
-        "status": "Done",
-        "est": 6,
-        "logged": 6,
-        "subtasks": "GIN-85 (Michael Earley, 6h est, 6h logged)",
+        "status": "Open",
+        "est": 0,
+        "logged": 1,
+        "subtasks": "",
         "points": 0
       },
       {
         "key": "GIN-61",
         "type": "Story",
-        "summary": "TFS Migration / Cleanup",
+        "summary": "Off Cycle deployment (GIC / WI Medicaid)",
         "assignee": "Unassigned",
         "status": "Open",
-        "est": 0,
-        "logged": 0,
-        "subtasks": "",
-        "points": 0
-      },
-      {
-        "key": "GIN-40",
-        "type": "Story",
-        "summary": "JohnC Onboarding - Business & Code Overview",
-        "assignee": "Unassigned",
-        "status": "Open",
-        "est": 0,
-        "logged": 0,
-        "subtasks": "",
-        "points": 0
-      },
-      {
-        "key": "GIN-39",
-        "type": "Story",
-        "summary": "Bug Backlog - Q2S2",
-        "assignee": "Unassigned",
-        "status": "Open",
-        "est": 0,
-        "logged": 0,
-        "subtasks": "",
-        "points": 0
-      },
-      {
-        "key": "GIN-38",
-        "type": "Story",
-        "summary": "CCL - Automate Actions",
-        "assignee": "Adam Rossman",
-        "status": "In Progress",
-        "est": 71,
-        "logged": 61,
-        "subtasks": "GIN-86 (Deepthi Manne, 6h est, 6h logged), GIN-77 (Deepthi Manne, 10h est, 9h logged), GIN-76 (Joel Wheeler, 3h est, 0h logged), GIN-75 (Joel Wheeler, 3h est, 3h logged), GIN-74 (Joel Wheeler, 3h est, 3h logged), GIN-73 (Joel Wheeler, 6h est, 6h logged), GIN-72 (Joel Wheeler, 6h est, 6h logged), GIN-71 (Joel Wheeler, 6h est, 6h logged), GIN-70 (Deepthi Manne, 16h est, 16h logged), GIN-69 (Joel Wheeler, 6h est, 6h logged)",
-        "points": 0
-      },
-      {
-        "key": "GIN-37",
-        "type": "Story",
-        "summary": "CCL - Automate the Rest",
-        "assignee": "Michael Earley",
-        "status": "Open",
-        "est": 62,
-        "logged": 29,
-        "subtasks": "GIN-83 (Joel Wheeler, 8h est, 0h logged), GIN-82 (John Coniff, 6h est, 3h logged), GIN-81 (John Coniff, 16h est, 0h logged), GIN-80 (Michael Earley, 6h est, 0h logged), GIN-79 (Michael Earley, 10h est, 10h logged), GIN-78 (Michael Earley, 16h est, 16h logged)",
-        "points": 0
-      },
-      {
-        "key": "GIN-36",
-        "type": "Story",
-        "summary": "Pract Perf GA (4/22)",
-        "assignee": "Adam Rossman",
-        "status": "Done",
         "est": 5,
-        "logged": 5,
-        "subtasks": "GIN-67 (Michael Earley, 3h est, 3h logged), GIN-66 (Deepthi Manne, 1h est, 1h logged), GIN-65 (Deepthi Manne, 1h est, 1h logged)",
+        "logged": 1,
+        "subtasks": "GIN-93 (Deepthi Manne, 1h est, 0h logged), GIN-91 (Unassigned, 3h est, 0h logged), GIN-90 (Deepthi Manne, 1h est, 1h logged)",
+        "points": 0
+      },
+      {
+        "key": "GIN-49",
+        "type": "Story",
+        "summary": "POC: Use AI to Update a Microservice",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 24,
+        "logged": 0,
+        "subtasks": "GIN-130 (John Coniff, 6h est, 0h logged), GIN-128 (John Coniff, 6h est, 0h logged), GIN-127 (John Coniff, 6h est, 0h logged), GIN-126 (John Coniff, 6h est, 0h logged)",
+        "points": 0
+      },
+      {
+        "key": "GIN-47",
+        "type": "Story",
+        "summary": "Update Claim Service with to Check for Depart/Div data",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 47,
+        "logged": 0,
+        "subtasks": "GIN-125 (Deepthi Manne, 3h est, 0h logged), GIN-124 (Deepthi Manne, 6h est, 0h logged), GIN-123 (Michael Earley, 19h est, 0h logged)",
+        "points": 0
+      },
+      {
+        "key": "GIN-46",
+        "type": "Story",
+        "summary": "Create/Populate AR Measure Tables in Snowflake",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
+        "points": 0
+      },
+      {
+        "key": "GIN-43",
+        "type": "Story",
+        "summary": "26.2 Int Testing - R2",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 12,
+        "logged": 0,
+        "subtasks": "GIN-122 (Joel Wheeler, 4h est, 0h logged), GIN-121 (Joel Wheeler, 4h est, 0h logged), GIN-97 (Deepthi Manne, 4h est, 0h logged)",
         "points": 0
       }
     ],
     "subtaskHrs": {
-      "Deepthi Manne": {
-        "est": 34,
-        "logged": 33
-      },
-      "Joel Wheeler": {
-        "est": 41,
-        "logged": 30
-      },
       "John Coniff": {
-        "est": 22,
-        "logged": 3
+        "est": 24,
+        "logged": 0
+      },
+      "Deepthi Manne": {
+        "est": 15,
+        "logged": 1
       },
       "Michael Earley": {
-        "est": 41,
-        "logged": 35
+        "est": 19,
+        "logged": 0
+      },
+      "Joel Wheeler": {
+        "est": 8,
+        "logged": 0
       }
     },
     "allSprints": [
       {
-        "name": "GIN 2026 Q2S2",
-        "startDate": "2026-04-15",
-        "endDate": "2026-04-29",
-        "state": "active",
-        "id": 27940
-      },
-      {
-        "name": "GIN 2026 Q2S3",
-        "startDate": "2026-04-29",
-        "endDate": "2026-05-13",
-        "state": "future",
-        "id": 27941
-      },
-      {
         "name": "GIN 2026 Q2S4",
         "startDate": "2026-05-13",
         "endDate": "2026-05-27",
-        "state": "future",
+        "state": "active",
         "id": 29502
       },
       {
@@ -401,12 +340,12 @@
   "MOJO": {
     "team": "Mojo",
     "projectKey": "MOJO",
-    "sprintName": "Mojo Q2S2",
-    "startDate": "2026-04-15",
-    "endDate": "2026-04-28",
+    "sprintName": "Mojo Q2S4",
+    "startDate": "2026-05-13",
+    "endDate": "2026-05-26",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-29T12:03:45.919591+00:00",
+    "syncedAt": "2026-05-13T19:11:55.888419+00:00",
     "members": [
       {
         "name": "Mike Jessen",
@@ -432,106 +371,92 @@
     "teamDays": [],
     "issues": [
       {
-        "key": "MOJO-55",
+        "key": "MOJO-89",
         "type": "Story",
-        "summary": "Team Reserve: Invalid Characters (T72T7)",
+        "summary": "Update iTools Utilization page: labels, suppression calculation, event 2",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 13,
+        "logged": 4,
+        "subtasks": "MOJO-93 (Serguei Pozdniakov, 6h est, 0h logged), MOJO-92 (Serguei Pozdniakov, 6h est, 0h logged), MOJO-91 (Mike Jessen, 1h est, 0h logged), MOJO-90 (Ilya Dyakov, 0h est, 4h logged)",
+        "points": 0
+      },
+      {
+        "key": "MOJO-88",
+        "type": "Story",
+        "summary": "Update CSV file",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 10,
+        "logged": 0,
+        "subtasks": "MOJO-97 (Serguei Pozdniakov, 3h est, 0h logged), MOJO-96 (Serguei Pozdniakov, 3h est, 0h logged), MOJO-95 (Mike Jessen, 1h est, 0h logged), MOJO-94 (Ilya Dyakov, 6h est, 0h logged)",
+        "points": 0
+      },
+      {
+        "key": "MOJO-56",
+        "type": "Bug",
+        "summary": "Don't execute iTools page code before SSO direct",
+        "assignee": "Unassigned",
+        "status": "Open",
+        "est": 0,
+        "logged": 6,
+        "subtasks": "MOJO-86 (Ilya Dyakov, 0h est, 6h logged)",
+        "points": 0
+      },
+      {
+        "key": "MOJO-52",
+        "type": "Story",
+        "summary": "Monthly Patching Verification - May",
         "assignee": "Unassigned",
         "status": "In Progress",
-        "est": 31,
-        "logged": 6,
-        "subtasks": "MOJO-71 (Serguei Pozdniakov, 9h est, 0h logged), MOJO-70 (Serguei Pozdniakov, 6h est, 0h logged), MOJO-69 (Mike Jessen, 1h est, 1h logged), MOJO-68 (Ilya Dyakov, 15h est, 5h logged)",
-        "points": 0
-      },
-      {
-        "key": "MOJO-54",
-        "type": "Story",
-        "summary": "Team Reserve: Invalid Characters (PIF2T7)",
-        "assignee": "Unassigned",
-        "status": "Done",
-        "est": 37,
-        "logged": 47,
-        "subtasks": "MOJO-67 (Serguei Pozdniakov, 9h est, 8h logged), MOJO-66 (Serguei Pozdniakov, 9h est, 9h logged), MOJO-65 (Mike Jessen, 1h est, 1h logged), MOJO-64 (Ilya Dyakov, 18h est, 29h logged)",
-        "points": 0
-      },
-      {
-        "key": "MOJO-51",
-        "type": "Story",
-        "summary": "Monthly Patching Verification - April",
-        "assignee": "Unassigned",
-        "status": "Done",
         "est": 3,
-        "logged": 6,
-        "subtasks": "MOJO-61 (Mike Jessen, 3h est, 6h logged)",
+        "logged": 0,
+        "subtasks": "MOJO-62 (Unassigned, 3h est, 0h logged)",
         "points": 0
       },
       {
-        "key": "MOJO-45",
+        "key": "MOJO-47",
         "type": "Story",
-        "summary": "Production Support Q2S2",
+        "summary": "Production Support Q2S4",
         "assignee": "Unassigned",
-        "status": "Done",
+        "status": "In Progress",
         "est": 6,
-        "logged": 4,
-        "subtasks": "MOJO-60 (Ilya Dyakov, 6h est, 4h logged)",
+        "logged": 0,
+        "subtasks": "MOJO-73 (Unassigned, 6h est, 0h logged)",
         "points": 0
       },
       {
-        "key": "MOJO-21",
+        "key": "MOJO-22",
         "type": "Story",
-        "summary": "VIP: spike - iTools Utilization layout options",
+        "summary": "VIP: Selenium - iTools utilization page",
         "assignee": "Unassigned",
-        "status": "Done",
-        "est": 12,
-        "logged": 12,
-        "subtasks": "MOJO-35 (Mike Jessen, 12h est, 12h logged)",
-        "points": 0
-      },
-      {
-        "key": "MOJO-18",
-        "type": "Story",
-        "summary": "VIP: A4HSNames report updates",
-        "assignee": "Unassigned",
-        "status": "Done",
-        "est": 43,
-        "logged": 42,
-        "subtasks": "MOJO-26 (Ilya Dyakov, 1h est, 1h logged), MOJO-25 (Serguei Pozdniakov, 9h est, 9h logged), MOJO-24 (Serguei Pozdniakov, 9h est, 9h logged), MOJO-23 (Mike Jessen, 24h est, 23h logged)",
+        "status": "Open",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
         "points": 0
       }
     ],
     "subtaskHrs": {
-      "Ilya Dyakov": {
-        "est": 40,
-        "logged": 39
+      "Serguei Pozdniakov": {
+        "est": 18,
+        "logged": 0
       },
       "Mike Jessen": {
-        "est": 41,
-        "logged": 43
+        "est": 2,
+        "logged": 0
       },
-      "Serguei Pozdniakov": {
-        "est": 51,
-        "logged": 35
+      "Ilya Dyakov": {
+        "est": 6,
+        "logged": 10
       }
     },
     "allSprints": [
       {
-        "name": "Mojo Q2S2",
-        "startDate": "2026-04-15",
-        "endDate": "2026-04-28",
-        "state": "active",
-        "id": 28970
-      },
-      {
-        "name": "Mojo Q2S3",
-        "startDate": "2026-04-29",
-        "endDate": "2026-05-12",
-        "state": "future",
-        "id": 28971
-      },
-      {
         "name": "Mojo Q2S4",
         "startDate": "2026-05-13",
         "endDate": "2026-05-26",
-        "state": "future",
+        "state": "active",
         "id": 29972
       },
       {
@@ -565,7 +490,7 @@
     "endDate": "2026-05-12",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-29T12:03:48.143403+00:00",
+    "syncedAt": "2026-05-13T14:00:00.000000+00:00",
     "members": [
       {
         "name": "Peter Lobo",
@@ -640,21 +565,10 @@
         "type": "Story",
         "summary": "Mavericks Team Reserve Q2S3",
         "assignee": "Unassigned",
-        "status": "Open",
+        "status": "Done",
         "est": 0,
         "logged": 0,
         "subtasks": "",
-        "points": 0
-      },
-      {
-        "key": "MAV-50",
-        "type": "Story",
-        "summary": "Mavericks 26.2 Integration Testing-Part 2",
-        "assignee": "Chethan Rangaswamy",
-        "status": "Open",
-        "est": 8,
-        "logged": 0,
-        "subtasks": "MAV-116 (Vikshani Chitlur, 4h est, 0h logged), MAV-115 (Chethan Rangaswamy, 4h est, 0h logged)",
         "points": 0
       },
       {
@@ -662,21 +576,10 @@
         "type": "Story",
         "summary": "UI Automation and wiki update",
         "assignee": "Kumaraswamy Krishnan",
-        "status": "Open",
-        "est": 0,
-        "logged": 0,
-        "subtasks": "",
-        "points": 0
-      },
-      {
-        "key": "MAV-35",
-        "type": "Story",
-        "summary": "UI Automation run and Dev support",
-        "assignee": "Chethan Rangaswamy",
-        "status": "Open",
-        "est": 18,
-        "logged": 0,
-        "subtasks": "MAV-113 (Chethan Rangaswamy, 18h est, 0h logged)",
+        "status": "In Progress",
+        "est": 22,
+        "logged": 22,
+        "subtasks": "MAV-119 (Kumaraswamy Krishnan, 4h est, 4h logged), MAV-118 (Kumaraswamy Krishnan, 12h est, 12h logged), MAV-117 (Kumaraswamy Krishnan, 6h est, 6h logged)",
         "points": 0
       },
       {
@@ -684,76 +587,10 @@
         "type": "Story",
         "summary": "Angular upgrade and validation",
         "assignee": "Rohan Kiran",
-        "status": "Open",
-        "est": 30,
-        "logged": 0,
-        "subtasks": "MAV-112 (Chethan Rangaswamy, 12h est, 0h logged), MAV-111 (Sougata Das, 6h est, 0h logged), MAV-102 (Sougata Das, 6h est, 0h logged), MAV-101 (Sougata Das, 6h est, 0h logged)",
-        "points": 0
-      },
-      {
-        "key": "MAV-32",
-        "type": "Story",
-        "summary": "Insurance Discovery-Wiki update",
-        "assignee": "Unassigned",
-        "status": "Open",
-        "est": 0,
-        "logged": 0,
-        "subtasks": "",
-        "points": 0
-      },
-      {
-        "key": "MAV-31",
-        "type": "Story",
-        "summary": "Alert for Unmatched Payer from Zoll",
-        "assignee": "Unassigned",
-        "status": "Open",
-        "est": 0,
-        "logged": 0,
-        "subtasks": "",
-        "points": 0
-      },
-      {
-        "key": "MAV-30",
-        "type": "Story",
-        "summary": "Zoll Payer ID to Payerpath TSPId Mapping",
-        "assignee": "Unassigned",
-        "status": "Open",
-        "est": 0,
-        "logged": 0,
-        "subtasks": "",
-        "points": 0
-      },
-      {
-        "key": "MAV-29",
-        "type": "Story",
-        "summary": "Integration Zoll with Call Partner service",
-        "assignee": "Unassigned",
-        "status": "Open",
-        "est": 0,
-        "logged": 0,
-        "subtasks": "",
-        "points": 0
-      },
-      {
-        "key": "MAV-28",
-        "type": "Story",
-        "summary": "Testdouble for Zoll Api",
-        "assignee": "Unassigned",
-        "status": "Open",
-        "est": 0,
-        "logged": 0,
-        "subtasks": "",
-        "points": 0
-      },
-      {
-        "key": "MAV-24",
-        "type": "Story",
-        "summary": "RTE : Migrate from NetFramework to NetCore",
-        "assignee": "Kumar Kuppusamy",
         "status": "In Progress",
-        "est": 60,
-        "logged": 54,
-        "subtasks": "MAV-69 (Kumar Kuppusamy, 24h est, 32h logged), MAV-68 (Vikshani Chitlur, 32h est, 20h logged), MAV-67 (Vikshani Chitlur, 4h est, 2h logged)",
+        "est": 30,
+        "logged": 20,
+        "subtasks": "MAV-112 (Chethan Rangaswamy, 12h est, 2h logged), MAV-111 (Sougata Das, 6h est, 6h logged), MAV-102 (Sougata Das, 6h est, 6h logged), MAV-101 (Sougata Das, 6h est, 6h logged)",
         "points": 0
       },
       {
@@ -761,29 +598,29 @@
         "type": "Story",
         "summary": "Mavericks 26.2 Integration Testing-Part 1",
         "assignee": "Chethan Rangaswamy",
-        "status": "Open",
-        "est": 10,
-        "logged": 0,
-        "subtasks": "MAV-114 (Chethan Rangaswamy, 10h est, 0h logged)",
+        "status": "Done",
+        "est": 22,
+        "logged": 63,
+        "subtasks": "MAV-127 (Unassigned, 0h est, 24h logged), MAV-126 (Vikshani Chitlur, 12h est, 12h logged), MAV-114 (Chethan Rangaswamy, 10h est, 27h logged)",
         "points": 0
       }
     ],
     "subtaskHrs": {
-      "Chethan Rangaswamy": {
-        "est": 44,
-        "logged": 0
+      "Vikshani Chitlur": {
+        "est": 12,
+        "logged": 12
       },
-      "Kumar Kuppusamy": {
-        "est": 24,
-        "logged": 32
+      "Kumaraswamy Krishnan": {
+        "est": 22,
+        "logged": 22
+      },
+      "Chethan Rangaswamy": {
+        "est": 22,
+        "logged": 29
       },
       "Sougata Das": {
         "est": 18,
-        "logged": 0
-      },
-      "Vikshani Chitlur": {
-        "est": 40,
-        "logged": 22
+        "logged": 18
       }
     },
     "allSprints": [
@@ -827,12 +664,12 @@
   "AMGO": {
     "team": "Amigos",
     "projectKey": "AMGO",
-    "sprintName": "AMGO 2026 Q2S2",
-    "startDate": "2026-04-16",
-    "endDate": "2026-04-28",
+    "sprintName": "AMGO 2026 Q2S3",
+    "startDate": "2026-04-29",
+    "endDate": "2026-05-12",
     "workDays": 10,
     "hrsPerDay": 6,
-    "syncedAt": "2026-04-29T07:51:13.253727+00:00",
+    "syncedAt": "2026-05-13T14:00:00.000000+00:00",
     "members": [
       {
         "name": "Peter Lobo",
@@ -883,6 +720,116 @@
     "teamDays": [],
     "issues": [
       {
+        "key": "AMGO-155",
+        "type": "Bug",
+        "summary": "Bug 8868300: FTPValidatorV2 fails",
+        "assignee": "Harsh Jain",
+        "status": "Done",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
+        "points": 0
+      },
+      {
+        "key": "AMGO-150",
+        "type": "Story",
+        "summary": "Bug 8867520: 837 Critical softshutdown validation in PSTG and STG",
+        "assignee": "Akshay Kompelli",
+        "status": "Done",
+        "est": 7,
+        "logged": 7,
+        "subtasks": "AMGO-154 (Kashish Thakur, 2h est, 2h logged), AMGO-152 (Akshay Kompelli, 5h est, 5h logged)",
+        "points": 0
+      },
+      {
+        "key": "AMGO-147",
+        "type": "Bug",
+        "summary": "federated logout is failing for Auth enabled customer",
+        "assignee": "Harsh Jain",
+        "status": "Done",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
+        "points": 0
+      },
+      {
+        "key": "AMGO-145",
+        "type": "Story",
+        "summary": "R26.2 Automation bug fixes",
+        "assignee": "Harsh Jain",
+        "status": "Done",
+        "est": 12,
+        "logged": 16,
+        "subtasks": "AMGO-148 (Harsh Jain, 12h est, 16h logged)",
+        "points": 0
+      },
+      {
+        "key": "AMGO-141",
+        "type": "Bug",
+        "summary": "Automation Bug: 8867883  UI (HfAutoSuite): PayerReportViewer_Test failing on Pstg",
+        "assignee": "Harsh Jain",
+        "status": "In Progress",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
+        "points": 0
+      },
+      {
+        "key": "AMGO-138",
+        "type": "Bug",
+        "summary": "Bug 8868213: Advanced Security: Angular: SSRF via protocol-relative and backslash URLs in Angular Platform-Server (CVE-2026-41423)",
+        "assignee": "Kapil Darji",
+        "status": "Done",
+        "est": 6,
+        "logged": 6,
+        "subtasks": "AMGO-143 (Kapil Darji, 6h est, 6h logged)",
+        "points": 0
+      },
+      {
+        "key": "AMGO-136",
+        "type": "Bug",
+        "summary": "Bug 8868017: Automation Bug: UI: ProfileMaintenance \u2013 Location Access Tab pagination blocked by footer overlay (Selenium click intercepted) INT1 BVT",
+        "assignee": "Harsh Jain",
+        "status": "In Progress",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
+        "points": 0
+      },
+      {
+        "key": "AMGO-135",
+        "type": "Bug",
+        "summary": "Bug 8867905: Automation Bug: UI \u2013  ReconcilebyBatch_Test failures",
+        "assignee": "Harsh Jain",
+        "status": "In Progress",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
+        "points": 0
+      },
+      {
+        "key": "AMGO-128",
+        "type": "Story",
+        "summary": "Metatask",
+        "assignee": "Yashodhara Kulal",
+        "status": "Done",
+        "est": 24,
+        "logged": 24,
+        "subtasks": "AMGO-149 (Akshay Kompelli, 5h est, 5h logged), AMGO-142 (Kashish Thakur, 6h est, 6h logged), AMGO-137 (Kapil Darji, 5h est, 5h logged), AMGO-134 (Kapil Darji, 8h est, 8h logged)",
+        "points": 0
+      },
+      {
+        "key": "AMGO-126",
+        "type": "Bug",
+        "summary": "Bug 8868043: Several issues with ARMeasuresTranslate",
+        "assignee": "Yashodhara Kulal",
+        "status": "Done",
+        "est": 10,
+        "logged": 11,
+        "subtasks": "AMGO-127 (Yashodhara Kulal, 10h est, 11h logged)",
+        "points": 0
+      },
+      {
         "key": "AMGO-108",
         "type": "Bug",
         "summary": "Bug 8867882: Automation Bug: UI (E2E) : ClaimForm and ClaimList_Test failing",
@@ -894,25 +841,14 @@
         "points": 0
       },
       {
-        "key": "AMGO-105",
-        "type": "Bug",
+        "key": "AMGO-104",
+        "type": "Task",
         "summary": "Automation Bug: Backend: (HFAutoSuite) Eligibility related test cases were failed",
         "assignee": "Kapil Darji",
         "status": "Done",
-        "est": 12,
-        "logged": 8,
-        "subtasks": "AMGO-107 (Kapil Darji, 8h est, 4h logged), AMGO-106 (Kapil Darji, 4h est, 4h logged)",
-        "points": 0
-      },
-      {
-        "key": "AMGO-100",
-        "type": "Story",
-        "summary": "Meta Task",
-        "assignee": "Yashodhara Kulal",
-        "status": "Done",
-        "est": 32,
-        "logged": 9,
-        "subtasks": "AMGO-109 (Akshay Kompelli, 4h est, 3h logged), AMGO-103 (Akshay Kompelli, 4h est, 0h logged), AMGO-102 (Yashodhara Kulal, 10h est, 6h logged), AMGO-101 (Akshay Kompelli, 6h est, 0h logged)",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
         "points": 0
       },
       {
@@ -938,188 +874,137 @@
         "points": 0
       },
       {
-        "key": "AMGO-72",
-        "type": "Bug",
-        "summary": "Automation Bug: Backend (E2E): ProviderInfoTest failing (E2E)",
-        "assignee": "Yashodhara Kulal",
-        "status": "Done",
-        "est": 6,
-        "logged": 9,
-        "subtasks": "AMGO-88 (Yashodhara Kulal, 6h est, 9h logged)",
-        "points": 0
-      },
-      {
-        "key": "AMGO-71",
-        "type": "Bug",
-        "summary": "Automation Bug: Backend (E2E): DatawarehouseFeed_Test failing",
-        "assignee": "Yashodhara Kulal",
-        "status": "Done",
-        "est": 2,
-        "logged": 2,
-        "subtasks": "AMGO-91 (Yashodhara Kulal, 2h est, 2h logged)",
-        "points": 0
-      },
-      {
         "key": "AMGO-70",
         "type": "Bug",
         "summary": "Dev02 PractPerf new loading icon and permission issue",
         "assignee": "Akshay Kompelli",
-        "status": "In Progress",
+        "status": "Done",
         "est": 12,
         "logged": 0,
         "subtasks": "AMGO-83 (Kashish Thakur, 6h est, 0h logged), AMGO-79 (Akshay Kompelli, 6h est, 0h logged)",
         "points": 0
       },
       {
-        "key": "AMGO-69",
-        "type": "Bug",
-        "summary": "Automation Bug: UI: (HfAutoSuite) PriorAuth_MainstreetLogin_SSO_Test fails",
+        "key": "AMGO-56",
+        "type": "Story",
+        "summary": "Bug backlog Placeholder 2",
+        "assignee": "Yashodhara Kulal",
+        "status": "Open",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
+        "points": 0
+      },
+      {
+        "key": "AMGO-40",
+        "type": "Story",
+        "summary": "Exploring the Playwright concepts",
+        "assignee": "Kashish Thakur",
+        "status": "Done",
+        "est": 36,
+        "logged": 30,
+        "subtasks": "AMGO-122 (Kashish Thakur, 24h est, 24h logged), AMGO-99 (Seetharamkumar Thummala, 12h est, 6h logged)",
+        "points": 0
+      },
+      {
+        "key": "AMGO-36",
+        "type": "Story",
+        "summary": "Rules update to accommodate ICD",
+        "assignee": "Unassigned",
+        "status": "Done",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
+        "points": 0
+      },
+      {
+        "key": "AMGO-35",
+        "type": "Story",
+        "summary": "Rules update to accommodate CPT",
+        "assignee": "Unassigned",
+        "status": "Done",
+        "est": 0,
+        "logged": 0,
+        "subtasks": "",
+        "points": 0
+      },
+      {
+        "key": "AMGO-28",
+        "type": "Story",
+        "summary": "Service Line Parity: Line Parity Report definition and Retrieval",
+        "assignee": "Harsh Jain",
+        "status": "Done",
+        "est": 26,
+        "logged": 7,
+        "subtasks": "AMGO-125 (Harsh Jain, 8h est, 7h logged), AMGO-124 (Harsh Jain, 6h est, 0h logged)",
+        "points": 0
+      },
+      {
+        "key": "AMGO-27",
+        "type": "Story",
+        "summary": "Service Line Parity: Update backend service with new aggregate columns",
+        "assignee": "Kapil Darji",
+        "status": "Done",
+        "est": 40,
+        "logged": 26,
+        "subtasks": "AMGO-117 (Kapil Darji, 16h est, 4h logged), AMGO-115 (Kapil Darji, 24h est, 22h logged)",
+        "points": 0
+      },
+      {
+        "key": "AMGO-25",
+        "type": "Story",
+        "summary": "26.2 Integration Testing - Round 1 ",
         "assignee": "Yashodhara Kulal",
         "status": "Done",
-        "est": 4,
-        "logged": 4,
-        "subtasks": "AMGO-90 (Yashodhara Kulal, 4h est, 4h logged)",
-        "points": 0
-      },
-      {
-        "key": "AMGO-68",
-        "type": "Bug",
-        "summary": "Ansi835TranslatorV3 throwing Could not load file or assembly 'System.Text.Json error",
-        "assignee": "Kapil Darji",
-        "status": "Done",
-        "est": 8,
-        "logged": 35,
-        "subtasks": "AMGO-94 (Yashodhara Kulal, 8h est, 13h logged), AMGO-75 (Kapil Darji, 0h est, 22h logged)",
-        "points": 0
-      },
-      {
-        "key": "AMGO-67",
-        "type": "Bug",
-        "summary": "8867520: 837Translator: Faulty DUPCHECK (NULL) logic fails files that are NOT duplicate",
-        "assignee": "Kashish Thakur",
-        "status": "In Progress",
-        "est": 16,
-        "logged": 33,
-        "subtasks": "AMGO-84 (Kashish Thakur, 8h est, 28h logged), AMGO-80 (Akshay Kompelli, 8h est, 5h logged)",
-        "points": 0
-      },
-      {
-        "key": "AMGO-66",
-        "type": "Story",
-        "summary": "26.1.1 Pract Perf Testing",
-        "assignee": "Akshay Kompelli",
-        "status": "Done",
-        "est": 6,
-        "logged": 0,
-        "subtasks": "AMGO-87 (Akshay Kompelli, 6h est, 0h logged)",
-        "points": 0
-      },
-      {
-        "key": "AMGO-61",
-        "type": "Story",
-        "summary": "Team Reserve 1",
-        "assignee": "Unassigned",
-        "status": "Open",
-        "est": 0,
-        "logged": 0,
-        "subtasks": "",
-        "points": 0
-      },
-      {
-        "key": "AMGO-57",
-        "type": "Story",
-        "summary": "Bug backlog Placeholder 1",
-        "assignee": "Unassigned",
-        "status": "Open",
-        "est": 0,
-        "logged": 0,
-        "subtasks": "",
-        "points": 0
-      },
-      {
-        "key": "AMGO-37",
-        "type": "Story",
-        "summary": "IntegratedEdits: SQL script to update spcidref entry and take backup",
-        "assignee": "Seetharamkumar Thummala",
-        "status": "Done",
-        "est": 0,
-        "logged": 2,
-        "subtasks": "AMGO-111 (Seetharamkumar Thummala, 0h est, 2h logged)",
-        "points": 0
-      },
-      {
-        "key": "AMGO-33",
-        "type": "Story",
-        "summary": "Research to find out complete list of claim edits to suppress",
-        "assignee": "Seetharamkumar Thummala",
-        "status": "Done",
-        "est": 10,
-        "logged": 0,
-        "subtasks": "AMGO-97 (Seetharamkumar Thummala, 10h est, 0h logged)",
-        "points": 0
-      },
-      {
-        "key": "AMGO-26",
-        "type": "Story",
-        "summary": "Pract Perf: Enabler - Analyze code structure and 835 service line data in snowflake",
-        "assignee": "Kapil Darji",
-        "status": "Done",
-        "est": 24,
-        "logged": 20,
-        "subtasks": "AMGO-78 (Kapil Darji, 4h est, 4h logged), AMGO-77 (Kapil Darji, 8h est, 4h logged), AMGO-76 (Kapil Darji, 12h est, 12h logged)",
+        "est": 25,
+        "logged": 24,
+        "subtasks": "AMGO-146 (Akshay Kompelli, 4h est, 4h logged), AMGO-121 (Yashodhara Kulal, 6h est, 10h logged), AMGO-119 (Akshay Kompelli, 5h est, 1h logged), AMGO-116 (Akshay Kompelli, 6h est, 5h logged), AMGO-112 (Seetharamkumar Thummala, 4h est, 4h logged)",
         "points": 0
       },
       {
         "key": "AMGO-11",
         "type": "Bug",
         "summary": "Automation Bug: UI: (BVT also) 5 GapsInCareConfiguration_Test failures",
-        "assignee": "Kashish Thakur",
+        "assignee": "Harsh Jain",
         "status": "In Progress",
         "est": 6,
-        "logged": 0,
-        "subtasks": "AMGO-89 (Kashish Thakur, 6h est, 0h logged)",
+        "logged": 4,
+        "subtasks": "AMGO-89 (Harsh Jain, 6h est, 4h logged)",
         "points": 0
       }
     ],
     "subtaskHrs": {
+      "Kashish Thakur": {
+        "est": 38,
+        "logged": 32
+      },
       "Akshay Kompelli": {
-        "est": 34,
-        "logged": 8
+        "est": 31,
+        "logged": 20
       },
       "Harsh Jain": {
-        "est": 10,
-        "logged": 3
+        "est": 42,
+        "logged": 30
       },
       "Kapil Darji": {
-        "est": 36,
-        "logged": 50
-      },
-      "Kashish Thakur": {
-        "est": 20,
-        "logged": 28
-      },
-      "Seetharamkumar Thummala": {
-        "est": 10,
-        "logged": 2
+        "est": 59,
+        "logged": 45
       },
       "Yashodhara Kulal": {
-        "est": 30,
-        "logged": 34
+        "est": 16,
+        "logged": 21
+      },
+      "Seetharamkumar Thummala": {
+        "est": 16,
+        "logged": 10
       }
     },
     "allSprints": [
       {
-        "name": "AMGO 2026 Q2S2",
-        "startDate": "2026-04-16",
-        "endDate": "2026-04-28",
-        "state": "active",
-        "id": 29757
-      },
-      {
         "name": "AMGO 2026 Q2S3",
         "startDate": "2026-04-29",
         "endDate": "2026-05-12",
-        "state": "future",
+        "state": "active",
         "id": 29758
       }
     ]

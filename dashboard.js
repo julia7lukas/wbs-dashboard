@@ -383,7 +383,7 @@ async function saveAll() {
 function wd()       { const v = parseInt(document.getElementById('work-days').value); return Math.max(1, isNaN(v) ? 10 : v); }
 function hd()       { const v = parseInt(document.getElementById('hrs-day').value);  return Math.max(1, isNaN(v) ? 6  : v); }
 function tdo()      { return teamDays.length; }
-function cap(m)     { const domWd = parseInt(document.getElementById('work-days').value); const sd = getSD(); const days = (!isNaN(domWd) && domWd > 0) ? domWd : (sd && sd.workDays ? sd.workDays : 10); return Math.max(0, days-tdo()-(m.pto||0)) * (m.hrs||hd()); }
+function cap(m)     { const domWd = parseInt(document.getElementById('work-days').value); const sd = getSD(); const days = (!isNaN(domWd) && domWd > 0) ? domWd : (sd && sd.workDays ? sd.workDays : 10); const hrs = (m.hrs != null && m.hrs !== '') ? +m.hrs : hd(); return Math.max(0, days-tdo()-(m.pto||0)) * hrs; }
 function asgnFor(n) {
   if (window._planningFutureSprint) return 0;
   const sd=getSD();
@@ -434,7 +434,7 @@ function renderMembers() {
     return '<tr class="dr" data-member-idx="'+i+'">'+
       '<td><div class="mc"><div class="av" style="background:'+AVB[i%8]+';color:'+AVC[i%8]+'">'+ini(m.name)+'</div>'+
       '<input style="background:transparent;border:none;color:var(--t1);font-family:var(--font);font-size:13px;width:130px" value="'+sanitize(m.name)+'" data-name-idx="'+i+'"></div></td>'+
-      '<td class="c"><input class="ni" type="number" min="1" max="12" value="'+(m.hrs||hd())+'" data-hrs-idx="'+i+'"></td>'+
+      '<td class="c"><input class="ni" type="number" min="0" max="12" value="'+((m.hrs != null && m.hrs !== '') ? m.hrs : hd())+'" data-hrs-idx="'+i+'"></td>'+
       '<td class="c"><input class="ni" type="number" min="0" value="'+(m.pto||0)+'" data-pto-idx="'+i+'"></td>'+
       '<td class="c netc" data-cap-idx="'+i+'">'+c+'h</td>'+
       '<td class="c" style="color:var(--blue)">'+asgn+'h</td>'+
@@ -455,7 +455,7 @@ function renderMembers() {
   tb.querySelectorAll('[data-hrs-idx]').forEach(inp => {
     inp.addEventListener('input', () => {
       const i = +inp.dataset.hrsIdx;
-      members[i].hrs = Math.max(1, +inp.value || hd());
+      members[i].hrs = Math.max(0, isNaN(+inp.value) ? hd() : +inp.value);
       const capCell = tb.querySelector('[data-cap-idx="'+i+'"]');
       if (capCell) capCell.textContent = cap(members[i]) + 'h';
       // Update KPI totals without full re-render
@@ -521,9 +521,9 @@ function renderTDO() {
     '<div class="dor">'+
     '<input type="date" class="si2" style="font-size:11px;padding:3px 5px" value="'+d.date+'" '+a+' data-tdo-date-idx="'+i+'">'+
     '<select class="si2" style="font-size:11px;padding:3px 5px" data-tdo-type-idx="'+i+'">'+
-      '<option '+(d.type==='Holiday' ?'selected':'')+'>Holiday</option>'+
-      '<option '+(d.type==='Recharge'?'selected':'')+'>Recharge</option>'+
-      '<option '+(d.type==='Company' ?'selected':'')+'>Company</option>'+
+      '<option '+(d.type==='Holiday'  ?'selected':'')+'>Holiday</option>'+
+      '<option '+(d.type==='Recharge' ?'selected':'')+'>Recharge</option>'+
+      '<option '+(d.type==='Team Day' ?'selected':'')+'>Team Day</option>'+
     '</select>'+
     '<button class="rb" data-tdo-idx="'+i+'">×</button></div>'
   ).join('');
@@ -947,7 +947,7 @@ setTimeout(function setupDelegation() {
     const ptoIdx = e.target.dataset && e.target.dataset.ptoIdx;
     if (hrsIdx !== undefined) {
       const i = +hrsIdx;
-      members[i].hrs = Math.max(1, +e.target.value || hd());
+      members[i].hrs = Math.max(0, isNaN(+e.target.value) ? hd() : +e.target.value);
       const capCell = tb.querySelector('[data-cap-idx="'+i+'"]');
       if (capCell) capCell.textContent = cap(members[i]) + 'h';
       const activeM = (window._planningFutureSprint === true) ? members : members.filter(m => asgnFor(m.name) > 0);

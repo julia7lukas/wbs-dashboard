@@ -1,0 +1,26 @@
+name: Keepalive
+
+on:
+  schedule:
+    # Runs on the 1st of every month — keeps the Sprint Data Refresh scheduled
+    # workflow from being disabled by GitHub's 60-day inactivity policy.
+    - cron: '0 9 1 * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Re-enable Sprint Data Refresh workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.enableWorkflow({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'refresh-sprint-data.yml'
+            });
+            core.info('Sprint Data Refresh workflow re-enabled.');
