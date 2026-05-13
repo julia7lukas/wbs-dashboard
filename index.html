@@ -10,14 +10,14 @@
        X-Frame-Options equivalent via CSP frame-ancestors prevents clickjacking. -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' https://cdnjs.cloudflare.com;
+    script-src 'self';
     connect-src 'self' https://api.anthropic.com https://raw.githubusercontent.com https://mcp.atlassian.com;
     style-src 'self' 'unsafe-inline';
     img-src 'self' data:;
     frame-ancestors 'none';
     object-src 'none';
     base-uri 'self';">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script src="chart.umd.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     :root{--bg:#0f1117;--bg1:#161b27;--bg2:#1e2535;--bg3:#252d3d;--bdr:#2a3347;--bdr2:#3a4560;--t1:#e2e8f0;--t2:#8b97b0;--t3:#5a6580;--green:#00d4aa;--g2:#00a87f;--gbg:rgba(0,212,170,.12);--blue:#4da6ff;--purple:#a78bfa;--amber:#fbbf24;--red:#f87171;--rbg:rgba(248,113,113,.12);--font:'DM Sans',system-ui,sans-serif;--mono:'DM Mono',monospace}
